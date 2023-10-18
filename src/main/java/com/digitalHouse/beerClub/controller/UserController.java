@@ -21,9 +21,15 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping()
+    @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> getUsers() {
         List<UserDTO> userDTOS = userService.getUsers();
+        return new ResponseEntity<>(userDTOS, HttpStatus.OK);
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<List<UserDTO>> getAllActiveUsers() {
+        List<UserDTO> userDTOS = userService.getAllActiveUsers();
         return new ResponseEntity<>(userDTOS, HttpStatus.OK);
     }
 
@@ -55,7 +61,7 @@ public class UserController {
             if (!errorMessages.isEmpty()) {
                 return new ResponseEntity<>(errorMessages, HttpStatus.BAD_REQUEST);
             } else {
-                return new ResponseEntity<>("Error interno del servidor", HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>("Internal server error.", HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
     }
@@ -73,12 +79,17 @@ public class UserController {
             return new ResponseEntity<>(userDTO, HttpStatus.OK);
         }catch (CompoundException e) {
             List<Exception> exceptions = e.getExceptions();
+            List<String> errorMessages = new ArrayList<>();
             for (Exception ex : exceptions) {
                 if (ex instanceof InvalidPasswordException || ex instanceof MissingFieldsException) {
-                    return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+                    errorMessages.add(ex.getMessage());
                 }
             }
-            return new ResponseEntity<>("Error interno del servidor", HttpStatus.INTERNAL_SERVER_ERROR);
+            if (!errorMessages.isEmpty()) {
+                return new ResponseEntity<>(errorMessages, HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<>("Internal server error.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
@@ -86,9 +97,29 @@ public class UserController {
     public ResponseEntity<String> updatePasswordUser(@RequestBody UserApplicationDTO user) throws MissingFieldsException, InvalidPasswordException {
         try {
             userService.UpdatePasswordUser(user);
-            return new ResponseEntity<>("Contraseña actualizada con éxito", HttpStatus.OK);
+            return new ResponseEntity<>("Password successfully updated.", HttpStatus.OK);
         }catch (MissingFieldsException | InvalidPasswordException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/activate/{userId}")
+    public ResponseEntity<String> activateUserSubscription(@PathVariable Long userId) {
+        try {
+            userService.activateUserSubscription(userId);
+            return new ResponseEntity<>("User subscription activated successfully", HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<String> softDeleteUser(@PathVariable Long userId) {
+        try {
+            userService.softDeleteUser(userId);
+            return new ResponseEntity<>("User soft-deleted successfully", HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 }

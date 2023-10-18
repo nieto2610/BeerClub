@@ -14,6 +14,7 @@ public class UserDTO {
     private LocalDate subscriptionDate;
     private Address address;
     private RoleType role;
+    private boolean active;
 
     public UserDTO() {};
 
@@ -27,6 +28,7 @@ public class UserDTO {
         this.subscriptionDate = user.getSubscriptionDate();
         this.address = user.getAddress();
         this.role = user.getRole();
+        this.active = user.isActive();
     }
 
     public Long getId() { return id; }
@@ -55,16 +57,19 @@ public class UserDTO {
 
     public RoleType getRole() { return role; }
 
+    public boolean isActive() { return active; }
+
     @Override
     public String toString() {
         return "UserDTO{" +
                 "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
-                ", birthday='" + birthday + '\'' +
+                ", birthday=" + birthday +
                 ", telephone='" + telephone + '\'' +
                 ", subscriptionDate=" + subscriptionDate +
                 ", role=" + role +
+                ", active=" + active +
                 '}';
     }
 }

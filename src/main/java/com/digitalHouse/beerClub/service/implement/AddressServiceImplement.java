@@ -28,7 +28,7 @@ public class AddressServiceImplement implements AddressService {
             return user.getAddress();
         } else {
             // Manejar el caso en el que el usuario no exista
-            throw new ResourceNotFoundException("Usuario no encontrado.");
+            throw new ResourceNotFoundException("User not found.");
         }
     }
 

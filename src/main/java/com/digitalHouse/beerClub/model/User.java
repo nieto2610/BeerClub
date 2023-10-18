@@ -23,6 +23,7 @@ public class User {
     private String telephone;
     private LocalDate subscriptionDate;
     private String password;
+    private boolean active;
 
     @Enumerated(EnumType.STRING)
     private RoleType role;
@@ -41,6 +42,7 @@ public class User {
         this.password = password;
         this.address = address;
         role = RoleType.USER;
+        active = true;
     }
 
     public void setFirstName(String firstName) {
@@ -66,6 +68,10 @@ public class User {
     public void setRole(RoleType role) {
         this.role = role;
     }
+
+    public boolean isActive() { return active; }
+
+    public void setActive(boolean active) { this.active = active; }
 
     public void assignRole(RoleType roleType) {
         this.role = roleType;

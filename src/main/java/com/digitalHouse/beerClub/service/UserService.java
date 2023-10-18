@@ -13,6 +13,8 @@ public interface UserService {
 
     List<UserDTO> getUsers();
 
+    public List<UserDTO> getAllActiveUsers();
+
     User findById(Long id) throws ResourceNotFoundException;
 
     UserDTO getUserById(Long id) throws ResourceNotFoundException;
@@ -24,4 +26,8 @@ public interface UserService {
     UserDTO UpdateUser(UserApplicationDTO user) throws CompoundException;
 
     void UpdatePasswordUser(UserApplicationDTO user) throws MissingFieldsException, InvalidPasswordException;
+
+    void activateUserSubscription(Long userId) throws ResourceNotFoundException;
+
+    void softDeleteUser(Long id) throws ResourceNotFoundException;
 }

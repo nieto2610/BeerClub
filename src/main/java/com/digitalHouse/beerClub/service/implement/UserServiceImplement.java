@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +34,6 @@ public class UserServiceImplement implements UserService {
             validationService.validateUserFields(user);
             validationService.validateUser(user);
         }
-
         Address address = new Address(user.getCountry(), user.getProvince(), user.getCity(), user.getStreet(), user.getNumber(), user.getFloor(), user.getApartment(), user.getZipCode());
         addressRepository.save(address);
         User newUser = new User(user.getFirstName(), user.getLastName(), user.getEmail(), user.getBirthday(), user.getTelephone(), LocalDate.now(), user.getPassword(), address);
@@ -46,6 +44,14 @@ public class UserServiceImplement implements UserService {
     @Override
     public List<UserDTO> getUsers() {
         return userRepository.findAll().stream().map(UserDTO::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDTO> getAllActiveUsers() {
+        // Filtrar usuarios no eliminados
+        List<UserDTO> users = userRepository.findByActiveTrue().stream().map(UserDTO::new).collect(Collectors.toList());
+        System.out.println(users);
+        return users;
     }
 
     @Override
@@ -104,4 +110,22 @@ public class UserServiceImplement implements UserService {
             }
         }
     }
+
+    @Override
+    public void activateUserSubscription(Long id) throws ResourceNotFoundException {
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+        user.setActive(true);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void softDeleteUser(Long id) throws ResourceNotFoundException {
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+        if(user != null) {
+            user.setActive(false);
+            userRepository.save(user);
+        }
+    }
+
+
 }
