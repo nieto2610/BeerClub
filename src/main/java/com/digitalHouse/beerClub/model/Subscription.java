@@ -25,4 +25,5 @@ public class Subscription {
     @JoinColumn(name = "subscription_id")
     private List<Benefit> benefits;
     private Boolean isRecommended;
+    private Boolean isActive;
 }

@@ -17,4 +17,5 @@ public class SubscriptionDTO {
     private Double price;
     private List<Benefit> benefits;
     private Boolean isRecommended;
+    private Boolean isActive;
 }
