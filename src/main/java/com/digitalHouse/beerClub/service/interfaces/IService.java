@@ -1,8 +1,8 @@
 package com.digitalHouse.beerClub.service.interfaces;
 
-import com.digitalHouse.beerClub.exeptions.BadRequestException;
-import com.digitalHouse.beerClub.exeptions.NotFoundException;
-import com.digitalHouse.beerClub.exeptions.ServiceException;
+import com.digitalHouse.beerClub.exceptions.BadRequestException;
+import com.digitalHouse.beerClub.exceptions.NotFoundException;
+import com.digitalHouse.beerClub.exceptions.ServiceException;
 
 import java.util.List;
 
