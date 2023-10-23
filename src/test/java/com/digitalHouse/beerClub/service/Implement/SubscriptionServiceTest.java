@@ -4,7 +4,9 @@ import com.digitalHouse.beerClub.exeptions.BadRequestException;
 import com.digitalHouse.beerClub.exeptions.NotFoundException;
 import com.digitalHouse.beerClub.exeptions.ServiceException;
 import com.digitalHouse.beerClub.mapper.Mapper;
+import com.digitalHouse.beerClub.model.Benefit;
 import com.digitalHouse.beerClub.model.Subscription;
+import com.digitalHouse.beerClub.model.dto.BenefitDTO;
 import com.digitalHouse.beerClub.model.dto.SubscriptionDTO;
 import com.digitalHouse.beerClub.repository.IBenefitRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
@@ -29,7 +31,6 @@ class SubscriptionServiceTest {
 
     @Mock
     private IBenefitRepository benefitRepository;
-
 
     @Mock
     private Mapper mapper;
@@ -107,9 +108,15 @@ class SubscriptionServiceTest {
     void update() throws NotFoundException {
         //ARRANGE
         Long id = 1L;
-        SubscriptionDTO subscriptionDTO = new SubscriptionDTO(1L, "Novato-up", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, List.of(), false, true);
+        List<Benefit> benefits = new ArrayList<>();
+        benefits.add(new Benefit(1L,"descuentos del 5%"));
 
-        Subscription subscription = new Subscription(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, List.of(), false, true);
+        List<BenefitDTO> benefitsDTO = new ArrayList<>();
+        benefitsDTO.add(new BenefitDTO(1L,"descuentos del 10%"));
+
+        SubscriptionDTO subscriptionDTO = new SubscriptionDTO(1L, "Novato-up", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, benefitsDTO, false, true);
+
+        Subscription subscription = new Subscription(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 100.0, benefits, false, true);
         when(subscriptionRepository.findById(any())).thenReturn(Optional.of(subscription));
         //ACT
         SubscriptionDTO result = subscriptionService.update(subscriptionDTO,id);

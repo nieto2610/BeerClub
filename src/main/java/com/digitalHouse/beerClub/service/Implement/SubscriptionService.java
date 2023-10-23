@@ -6,14 +6,15 @@ import com.digitalHouse.beerClub.exeptions.ServiceException;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Benefit;
 import com.digitalHouse.beerClub.model.Subscription;
+import com.digitalHouse.beerClub.model.dto.BenefitDTO;
 import com.digitalHouse.beerClub.model.dto.SubscriptionDTO;
 import com.digitalHouse.beerClub.repository.IBenefitRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.service.interfaces.ISubscriptionService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class SubscriptionService implements ISubscriptionService {
@@ -54,12 +55,14 @@ public class SubscriptionService implements ISubscriptionService {
         subscription.setDescription(subscriptionDTO.getDescription());
         subscription.setPrice(subscriptionDTO.getPrice());
         subscription.setIsRecommended(subscriptionDTO.getIsRecommended());
-        // set new benefits
-        subscription.getBenefits().clear();
-        subscription.getBenefits().addAll(subscriptionDTO.getBenefits().stream().map(b-> mapper.converter(b, Benefit.class)).collect(Collectors.toList()));
-        Subscription subscriptionUpdated = subscriptionRepository.save(subscription);
 
-        return mapper.converter(subscriptionUpdated,SubscriptionDTO.class);
+        // set new benefits
+        List<BenefitDTO> newBenefits = new ArrayList<>(subscriptionDTO.getBenefits());
+        subscription.getBenefits().clear();
+        subscription.getBenefits().addAll(newBenefits.stream().map(b -> mapper.converter(b, Benefit.class)).toList());
+
+        Subscription subscriptionUpdated = subscriptionRepository.save(subscription);
+        return mapper.converter(subscriptionUpdated, SubscriptionDTO.class);
     }
 
     @Override

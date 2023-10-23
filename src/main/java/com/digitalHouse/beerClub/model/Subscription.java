@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -23,7 +24,7 @@ public class Subscription {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "subscription_id")
-    private List<Benefit> benefits;
+    private List<Benefit> benefits = new ArrayList<>();
     private Boolean isRecommended;
     private Boolean isActive;
 }
