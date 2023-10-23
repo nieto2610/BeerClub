@@ -6,11 +6,12 @@ import com.digitalHouse.beerClub.exeptions.ServiceException;
 import com.digitalHouse.beerClub.model.dto.SubscriptionDTO;
 import com.digitalHouse.beerClub.service.Implement.SubscriptionService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/subscriptions")
@@ -23,26 +24,27 @@ public class SubscriptionController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAll() {
+    public ResponseEntity<List<SubscriptionDTO>> getAll() {
         return ResponseEntity.status(HttpStatus.OK).body(subscriptionService.searchAll());
     }
 
     @PostMapping
-    public ResponseEntity<?> save(@RequestBody @Valid SubscriptionDTO subscriptionDTO) throws BadRequestException {
+    public ResponseEntity<SubscriptionDTO> save(@RequestBody @Valid SubscriptionDTO subscriptionDTO) throws BadRequestException {
         return ResponseEntity.status(HttpStatus.CREATED).body(subscriptionService.create(subscriptionDTO));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable @Positive(message = "Id must be greater than 0") Long id) throws NotFoundException {
-        return  ResponseEntity.status(HttpStatus.OK).body(subscriptionService.searchById(id));
+    public ResponseEntity<SubscriptionDTO> getById(@PathVariable @Positive(message = "Id must be greater than 0") Long id) throws NotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(subscriptionService.searchById(id));
     }
+
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@RequestBody @Valid SubscriptionDTO subscriptionDTO, @PathVariable @Positive(message = "Id must be greater than 0") Long id) throws NotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(subscriptionService.update(subscriptionDTO,id));
+    public ResponseEntity<SubscriptionDTO> update(@RequestBody @Valid SubscriptionDTO subscriptionDTO, @PathVariable @Positive(message = "Id must be greater than 0") Long id) throws NotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(subscriptionService.update(subscriptionDTO, id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete (@PathVariable @Positive(message = "Id must be greater than 0") Long id) throws ServiceException, NotFoundException {
+    public ResponseEntity<?> delete(@PathVariable @Positive(message = "Id must be greater than 0") Long id) throws ServiceException, NotFoundException {
         subscriptionService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

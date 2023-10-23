@@ -4,9 +4,7 @@ import com.digitalHouse.beerClub.exeptions.BadRequestException;
 import com.digitalHouse.beerClub.exeptions.NotFoundException;
 import com.digitalHouse.beerClub.exeptions.ServiceException;
 import com.digitalHouse.beerClub.mapper.Mapper;
-import com.digitalHouse.beerClub.model.Benefit;
 import com.digitalHouse.beerClub.model.Subscription;
-import com.digitalHouse.beerClub.model.dto.BenefitDTO;
 import com.digitalHouse.beerClub.model.dto.SubscriptionDTO;
 import com.digitalHouse.beerClub.repository.IBenefitRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
@@ -31,21 +29,20 @@ public class SubscriptionService implements ISubscriptionService {
 
     @Override
     public List<SubscriptionDTO> searchAll() {
-        return subscriptionRepository.findAll().stream().filter(s -> s.getIsActive()).map(s -> mapper.converter(s,SubscriptionDTO.class)).toList();
+        return subscriptionRepository.findAll().stream().filter(s -> s.getIsActive()).map(s -> mapper.converter(s, SubscriptionDTO.class)).toList();
     }
 
     @Override
     public SubscriptionDTO searchById(Long id) throws NotFoundException {
-        return subscriptionRepository.findById(id)
-                .stream().map(s -> mapper.converter(s,SubscriptionDTO.class)).findFirst()
-                .orElseThrow(()-> new NotFoundException("Subscription not found"));
+        Subscription subscription = subscriptionRepository.findById(id).orElseThrow(() -> new NotFoundException("Subscription not found"));
+        return mapper.converter(subscription, SubscriptionDTO.class);
     }
 
     @Override
     public SubscriptionDTO create(SubscriptionDTO subscriptionDTO) throws BadRequestException {
-            subscriptionDTO.setIsActive(true);
-            Subscription newSubscription = subscriptionRepository.save(mapper.converter(subscriptionDTO,Subscription.class));
-            return mapper.converter(newSubscription,SubscriptionDTO.class);
+        subscriptionDTO.setIsActive(true);
+        Subscription newSubscription = subscriptionRepository.save(mapper.converter(subscriptionDTO, Subscription.class));
+        return mapper.converter(newSubscription, SubscriptionDTO.class);
     }
 
     @Override
