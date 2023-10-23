@@ -1,6 +1,8 @@
 package com.digitalHouse.beerClub.exeptions;
 
 import com.digitalHouse.beerClub.model.dto.ExceptionDTO;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleValidationErrors(MethodArgumentNotValidException e) {
         ExceptionDTO errors = new ExceptionDTO(e.getBindingResult().getFieldErrors()
                 .stream().map(FieldError::getDefaultMessage).toList());
+        return new ResponseEntity<>(errors, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<?> handleValidationErrors(ConstraintViolationException e) {
+        ExceptionDTO errors = new ExceptionDTO(e.getConstraintViolations()
+                .stream().map(ConstraintViolation::getMessage).toList());
         return new ResponseEntity<>(errors, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 }

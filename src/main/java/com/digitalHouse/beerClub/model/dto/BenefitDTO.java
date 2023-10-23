@@ -13,7 +13,7 @@ public class BenefitDTO {
 
     private Long id;
 
-    @NotBlank
-    @Size(max = 255, message = "name must have at most 255 characters")
+    @NotBlank(message = "Benefit name must not be blank")
+    @Size(max = 255, message = "Benefit name must have at most 255 characters")
     private String name;
 }

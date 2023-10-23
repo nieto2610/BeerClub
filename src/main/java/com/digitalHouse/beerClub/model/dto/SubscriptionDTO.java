@@ -14,21 +14,21 @@ import java.util.List;
 public class SubscriptionDTO {
 
     private Long id;
-    @NotBlank
+    @NotBlank(message = "Subscription name must not be blank")
     private String name;
 
-    @Size(max = 255, message = "Description must have at most 255 characters")
+    @Size(max = 255, message = "Subscription description must have at most 255 characters")
     private String description;
 
-    @NotNull
-    @Positive(message = "Price must be greater than 0")
+    @NotNull(message = "Subscription price must not be null")
+    @Positive(message = "Subscription price must be greater than 0")
     private Double price;
     private List<@Valid BenefitDTO> benefits;
 
-    @NotNull(message = "isRecommended must not be null")
-    @AssertTrue(message = "isRecommended must be true or false")
+    @NotNull(message = "Subscription isRecommended must not be null")
+    @AssertTrue(message = "Subscription isRecommended must be true or false")
     private Boolean isRecommended;
 
-    @AssertTrue(message = "isActive must be true or false")
+    @AssertTrue(message = "Subscription isActive must be true or false")
     private Boolean isActive;
 }

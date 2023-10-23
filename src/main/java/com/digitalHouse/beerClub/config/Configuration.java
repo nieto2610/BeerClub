@@ -2,10 +2,9 @@ package com.digitalHouse.beerClub.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
-public class configuration {
+@org.springframework.context.annotation.Configuration
+public class Configuration {
 
     @Bean
     public ModelMapper modelMapper() {
