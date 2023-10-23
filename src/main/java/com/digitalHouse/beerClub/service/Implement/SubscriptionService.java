@@ -54,19 +54,10 @@ public class SubscriptionService implements ISubscriptionService {
         subscription.setDescription(subscriptionDTO.getDescription());
         subscription.setPrice(subscriptionDTO.getPrice());
         subscription.setIsRecommended(subscriptionDTO.getIsRecommended());
-
-//        subscription.getBenefits().forEach(b -> benefitRepository.deleteById(b.getId()));
-//
-//        List<Benefit> benefits = subscriptionDTO.getBenefits().stream().map(b-> mapper.converter(b,Benefit.class)).toList();
-//        List<Benefit> newBenefits = benefits.stream().map(benefitRepository::save).collect(Collectors.toList());
-        List<Benefit> benefits = subscription.getBenefits();
-        benefits.clear();
-        List<Benefit> newBenefits = subscriptionDTO.getBenefits().stream().map(b-> mapper.converter(b,Benefit.class)).collect(Collectors.toList());
-        benefits.addAll(newBenefits);
-
-        subscription.setBenefits(newBenefits);
+        // set new benefits
+        subscription.getBenefits().clear();
+        subscription.getBenefits().addAll(subscriptionDTO.getBenefits().stream().map(b-> mapper.converter(b, Benefit.class)).collect(Collectors.toList()));
         Subscription subscriptionUpdated = subscriptionRepository.save(subscription);
-
 
         return mapper.converter(subscriptionUpdated,SubscriptionDTO.class);
     }

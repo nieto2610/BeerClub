@@ -21,7 +21,7 @@ public class Subscription {
     private String description;
     private Double price;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "subscription_id")
     private List<Benefit> benefits;
     private Boolean isRecommended;
