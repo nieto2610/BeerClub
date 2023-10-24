@@ -1,39 +1,53 @@
 package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.exceptions.ResourceNotFoundException;
+import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Address;
 import com.digitalHouse.beerClub.model.User;
-import com.digitalHouse.beerClub.repository.AddressRepository;
-import com.digitalHouse.beerClub.repository.UserRepository;
-import com.digitalHouse.beerClub.service.AddressService;
+import com.digitalHouse.beerClub.model.dto.AddressDTO;
+import com.digitalHouse.beerClub.repository.IAddressRepository;
+import com.digitalHouse.beerClub.repository.IUserRepository;
+import com.digitalHouse.beerClub.service.interfaces.IAddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AddressServiceImplement implements AddressService {
+public class AddressServiceImplement implements IAddressService {
 
     @Autowired
-    private UserRepository userRepository;
+    private IUserRepository IUserRepository;
 
     @Autowired
-    private AddressRepository addressRepository;
+    private IAddressRepository IAddressRepository;
+
+
+    private final Mapper addressMapper;
+
+    @Autowired
+    public AddressServiceImplement(Mapper addressMapper) {
+        this.addressMapper = addressMapper;
+    }
+
+    //Mapper<AddressDTO, Address> addressMapper;
 
     @Override
     public Address findAddressByUserEmail(String userEmail) throws ResourceNotFoundException {
-        // Paso 1: Obtener el usuario por su email
-        User user = userRepository.findByEmail(userEmail);
+        User user = IUserRepository.findByEmail(userEmail);
         System.out.println(user);
         if (user != null) {
-            // Paso 2: Obtener la dirección asociada al usuario
             return user.getAddress();
         } else {
-            // Manejar el caso en el que el usuario no exista
             throw new ResourceNotFoundException("User not found.");
         }
     }
 
     @Override
-    public Address updateAddressByUserEmail(String userEmail, Address updatedAddress) throws ResourceNotFoundException {
+    public AddressDTO getAddressByUserAuth(String email) throws ResourceNotFoundException {
+        return addressMapper.converter(this.findAddressByUserEmail(email), AddressDTO.class);
+    }
+
+    @Override
+    public AddressDTO updateAddressByUserEmail(String userEmail, AddressDTO updatedAddress) throws ResourceNotFoundException {
         // Paso 1: Utiliza el método findAddressByUserEmail para obtener la dirección asociada al usuario.
         Address address = findAddressByUserEmail(userEmail);
 
@@ -47,9 +61,8 @@ public class AddressServiceImplement implements AddressService {
         address.setApartment(updatedAddress.getApartment());
         address.setZipCode(updatedAddress.getZipCode());
 
-        // Paso 3: Guardar la dirección actualizada en la base de datos
-        addressRepository.save(address);
-        return address;
+        IAddressRepository.save(address);
+        return addressMapper.converter(address, AddressDTO.class);
     }
 
 

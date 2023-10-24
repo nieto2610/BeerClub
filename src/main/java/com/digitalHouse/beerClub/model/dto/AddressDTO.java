@@ -1,18 +1,11 @@
-package com.digitalHouse.beerClub.model;
+package com.digitalHouse.beerClub.model.dto;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Data;
 
 @Data
-@NoArgsConstructor
-@Entity
-@Table(name = "addresses")
-public class Address {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class AddressDTO {
 
     @NotBlank(message = "Country cannot be null")
     @Size(min=4)
@@ -38,16 +31,5 @@ public class Address {
 
     @NotBlank(message = "ZipCode cannot be null")
     private String zipCode;
-
-    public Address(String country, String province, String city, String street, int number, int floor, String apartment, String zipCode) {
-        this.country = country;
-        this.province = province;
-        this.city = city;
-        this.street = street;
-        this.number = number;
-        this.floor = floor;
-        this.apartment = apartment;
-        this.zipCode = zipCode;
-    }
 
 }
