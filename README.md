@@ -3,7 +3,7 @@ Este repositorio contiene una aplicación back-end desarrollada en Java, utiliza
 
 ___
 
-###Grupo 4:
+<h3>Grupo 4:</h3>
 
 - **Backend:**
     - Belén Santochi
@@ -23,7 +23,7 @@ ___
 - **Infraestructura:**
     - Winston Shaw 
 
-###Documentación
+<h3>Documentación</h3>
 
 - El equipo utilizó Swagger para la documentación de la API:
     - [Link documentación API](http://localhost:8080/api/v1/swagger-ui/index.html#/).
