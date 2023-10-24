@@ -1,7 +1,7 @@
 package com.digitalHouse.beerClub.controller;
 
-import com.digitalHouse.beerClub.exeptions.BadRequestException;
-import com.digitalHouse.beerClub.exeptions.NotFoundException;
+import com.digitalHouse.beerClub.exceptions.BadRequestException;
+import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.model.dto.AgeVerificationAppDTO;
 import com.digitalHouse.beerClub.model.dto.AgeVerificationDTO;
 import com.digitalHouse.beerClub.service.Implement.AgeVerificationService;
