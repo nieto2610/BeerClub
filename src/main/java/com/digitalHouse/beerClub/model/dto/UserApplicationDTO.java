@@ -28,7 +28,7 @@ public class UserApplicationDTO {
 
     @Column(nullable = false, updatable = false)
     @DateTimeFormat(pattern = "dd-MM-yyyy")
-    private LocalDate birthday;
+    private LocalDate birthdate;
 
     @NotBlank(message = "Telephone cannot be null")
     private String telephone;

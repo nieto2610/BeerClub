@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -77,11 +78,11 @@ public class UserController {
 
     @Operation(summary = "Update a user", description = "Update an existing user", responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class))),
-        @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with email: example@beerClub")))})
-    @PutMapping("/update")
-    public ResponseEntity<Object> updateUser(@Valid @RequestBody UserApplicationDTO user) throws NotFoundException {
+        @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Object> updateUser(@Parameter(description = "ID del usuario a actualizar", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long id, @Valid @RequestBody UserApplicationDTO user) throws NotFoundException {
         try {
-            UserDTO userDTO = IUserService.updateUser(user);
+            UserDTO userDTO = IUserService.updateUser(user, id);
             return new ResponseEntity<>(userDTO, HttpStatus.OK);
         }catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);

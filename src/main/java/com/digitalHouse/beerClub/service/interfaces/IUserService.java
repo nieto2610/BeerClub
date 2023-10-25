@@ -21,7 +21,7 @@ public interface IUserService extends IService<UserDTO>{
 
     UserDTO getUserAuth(String email);
 
-    UserDTO updateUser(UserApplicationDTO user) throws NotFoundException;
+    UserDTO updateUser(UserApplicationDTO user, Long id) throws NotFoundException;
 
     void updatePasswordUser(UserAuthRequest user) ;
 
