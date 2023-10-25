@@ -1,8 +1,8 @@
 package com.digitalHouse.beerClub.service.Implement;
 
-import com.digitalHouse.beerClub.exeptions.BadRequestException;
-import com.digitalHouse.beerClub.exeptions.NotFoundException;
-import com.digitalHouse.beerClub.exeptions.ServiceException;
+import com.digitalHouse.beerClub.exceptions.BadRequestException;
+import com.digitalHouse.beerClub.exceptions.NotFoundException;
+import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Benefit;
 import com.digitalHouse.beerClub.model.Subscription;

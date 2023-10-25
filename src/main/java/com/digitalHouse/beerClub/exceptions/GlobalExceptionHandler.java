@@ -1,4 +1,4 @@
-package com.digitalHouse.beerClub.exeptions;
+package com.digitalHouse.beerClub.exceptions;
 
 import com.digitalHouse.beerClub.model.dto.ExceptionDTO;
 import jakarta.validation.ConstraintViolation;
