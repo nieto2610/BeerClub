@@ -1,104 +1,65 @@
 package com.digitalHouse.beerClub.model.dto;
 
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 
+@Data
+@AllArgsConstructor
 public class UserApplicationDTO {
-    private String firstName, lastName, email;
+    @NotBlank(message = "Name cannot be null")
+    @Size(min=3)
+    private String name;
+
+    @NotBlank(message = "LastName cannot be null")
+    @Size(min=3)
+    private String lastName;
+
+    @NotBlank(message = "Email cannot be null")
+    @Email(message = "Email should be valid")
+    private String email;
+
+    @Column(nullable = false, updatable = false)
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate birthday;
-    private String telephone, country, province, city, street;
+
+    @NotBlank(message = "Telephone cannot be null")
+    private String telephone;
+
+    @NotBlank(message = "Country cannot be null")
+    @Size(min=4)
+    private String country;
+
+    @NotBlank(message = "Province cannot be null")
+    @Size(min=4)
+    private String province;
+
+    @NotBlank(message = "City cannot be null")
+    @Size(min=4)
+    private String city;
+
+    @NotBlank(message = "Street cannot be null")
+    private String street;
+
     private int number, floor;
-    private String apartment, zipCode, password;
 
-    public UserApplicationDTO() {};
+    @NotBlank(message = "Apartment cannot be null")
+    private String apartment;
 
-    public UserApplicationDTO(String firstName, String lastName, String email, LocalDate birthday, String telephone, String country, String province, String city, String street, int number, int floor, String apartment, String zipCode, String password) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.birthday = birthday;
-        this.telephone = telephone;
-        this.country = country;
-        this.province = province;
-        this.city = city;
-        this.street = street;
-        this.number = number;
-        this.floor = floor;
-        this.apartment = apartment;
-        this.zipCode = zipCode;
-        this.password = password;
-    }
+    @NotBlank(message = "ZipCode cannot be null")
+    private String zipCode;
 
-    public String getFirstName() {
-        return firstName;
-    }
+    @Pattern(
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$",
+        message = "The password must contain at least 8 characters and meet the following criteria: at least one uppercase letter, one lowercase letter, one number, and one special character @#$%^&+=!)."
+    )
+    private String password;
 
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public LocalDate getBirthday() { return birthday; }
-
-    public String getTelephone() {
-        return telephone;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public String getProvince() {
-        return province;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public int getNumber() {
-        return number;
-    }
-
-    public int getFloor() {
-        return floor;
-    }
-
-    public String getApartment() {
-        return apartment;
-    }
-
-    public String getZipCode() {
-        return zipCode;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String toString() {
-        return "UserApplicationDTO{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", birthday=" + birthday +
-                ", telephone='" + telephone + '\'' +
-                ", country='" + country + '\'' +
-                ", province='" + province + '\'' +
-                ", city='" + city + '\'' +
-                ", street='" + street + '\'' +
-                ", number=" + number +
-                ", floor=" + floor +
-                ", apartment='" + apartment + '\'' +
-                ", zipCode='" + zipCode + '\'' +
-                ", password='" + password + '\'' +
-                '}';
-    }
 }

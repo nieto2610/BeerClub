@@ -56,3 +56,30 @@ Para que las respuestas de nuestras APIs sean claras y consistentes, seguimos es
 De igual forma se deja el `.png` de este dentro del proyecto
 
 ![Diagrama de la base de datos](/Esquema.png)
+
+___
+
+<h3>Grupo 4:</h3>
+
+- **Backend:**
+    - Belén Santochi
+    - Carla Anahí Nieto
+    - Juan Camargo
+    - Mauricio Grisales
+    - Paola Gómez
+      <br>
+
+- **Frontend:**
+    - Camilo Martinez
+    - Clara Lisle
+    - Delfina Molter
+    - Laura Lopez
+      <br>
+
+- **Infraestructura:**
+    - Winston Shaw 
+
+<h3>Documentación</h3>
+
+- El equipo utilizó Swagger para la documentación de la API:
+    - [Link documentación API](http://localhost:8080/api/v1/swagger-ui/index.html#/).

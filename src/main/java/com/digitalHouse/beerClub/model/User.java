@@ -2,13 +2,13 @@ package com.digitalHouse.beerClub.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-@ToString
-@Getter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
 @Entity
 @Table(name="users")
@@ -16,13 +16,37 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank(message = "Name cannot be null")
+    @Size(min=3)
     private String firstName;
+
+    @NotBlank(message = "LastName cannot be null")
+    @Size(min=2)
     private String lastName;
+
+    @Column(unique = true)
+    @NotBlank(message = "Email cannot be null")
+    @Email(message = "Email should be valid")
     private String email;
+
+    @Column(nullable = false)
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate birthday;
+
+    @NotBlank(message = "Telephone cannot be null")
     private String telephone;
+
+    @Column(nullable = false, updatable = false)
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate subscriptionDate;
+
+    @Pattern(
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$",
+        message = "The password must contain at least 8 characters and meet the following criteria: at least one uppercase letter, one lowercase letter, one number, and one special character @#$%^&+=!)."
+    )
     private String password;
+
     private boolean active;
 
     @Enumerated(EnumType.STRING)
@@ -44,34 +68,6 @@ public class User {
         role = RoleType.USER;
         active = true;
     }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setRole(RoleType role) {
-        this.role = role;
-    }
-
-    public boolean isActive() { return active; }
-
-    public void setActive(boolean active) { this.active = active; }
 
     public void assignRole(RoleType roleType) {
         this.role = roleType;
