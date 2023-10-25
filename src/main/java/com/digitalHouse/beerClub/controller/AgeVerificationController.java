@@ -16,7 +16,7 @@ import org.w3c.dom.stylesheets.LinkStyle;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/ageVerification")
+@RequestMapping("/ageVerification")
 @CrossOrigin("*")
 public class AgeVerificationController {
     private final AgeVerificationService ageVerificationService;

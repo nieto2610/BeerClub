@@ -18,15 +18,9 @@ public class AgeVerification {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
-    @NotNull
-    @NotBlank(message = "ip is required")
     private String ip;
-    @NotNull
-    @NotBlank(message = "city is required")
     private String city;
-    @NotNull(message = "dateOfBirth is required")
     private LocalDate dateOfBirth;
-    @NotNull(message = "age is required")
     private int age;
 
     public AgeVerification(String ip, String city, LocalDate dateOfBirth, int age) {
