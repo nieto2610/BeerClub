@@ -59,14 +59,6 @@ public class UserController {
        }
     }
 
-    @Operation(summary="Add user", description="Add a new user", responses = {
-        @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
-    @PostMapping("/create")
-    public ResponseEntity<Object> saveUser(@RequestBody UserApplicationDTO user) {
-        UserDTO userDTO = IUserService.saveUser(user);
-        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
-    }
-
     @Operation(summary ="Find user by Email", description ="Find user by Email",  responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @GetMapping("/email/{email}")
