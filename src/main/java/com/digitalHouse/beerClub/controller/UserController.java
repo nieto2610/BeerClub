@@ -13,14 +13,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Tag(name = "Users")
@@ -63,7 +66,7 @@ public class UserController {
     @Operation(summary="Add user", description="Add a new user", responses = {
         @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @PostMapping("/create")
-    public ResponseEntity<Object> saveUser(@RequestBody UserApplicationDTO user) {
+    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) {
         UserDTO userDTO = IUserService.saveUser(user);
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
@@ -92,7 +95,7 @@ public class UserController {
     @Operation(summary = "Update user password", description = "Update the password of an existing user",responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "Password successfully updated.")))})
     @PatchMapping("/update/password")
-    public ResponseEntity<String> updatePasswordUser(@RequestBody UserAuthRequest user)  {
+    public ResponseEntity<String> updatePasswordUser( @Valid @RequestBody UserAuthRequest user) throws NotFoundException {
         IUserService.updatePasswordUser(user);
         return new ResponseEntity<>("Password successfully updated.", HttpStatus.OK);
     }
@@ -107,6 +110,8 @@ public class UserController {
             return new ResponseEntity<>("User subscription activated successfully", HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }catch (UserActiveException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -120,6 +125,20 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }catch (ServiceException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }

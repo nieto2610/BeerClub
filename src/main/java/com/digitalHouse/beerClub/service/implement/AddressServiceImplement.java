@@ -1,6 +1,6 @@
 package com.digitalHouse.beerClub.service.implement;
 
-import com.digitalHouse.beerClub.exceptions.ResourceNotFoundException;
+import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Address;
 import com.digitalHouse.beerClub.model.User;
@@ -28,30 +28,30 @@ public class AddressServiceImplement implements IAddressService {
         this.addressMapper = addressMapper;
     }
 
-    //Mapper<AddressDTO, Address> addressMapper;
-
     @Override
-    public Address findAddressByUserEmail(String userEmail) throws ResourceNotFoundException {
+    public Address findAddressByUserEmail(String userEmail) throws NotFoundException {
         User user = IUserRepository.findByEmail(userEmail);
         System.out.println(user);
         if (user != null) {
             return user.getAddress();
         } else {
-            throw new ResourceNotFoundException("User not found.");
+            throw new NotFoundException("User not found.");
         }
     }
 
     @Override
-    public AddressDTO getAddressByUserAuth(String email) throws ResourceNotFoundException {
+    public AddressDTO getAddressByUserAuth(String email) throws NotFoundException {
         return addressMapper.converter(this.findAddressByUserEmail(email), AddressDTO.class);
     }
 
     @Override
-    public AddressDTO updateAddressByUserEmail(String userEmail, AddressDTO updatedAddress) throws ResourceNotFoundException {
-        // Paso 1: Utiliza el método findAddressByUserEmail para obtener la dirección asociada al usuario.
-        Address address = findAddressByUserEmail(userEmail);
+    public AddressDTO updateAddressByUserEmail(String userEmail, AddressDTO updatedAddress) throws NotFoundException{
+        User user = IUserRepository.findByEmail(userEmail);
+        if (!user.isActive()) {
+            throw new NotFoundException ("The user is not active, and their address cannot be modified.");
+        }
+        Address address = user.getAddress();
 
-        // Paso 2: Actualizar los campos de la dirección
         address.setCountry(updatedAddress.getCountry());
         address.setProvince(updatedAddress.getProvince());
         address.setCity(updatedAddress.getCity());

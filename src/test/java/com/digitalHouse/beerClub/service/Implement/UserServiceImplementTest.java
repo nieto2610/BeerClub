@@ -3,7 +3,6 @@ package com.digitalHouse.beerClub.service.Implement;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Address;
-import com.digitalHouse.beerClub.model.RoleType;
 import com.digitalHouse.beerClub.model.User;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.model.dto.UserAuthRequest;
@@ -207,6 +206,7 @@ class UserServiceImplementTest {
         Long userId = 1L;
         Address address = new Address("Argentina", "Santa Fe", "Rosario", "Roca", 1200, 15, "A3", "3400");
         User existingUser = new User("Juan", "Perez", "juan@beerClub.com", LocalDate.now().minusYears(23), "123456789", LocalDate.now().plusMonths(1).withDayOfMonth(1), "Juan123#", address);
+        existingUser.setActive(false);
         when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
 
         // ACT

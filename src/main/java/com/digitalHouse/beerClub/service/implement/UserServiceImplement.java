@@ -82,6 +82,9 @@ public class UserServiceImplement implements IUserService {
     @Override
     public UserDTO updateUser(UserApplicationDTO user, Long id) throws NotFoundException {
         User searchedUser = this.findById(id);
+        if (!searchedUser.isActive()) {
+            throw new NotFoundException("The user is not active and cannot be modified.");
+        }
         searchedUser.setFirstName(user.getName());
         searchedUser.setLastName(user.getLastName());
         searchedUser.setEmail(user.getEmail());
@@ -94,10 +97,11 @@ public class UserServiceImplement implements IUserService {
     @Override
     public void delete(Long id) throws NotFoundException {
         User user = this.findById(id);
-        if(user != null) {
-            user.setActive(false);
-            userRepository.save(user);
+        if (!user.isActive()) {
+            throw new NotFoundException("The user is not active and cannot be deleted.");
         }
+        user.setActive(false);
+        userRepository.save(user);
     }
 
     @Override
@@ -114,17 +118,21 @@ public class UserServiceImplement implements IUserService {
     }
 
     @Override
-    public void updatePasswordUser(UserAuthRequest user) {
+    public void updatePasswordUser(UserAuthRequest user) throws NotFoundException {
         User searchedUser = userRepository.findByEmail(user.getEmail());
-        if (searchedUser != null) {
-            searchedUser.setPassword(user.getPassword());
-            userRepository.save(searchedUser);
+        if (!searchedUser.isActive()) {
+            throw new NotFoundException("The user is not active.");
         }
+        searchedUser.setPassword(user.getPassword());
+        userRepository.save(searchedUser);
     }
 
     @Override
-    public void activateUserSubscription(Long id) throws NotFoundException {
+    public void activateUserSubscription(Long id) throws NotFoundException, UserActiveException {
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
+        if (user.isActive()) {
+            throw new UserActiveException("The user is active.");
+        }
         user.setActive(true);
         userRepository.save(user);
     }

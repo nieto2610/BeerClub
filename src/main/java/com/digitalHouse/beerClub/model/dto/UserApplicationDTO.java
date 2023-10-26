@@ -1,10 +1,7 @@
 package com.digitalHouse.beerClub.model.dto;
 
 import jakarta.persistence.Column;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,19 +11,21 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 public class UserApplicationDTO {
+
     @NotBlank(message = "Name cannot be null")
-    @Size(min=3)
+    @Size(min=3, max = 50, message = "Name must be between 3 and 50 characters")
     private String name;
 
     @NotBlank(message = "LastName cannot be null")
-    @Size(min=3)
+    @Size(min=2, max = 50, message = "LastName must be between 2 and 50 characters")
     private String lastName;
 
     @NotBlank(message = "Email cannot be null")
     @Email(message = "Email should be valid")
     private String email;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
+    @Past
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate birthdate;
 
