@@ -26,14 +26,14 @@ public class UserServiceImplement implements IUserService {
     @Autowired
     private IAddressRepository addressRepository;
 
-    //private final Mapper<UserDTO, User> userMapper;
     private final Mapper userMapper;
 
     @Autowired
-    public UserServiceImplement(Mapper userMapper) {
+    public UserServiceImplement(IUserRepository userRepository, IAddressRepository addressRepository, Mapper userMapper) {
+        this.userRepository = userRepository;
+        this.addressRepository = addressRepository;
         this.userMapper = userMapper;
     }
-
 
     @Override
     public List<UserDTO> searchAll() {
@@ -44,7 +44,6 @@ public class UserServiceImplement implements IUserService {
     public List<UserDTO> getAllActiveUsers() {
         // Filtrar usuarios activos
         List<UserDTO> users = userRepository.findByActiveTrue().stream().map(user -> userMapper.converter(user, UserDTO.class)).collect(Collectors.toList());
-        System.out.println(users);
         return users;
     }
 
@@ -67,7 +66,6 @@ public class UserServiceImplement implements IUserService {
 
     @Override
     public UserDTO saveUser(UserApplicationDTO user) {
-        System.out.println(user.getBirthday());
         Address address = new Address(user.getCountry(), user.getProvince(), user.getCity(), user.getStreet(), user.getNumber(), user.getFloor(), user.getApartment(), user.getZipCode());
         addressRepository.save(address);
         LocalDate subscriptionDate = LocalDate.now();
@@ -75,16 +73,18 @@ public class UserServiceImplement implements IUserService {
             // Si es el día 20 o posterior, establece la fecha de suscripción en el primer día del mes siguiente
             subscriptionDate = subscriptionDate.plusMonths(1).withDayOfMonth(1);
         }
-        User newUser = new User(user.getName(), user.getLastName(), user.getEmail(), user.getBirthday(), user.getTelephone(), subscriptionDate, user.getPassword(), address);
+        User newUser = new User(user.getName(), user.getLastName(), user.getEmail(), user.getBirthdate(), user.getTelephone(), subscriptionDate, user.getPassword(), address);
         userRepository.save(newUser);
         UserDTO userDTO = userMapper.converter(newUser, UserDTO.class);
         return userDTO;
     }
 
     @Override
-    public UserDTO updateUser(UserApplicationDTO user) throws NotFoundException {
-        User searchedUser = userRepository.findByEmail(user.getEmail());
-        System.out.println("SearchedUSER: "+searchedUser);
+    public UserDTO updateUser(UserApplicationDTO user, Long id) throws NotFoundException {
+        User searchedUser = this.findById(id);
+        if (!searchedUser.isActive()) {
+            throw new NotFoundException("The user is not active and cannot be modified.");
+        }
         searchedUser.setFirstName(user.getName());
         searchedUser.setLastName(user.getLastName());
         searchedUser.setEmail(user.getEmail());
@@ -96,11 +96,12 @@ public class UserServiceImplement implements IUserService {
 
     @Override
     public void delete(Long id) throws NotFoundException {
-        User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
-        if(user != null) {
-            user.setActive(false);
-            userRepository.save(user);
+        User user = this.findById(id);
+        if (!user.isActive()) {
+            throw new NotFoundException("The user is not active and cannot be deleted.");
         }
+        user.setActive(false);
+        userRepository.save(user);
     }
 
     @Override
@@ -117,17 +118,21 @@ public class UserServiceImplement implements IUserService {
     }
 
     @Override
-    public void updatePasswordUser(UserAuthRequest user) {
+    public void updatePasswordUser(UserAuthRequest user) throws NotFoundException {
         User searchedUser = userRepository.findByEmail(user.getEmail());
-        if (searchedUser != null) {
-            searchedUser.setPassword(user.getPassword());
-            userRepository.save(searchedUser);
+        if (!searchedUser.isActive()) {
+            throw new NotFoundException("The user is not active.");
         }
+        searchedUser.setPassword(user.getPassword());
+        userRepository.save(searchedUser);
     }
 
     @Override
-    public void activateUserSubscription(Long id) throws NotFoundException {
+    public void activateUserSubscription(Long id) throws NotFoundException, UserActiveException {
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
+        if (user.isActive()) {
+            throw new UserActiveException("The user is active.");
+        }
         user.setActive(true);
         userRepository.save(user);
     }

@@ -32,7 +32,7 @@ public class User {
 
     @Column(nullable = false)
     @DateTimeFormat(pattern = "dd-MM-yyyy")
-    private LocalDate birthday;
+    private LocalDate birthdate;
 
     @NotBlank(message = "Telephone cannot be null")
     private String telephone;
@@ -56,11 +56,11 @@ public class User {
     @JoinColumn(name = "address_id")
     private Address address;
 
-    public User(String firstName, String lastName, String email, LocalDate birthday,String telephone, LocalDate subscriptionDate, String password, Address address) {
+    public User(String firstName, String lastName, String email, LocalDate birthdate, String telephone, LocalDate subscriptionDate, String password, Address address) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.birthday = birthday;
+        this.birthdate = birthdate;
         this.telephone = telephone;
         this.subscriptionDate = subscriptionDate;
         this.password = password;

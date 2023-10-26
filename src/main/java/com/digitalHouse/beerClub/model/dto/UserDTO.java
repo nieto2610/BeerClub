@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public class UserDTO {
     private Long id;
     private String firstName, lastName, email;
-    private LocalDate birthday;
+    private LocalDate birthdate;
     private String telephone;
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate subscriptionDate;

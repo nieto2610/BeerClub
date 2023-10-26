@@ -16,10 +16,14 @@ import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Tag(name = "Users")
@@ -59,6 +63,14 @@ public class UserController {
        }
     }
 
+    @Operation(summary="Add user", description="Add a new user", responses = {
+        @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
+    @PostMapping("/create")
+    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) {
+        UserDTO userDTO = IUserService.saveUser(user);
+        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
+    }
+
     @Operation(summary ="Find user by Email", description ="Find user by Email",  responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @GetMapping("/email/{email}")
@@ -69,11 +81,11 @@ public class UserController {
 
     @Operation(summary = "Update a user", description = "Update an existing user", responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class))),
-        @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with email: example@beerClub")))})
-    @PutMapping("/update")
-    public ResponseEntity<Object> updateUser(@Valid @RequestBody UserApplicationDTO user) throws NotFoundException {
+        @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Object> updateUser(@Parameter(description = "ID del usuario a actualizar", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long id, @Valid @RequestBody UserApplicationDTO user) throws NotFoundException {
         try {
-            UserDTO userDTO = IUserService.updateUser(user);
+            UserDTO userDTO = IUserService.updateUser(user, id);
             return new ResponseEntity<>(userDTO, HttpStatus.OK);
         }catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -83,7 +95,7 @@ public class UserController {
     @Operation(summary = "Update user password", description = "Update the password of an existing user",responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "Password successfully updated.")))})
     @PatchMapping("/update/password")
-    public ResponseEntity<String> updatePasswordUser(@RequestBody UserAuthRequest user)  {
+    public ResponseEntity<String> updatePasswordUser( @Valid @RequestBody UserAuthRequest user) throws NotFoundException {
         IUserService.updatePasswordUser(user);
         return new ResponseEntity<>("Password successfully updated.", HttpStatus.OK);
     }
@@ -98,6 +110,8 @@ public class UserController {
             return new ResponseEntity<>("User subscription activated successfully", HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }catch (UserActiveException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -111,6 +125,20 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }catch (ServiceException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }

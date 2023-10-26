@@ -1,12 +1,8 @@
 package com.digitalHouse.beerClub.controller;
 
-
-import com.digitalHouse.beerClub.exceptions.ResourceNotFoundException;
-import com.digitalHouse.beerClub.model.Address;
+import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.model.dto.AddressDTO;
-import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.service.interfaces.IAddressService;
-//import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -37,7 +33,7 @@ public class AddressController {
         try {
             AddressDTO address = addressService.getAddressByUserAuth(userEmail);
             return ResponseEntity.ok(address);
-        } catch (ResourceNotFoundException ex) {
+        } catch (NotFoundException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
@@ -50,7 +46,7 @@ public class AddressController {
         try {
             AddressDTO updated = addressService.updateAddressByUserEmail(userEmail, updatedAddress);
             return ResponseEntity.ok(updated);
-        } catch (ResourceNotFoundException ex) {
+        } catch (NotFoundException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
