@@ -1,5 +1,7 @@
 package com.digitalHouse.beerClub.service.Implement;
 
+import com.digitalHouse.beerClub.mapper.Mapper;
+import com.digitalHouse.beerClub.model.AgeVerification;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,16 +24,17 @@ import static org.mockito.Mockito.*;
 
 
 class FaqsServiceTest {
-/*
-    @InjectMocks
-    private FaqsService faqsService;
 
     @Mock
     private IFaqsRepository faqsRepository;
+    @Mock
+    private Mapper mapper;
+    private FaqsService faqsService;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
+        faqsService = new FaqsService(faqsRepository, mapper);
     }
 
     @Test
@@ -49,24 +52,32 @@ class FaqsServiceTest {
         Long id = 1L;
         Faqs faqs = new Faqs();
         faqs.setId(id);
+        faqs.setQuestion("Q1");
+        faqs.setAnswer("A1");
 
         when(faqsRepository.findById(id)).thenReturn(Optional.of(faqs));
+        when(mapper.converter(faqs, FaqsDTO.class)).thenReturn(new FaqsDTO(faqs.getId(), faqs.getQuestion(), faqs.getAnswer()));
 
         FaqsDTO result = faqsService.searchById(id);
 
         assertEquals(id, result.getId());
     }
 
+    /*
     @Test
     void create() throws BadRequestException {
+        Long id = 1L;
         FaqsDTO faqsDTO = new FaqsDTO();
-        Faqs faqs = new Faqs();
+        faqsDTO.setQuestion("Q1");
+        faqsDTO.setAnswer("A1");
 
-        when(faqsRepository.save(any())).thenReturn(faqs);
+        when(faqsRepository.save(org.mockito.ArgumentMatchers.any(Faqs.class)))
+                .thenReturn(new Faqs(id, faqsDTO.getQuestion(), faqsDTO.getAnswer()));
 
         FaqsDTO result = faqsService.create(faqsDTO);
 
         assertNotNull(result);
+        assertEquals(id, result.getId());
     }
     @Test
     void update() throws NotFoundException {
@@ -86,7 +97,7 @@ class FaqsServiceTest {
         FaqsDTO result = faqsService.update(faqsDTO, faqsDTO.getId());
 
         assertEquals(id, result.getId());
-    }
+    }*/
 
 
     @Test
@@ -96,5 +107,5 @@ class FaqsServiceTest {
         when(faqsRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> faqsService.delete(id));
-    }*/
+    }
 }
