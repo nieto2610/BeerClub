@@ -15,5 +15,4 @@ public class Mapper {
     public <E> E converter(Object obj, Class<E> resultClass) {
         return modelMapper.map(obj, resultClass);
     }
-
 }
