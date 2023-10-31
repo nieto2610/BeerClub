@@ -1,4 +1,4 @@
-package com.digitalHouse.beerClub.service.Implement;
+package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.exceptions.BadRequestException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
@@ -9,14 +9,11 @@ import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.repository.IAgeVerificationRepository;
 import com.digitalHouse.beerClub.service.interfaces.IAgeVerificationService;
 
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 @Service

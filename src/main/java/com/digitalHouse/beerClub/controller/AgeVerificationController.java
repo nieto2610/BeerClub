@@ -4,14 +4,12 @@ import com.digitalHouse.beerClub.exceptions.BadRequestException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.model.dto.AgeVerificationAppDTO;
 import com.digitalHouse.beerClub.model.dto.AgeVerificationDTO;
-import com.digitalHouse.beerClub.service.Implement.AgeVerificationService;
+import com.digitalHouse.beerClub.service.implement.AgeVerificationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.util.List;
 

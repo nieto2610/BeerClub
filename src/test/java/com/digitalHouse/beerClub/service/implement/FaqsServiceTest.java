@@ -1,25 +1,21 @@
-package com.digitalHouse.beerClub.service.Implement;
+package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.mapper.Mapper;
-import com.digitalHouse.beerClub.model.AgeVerification;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import com.digitalHouse.beerClub.exceptions.BadRequestException;
+
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.model.Faqs;
 import com.digitalHouse.beerClub.model.dto.FaqsDTO;
 import com.digitalHouse.beerClub.repository.IFaqsRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.*;
+
 import static org.mockito.Mockito.*;
 
 

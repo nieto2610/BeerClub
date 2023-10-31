@@ -4,7 +4,7 @@ import com.digitalHouse.beerClub.exceptions.BadRequestException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.model.dto.SubscriptionDTO;
-import com.digitalHouse.beerClub.service.Implement.SubscriptionService;
+import com.digitalHouse.beerClub.service.implement.SubscriptionService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;

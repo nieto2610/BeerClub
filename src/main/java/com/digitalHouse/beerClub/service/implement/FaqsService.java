@@ -1,4 +1,4 @@
-package com.digitalHouse.beerClub.service.Implement;
+package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.exceptions.BadRequestException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
@@ -10,7 +10,6 @@ import com.digitalHouse.beerClub.repository.IFaqsRepository;
 import com.digitalHouse.beerClub.service.interfaces.IFaqsService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -1,4 +1,4 @@
-package com.digitalHouse.beerClub.service.Implement;
+package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.exceptions.BadRequestException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
