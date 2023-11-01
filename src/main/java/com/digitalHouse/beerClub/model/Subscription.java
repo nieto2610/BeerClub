@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -27,4 +28,7 @@ public class Subscription {
     private List<Benefit> benefits = new ArrayList<>();
     private Boolean isRecommended;
     private Boolean isActive;
+
+    @ManyToMany(mappedBy = "subscriptions")
+    Set<Recomendation> recomendations;
 }

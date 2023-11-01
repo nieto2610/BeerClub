@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -25,5 +26,12 @@ public class Recomendation {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+
+    @ManyToMany
+    @JoinTable(
+            name = "recomendation_subscription",
+            joinColumns = @JoinColumn(name = "recomendation_id"),
+            inverseJoinColumns = @JoinColumn(name = "subscription_id"))
+    Set<Subscription> subscriptions;
 
 }

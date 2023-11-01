@@ -1,6 +1,5 @@
 package com.digitalHouse.beerClub.model.dto;
 
-import com.digitalHouse.beerClub.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
