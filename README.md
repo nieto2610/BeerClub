@@ -83,5 +83,5 @@ Para que las respuestas de nuestras APIs sean claras y consistentes, seguimos es
 ### Diagrama de la base de datos
 De igual forma se deja el `.png` de este dentro del proyecto
 
-![Diagrama de la base de datos](/Esquema.png)
+![Diagrama de la base de datos](Esquema.png)
 

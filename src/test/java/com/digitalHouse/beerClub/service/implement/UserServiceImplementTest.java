@@ -1,4 +1,4 @@
-package com.digitalHouse.beerClub.service.Implement;
+package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.mapper.Mapper;
@@ -9,7 +9,6 @@ import com.digitalHouse.beerClub.model.dto.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.repository.IAddressRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
-import com.digitalHouse.beerClub.service.implement.UserServiceImplement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -104,7 +103,7 @@ class UserServiceImplementTest {
 
     @Test
     @DisplayName("Save User")
-    void saveUser() {
+    void saveUser() throws NotFoundException {
         // ARRANGE
         UserApplicationDTO userDto = new UserApplicationDTO("Juan", "Perez", "juan@beerClub.com",
                 LocalDate.now().minusYears(23), "123456789", "Argentina", "Santa Fe", "Rosario", "Roca", 1200, 15, "A3", "3400","Juan123#");

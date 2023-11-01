@@ -3,11 +3,13 @@ package com.digitalHouse.beerClub.service.implement;
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Address;
+import com.digitalHouse.beerClub.model.Subscription;
 import com.digitalHouse.beerClub.model.User;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.model.dto.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.repository.IAddressRepository;
+import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,8 @@ public class UserServiceImplement implements IUserService {
 
     @Autowired
     private IAddressRepository addressRepository;
+
+    private ISubscriptionRepository subscriptionRepository;
 
     private final Mapper userMapper;
 
