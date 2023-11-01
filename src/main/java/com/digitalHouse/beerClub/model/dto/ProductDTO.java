@@ -16,6 +16,6 @@ public class ProductDTO {
     private Integer id;
     private String name;
     private String description;
-    private List<String> imageUrl;
+    private List<ProductImageDTO> imageUrl;
     private List<RecomendationDTO> recomendationList;
 }

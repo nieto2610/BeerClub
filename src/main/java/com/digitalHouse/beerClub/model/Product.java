@@ -18,7 +18,10 @@ public class Product {
     private Integer id;
     private String name;
     private String description;
-    private List<String> imageUrl;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "product_id")
+    private List<ProductImage> imageUrl;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Recomendation> recomendationList;
