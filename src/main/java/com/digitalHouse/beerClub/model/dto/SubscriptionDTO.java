@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -32,4 +33,5 @@ public class SubscriptionDTO {
 
     @AssertTrue(message = "Subscription isActive must be true or false")
     private Boolean isActive;
+
 }

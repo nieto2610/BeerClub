@@ -2,6 +2,7 @@ package com.digitalHouse.beerClub.model.dto;
 
 import com.digitalHouse.beerClub.model.Address;
 import com.digitalHouse.beerClub.model.RoleType;
+import com.digitalHouse.beerClub.model.Subscription;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -18,5 +19,5 @@ public class UserDTO {
     private Address address;
     private RoleType role;
     private boolean active;
-
+    private Subscription subscription;
 }

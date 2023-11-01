@@ -27,7 +27,7 @@ import java.util.Map;
 
 @RestController
 @Tag(name = "Users")
-@RequestMapping("/api/v1/users")
+@RequestMapping("/users")
 @Validated
 public class UserController {
 
@@ -66,7 +66,7 @@ public class UserController {
     @Operation(summary="Add user", description="Add a new user", responses = {
         @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @PostMapping("/create")
-    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) {
+    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) throws NotFoundException {
         UserDTO userDTO = IUserService.saveUser(user);
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }

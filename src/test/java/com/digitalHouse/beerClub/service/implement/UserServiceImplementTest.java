@@ -3,11 +3,13 @@ package com.digitalHouse.beerClub.service.implement;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Address;
+import com.digitalHouse.beerClub.model.Subscription;
 import com.digitalHouse.beerClub.model.User;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.model.dto.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.repository.IAddressRepository;
+import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
@@ -23,6 +27,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -37,12 +42,16 @@ class UserServiceImplementTest {
     @Mock
     private Mapper mapper;
 
+    @InjectMocks
     private UserServiceImplement userServiceImplement;
+
+    @Mock
+    private ISubscriptionRepository subscriptionRepository;
 
     @BeforeEach
     void setUp() {
         mapper = new Mapper(new ModelMapper());
-        userServiceImplement = new UserServiceImplement(userRepository,addressRepository,mapper);
+        userServiceImplement = new UserServiceImplement(userRepository,addressRepository,subscriptionRepository,mapper);
     }
 
     @Test
@@ -105,8 +114,10 @@ class UserServiceImplementTest {
     @DisplayName("Save User")
     void saveUser() throws NotFoundException {
         // ARRANGE
+        Subscription subscription = new Subscription(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, List.of(), false, true, Set.of());
+        subscriptionRepository.save(subscription);
         UserApplicationDTO userDto = new UserApplicationDTO("Juan", "Perez", "juan@beerClub.com",
-                LocalDate.now().minusYears(23), "123456789", "Argentina", "Santa Fe", "Rosario", "Roca", 1200, 15, "A3", "3400","Juan123#");
+                LocalDate.now().minusYears(23), "123456789", "Argentina", "Santa Fe", "Rosario", "Roca", 1200, 15, "A3", "3400","Juan123#", 1L);
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
             User savedUser = invocation.getArgument(0);
             savedUser.setId(1L);
@@ -132,7 +143,7 @@ class UserServiceImplementTest {
         existingUser.setId(userId);
 
         // Configura el DTO con los datos de actualización
-        UserApplicationDTO updatedUserData = new UserApplicationDTO("Juana", "Pérez", "juana@beerClub.com", LocalDate.now().minusYears(23), "987654321", "Argentina", "Santa Fe", "Rosario", "Roca", 1200, 15, "A3", "3400","Juana123#");
+        UserApplicationDTO updatedUserData = new UserApplicationDTO("Juana", "Pérez", "juana@beerClub.com", LocalDate.now().minusYears(23), "987654321", "Argentina", "Santa Fe", "Rosario", "Roca", 1200, 15, "A3", "3400","Juana123#", 1L);
         when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
 
         // ACT
