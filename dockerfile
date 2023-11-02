@@ -19,7 +19,7 @@ FROM openjdk:11-jre-slim
 WORKDIR /app
 
 # Copia el archivo JAR generado durante la construcción
-COPY --from=builder /app/target/beer_club_back.jar app.jar
+COPY --from=builder /app/target/beer_club-back.jar app.jar
 
 # Define el comando para ejecutar la aplicación
 CMD ["java", "-jar", "app.jar"]
