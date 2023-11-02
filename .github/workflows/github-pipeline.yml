@@ -1,0 +1,29 @@
+name: Docker Build & Push
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Login to Docker Hub
+      run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    - name: Build and push Docker image
+      run: |
+        docker build -t my-docker-image .
+        docker tag my-docker-image ${{ secrets.DOCKERHUB_USERNAME }}/my-docker-image:latest
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-docker-image:latest
+      env:
+        DOCKER_CLI_ACI_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        DOCKER_CLI_ACI_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
