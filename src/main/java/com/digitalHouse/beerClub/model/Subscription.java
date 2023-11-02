@@ -1,9 +1,7 @@
 package com.digitalHouse.beerClub.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,9 +25,12 @@ public class Subscription {
     private String description;
     private Double price;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @JoinColumn(name = "subscription_id")
-    private List<Benefit> benefits = new ArrayList<>();
+    //@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    //@JoinColumn(name = "subscription_id")
+    //private List<Benefit> benefits = new ArrayList<>();
+    @ElementCollection
+    private List<String> benefits = new ArrayList<>();
+
     private Boolean isRecommended;
     private Boolean isActive;
 
@@ -37,8 +38,16 @@ public class Subscription {
     @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY)
     private Set<User> users = new HashSet<>();
 
+    @OneToMany(mappedBy = "subscription", fetch = FetchType.EAGER)
+    private Set<Transaction> transactions = new HashSet<>();
+
     public void addUser(User user) {
         user.setSubscription(this);
         users.add(user);
+    }
+
+    public void addTransaction(Transaction transaction) {
+        transaction.setSubscription(this);
+        transactions.add(transaction);
     }
 }

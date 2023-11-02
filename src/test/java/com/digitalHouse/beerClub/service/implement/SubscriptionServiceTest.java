@@ -4,11 +4,11 @@ import com.digitalHouse.beerClub.exceptions.BadRequestException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.mapper.Mapper;
-import com.digitalHouse.beerClub.model.Benefit;
+//import com.digitalHouse.beerClub.model.Benefit;
 import com.digitalHouse.beerClub.model.Subscription;
 import com.digitalHouse.beerClub.model.dto.BenefitDTO;
 import com.digitalHouse.beerClub.model.dto.SubscriptionDTO;
-import com.digitalHouse.beerClub.repository.IBenefitRepository;
+//import com.digitalHouse.beerClub.repository.IBenefitRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,10 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -30,20 +27,25 @@ class SubscriptionServiceTest {
     @Mock
     private ISubscriptionRepository subscriptionRepository;
 
-    @Mock
-    private IBenefitRepository benefitRepository;
+   /* @Mock
+    private IBenefitRepository benefitRepository;*/
 
     @Mock
     private Mapper mapper;
 
     private SubscriptionService subscriptionService;
 
-    @BeforeEach
+   /* @BeforeEach
     void setUp() {
         mapper = new Mapper(new ModelMapper());
         subscriptionService = new SubscriptionService(subscriptionRepository, benefitRepository, mapper);
-    }
+    }*/
 
+    @BeforeEach
+    void setUp() {
+        mapper = new Mapper(new ModelMapper());
+        subscriptionService = new SubscriptionService(subscriptionRepository, mapper);
+    }
 
     @Test
     @DisplayName("✅ - Search all the subscriptions")
@@ -109,11 +111,15 @@ class SubscriptionServiceTest {
     void update() throws NotFoundException {
         //ARRANGE
         Long id = 1L;
-        List<Benefit> benefits = new ArrayList<>();
+        /*List<Benefit> benefits = new ArrayList<>();
         benefits.add(new Benefit(1L,"descuentos del 5%"));
 
         List<BenefitDTO> benefitsDTO = new ArrayList<>();
-        benefitsDTO.add(new BenefitDTO(1L,"descuentos del 10%"));
+        benefitsDTO.add(new BenefitDTO(1L,"descuentos del 10%")); */
+
+        List<String> benefits = List.of("descuentos del 5%");
+
+        List<String> benefitsDTO = List.of("descuentos del 10%");
 
         SubscriptionDTO subscriptionDTO = new SubscriptionDTO(1L, "Novato-up", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, benefitsDTO, false, true);
 
