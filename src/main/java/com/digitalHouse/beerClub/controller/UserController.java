@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -33,7 +34,6 @@ public class UserController {
 
     @Autowired
     private IUserService IUserService;
-
     @Operation(summary="List all users", description="List all users", responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @GetMapping("/all")
@@ -49,6 +49,13 @@ public class UserController {
         List<UserDTO> userDTOS = IUserService.getAllActiveUsers();
         return new ResponseEntity<>(userDTOS, HttpStatus.OK);
     }
+    @Operation(summary="Add user", description="Add a new user", responses = {
+            @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
+    @PostMapping("/create")
+    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) {
+        UserDTO userDTO = IUserService.saveUser(user);
+        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
+    }
 
     @Operation(summary ="Find user by ID", description ="Find user by ID", responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class))),
@@ -61,14 +68,6 @@ public class UserController {
        } catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
        }
-    }
-
-    @Operation(summary="Add user", description="Add a new user", responses = {
-        @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
-    @PostMapping("/create")
-    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) {
-        UserDTO userDTO = IUserService.saveUser(user);
-        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
     @Operation(summary ="Find user by Email", description ="Find user by Email",  responses = {

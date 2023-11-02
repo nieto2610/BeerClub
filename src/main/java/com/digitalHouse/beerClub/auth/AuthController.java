@@ -3,6 +3,7 @@ package com.digitalHouse.beerClub.auth;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,8 +25,12 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    @Operation(summary = "User registration", description = "Register a new user and return a registration confirmation.")
+    @ApiResponse(responseCode = "201", description = "User registered successfully.")
+    @ApiResponse(responseCode = "400", description = "Bad request, missing or invalid parameters.")
+    @ApiResponse(responseCode = "409", description = "Conflict, user already exists.")
     @PostMapping(value = "register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 }
