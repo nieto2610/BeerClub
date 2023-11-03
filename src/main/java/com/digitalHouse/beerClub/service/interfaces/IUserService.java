@@ -3,7 +3,7 @@ package com.digitalHouse.beerClub.service.interfaces;
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.model.User;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
-import com.digitalHouse.beerClub.model.dto.UserAuthRequest;
+import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.exceptions.UserActiveException;
 

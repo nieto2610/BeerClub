@@ -1,5 +1,6 @@
 package com.digitalHouse.beerClub.auth;
 
+import com.digitalHouse.beerClub.model.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class AuthController {
     @ApiResponse(responseCode = "401", description = "Invalid credentials.")
     @ApiResponse(responseCode = "400", description = "Bad request, missing or invalid parameters.")
     @PostMapping(value = "login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@RequestBody UserAuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
@@ -30,7 +31,7 @@ public class AuthController {
     @ApiResponse(responseCode = "400", description = "Bad request, missing or invalid parameters.")
     @ApiResponse(responseCode = "409", description = "Conflict, user already exists.")
     @PostMapping(value = "register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(@RequestBody User request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 }
