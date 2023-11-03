@@ -27,10 +27,19 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authRequest ->
                         authRequest
+                                //Los endpoint Post que se pueden user sin autenticación
                                 .requestMatchers(HttpMethod.POST,"/auth/**").permitAll()
+                                //Los endpoint que se pueden ver sin autenticación
                                 .requestMatchers(HttpMethod.GET,"/api/v1/swagger-ui/**").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/v3/api-docs/**").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/api/v1/users/**").hasRole("USER")
+                                //Los endpoint que se pueden ver siendo USER
+                                .requestMatchers(HttpMethod.GET,"/api/v1/users/email/**").hasRole("USER")
+                                //Los endpoint que se pueden ver siendo ADMIN
+                                .requestMatchers(HttpMethod.GET,"/api/v1/users/all").hasRole("ADMIN")
+                                //Los endpoint que se pueden ver siendo ADMIN
+                                .requestMatchers(HttpMethod.DELETE,"/api/v1/users/**").hasRole("ADMIN")
+                                //Los endpoint que se pueden Modificar datos siendo USER
+                                .requestMatchers(HttpMethod.GET,"/api/v1/users/update/passwword").hasRole("USER")
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->
