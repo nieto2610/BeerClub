@@ -2,9 +2,7 @@ package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.mapper.Mapper;
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
-
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.model.Faqs;
 import com.digitalHouse.beerClub.model.dto.FaqsDTO;

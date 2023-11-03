@@ -49,7 +49,6 @@ public class UserApplicationDTO {
 
     private int number, floor;
 
-    @NotBlank(message = "Apartment cannot be null")
     private String apartment;
 
     @NotBlank(message = "ZipCode cannot be null")

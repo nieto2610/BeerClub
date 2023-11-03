@@ -31,9 +31,9 @@ public class Address {
     private String street;
 
     private int number;
+    
     private int floor;
 
-    @NotBlank(message = "Apartment cannot be null")
     private String apartment;
 
     @NotBlank(message = "ZipCode cannot be null")

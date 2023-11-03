@@ -7,6 +7,7 @@ import com.digitalHouse.beerClub.model.AgeVerification;
 import com.digitalHouse.beerClub.model.dto.AgeVerificationAppDTO;
 import com.digitalHouse.beerClub.model.dto.AgeVerificationDTO;
 import com.digitalHouse.beerClub.repository.IAgeVerificationRepository;
+import com.digitalHouse.beerClub.service.implement.AgeVerificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -77,4 +78,5 @@ class AgeVerificationServiceTest {
         AgeVerificationDTO result = ageVerificationService.create(ageVerificationAppDTO);
         assertEquals("127.0.0.1", result.getIp());
     }
+
 }
