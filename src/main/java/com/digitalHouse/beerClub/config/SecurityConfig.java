@@ -23,23 +23,30 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        //TODO: me falta subscription-controller
+        //TODO: Realizar pruebas sobre si solo con el endpoint o con todo "user/id/{id}" o "user/id/**"
         HttpSecurity configuredHttp = http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authRequest ->
                         authRequest
                                 //Los endpoint Post que se pueden user sin autenticación
-                                .requestMatchers(HttpMethod.POST,"/auth/**").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/auth/**", "/ageVerification").permitAll()
+                                //Los endpoint Post que se pueden ADMIN con autenticación
+                                .requestMatchers(HttpMethod.POST,"/users/**", "/faqs", "/users/create", "/subscriptions").hasRole("ADMIN")
                                 //Los endpoint que se pueden ver sin autenticación
-                                .requestMatchers(HttpMethod.GET,"/api/v1/swagger-ui/**").permitAll()
-                                .requestMatchers(HttpMethod.GET,"/v3/api-docs/**").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/swagger-ui/**", "/v3/api-docs/**", "/subscriptions", "/faqs").permitAll()
                                 //Los endpoint que se pueden ver siendo USER
-                                .requestMatchers(HttpMethod.GET,"/api/v1/users/email/**").hasRole("USER")
+                                .requestMatchers(HttpMethod.GET,"/users/email/**", "/address/**").hasAnyRole("USER", "ADMIN")
                                 //Los endpoint que se pueden ver siendo ADMIN
-                                .requestMatchers(HttpMethod.GET,"/api/v1/users/all").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/users/all", "/users/active", "/users/id/**", "/subscriptions/**", "/faqs/**","/ageVerification/***").hasRole("ADMIN")
+                                //Los endpoint Put que se pueden user con autenticación
+                                .requestMatchers(HttpMethod.PUT,"/address/update/**", "/users/update/**").hasRole("USER")
+                                //Los endpoint Put que se pueden admin con autenticación
+                                .requestMatchers(HttpMethod.PUT,"/faqs/**", "/users/activate/**", "/subscriptions/**").hasRole("ADMIN")
                                 //Los endpoint que se pueden ver siendo ADMIN
-                                .requestMatchers(HttpMethod.DELETE,"/api/v1/users/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/users/**", "/faqs/**", "/subscriptions/**").hasRole("ADMIN")
                                 //Los endpoint que se pueden Modificar datos siendo USER
-                                .requestMatchers(HttpMethod.GET,"/api/v1/users/update/passwword").hasRole("USER")
+                                .requestMatchers(HttpMethod.PATCH,"/users/update/passwword").hasAnyRole("USER", "ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->
