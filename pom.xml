@@ -9,11 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.digitalHouse</groupId>
-<<<<<<< HEAD
 	<artifactId>beer_club</artifactId>
-=======
-	<artifactId>beerClub</artifactId>
->>>>>>> b414897076caac3d009c9ecbaf7b8a96d60452e9
 	<version>0.0.1-SNAPSHOT</version>
 	<name>beerClub</name>
 	<description>Demo project for Spring Boot</description>
@@ -43,7 +39,6 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-<<<<<<< HEAD
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
@@ -55,33 +50,23 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<dependency>
-=======
-        <dependency>
->>>>>>> b414897076caac3d009c9ecbaf7b8a96d60452e9
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.15.2</version>
         </dependency>
-<<<<<<< HEAD
 		<!-- Mapper -->
-=======
-		<!-- Mapper   -->
->>>>>>> b414897076caac3d009c9ecbaf7b8a96d60452e9
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
 			<version>3.1.0</version>
 		</dependency>
-<<<<<<< HEAD
-		<!--Swagger-->
-=======
 		<!-- Validation   -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<!-- Documentation  -->
->>>>>>> b414897076caac3d009c9ecbaf7b8a96d60452e9
+		<!--Swagger-->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -92,7 +77,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-<<<<<<< HEAD
 		<!--Dependecias de seguridad-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -126,10 +110,6 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-=======
-	</dependencies>
-
->>>>>>> b414897076caac3d009c9ecbaf7b8a96d60452e9
 	<build>
 		<plugins>
 			<plugin>
