@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Address")
-@RequestMapping("/api/v1/address")
+@RequestMapping("/address")
 @Validated
 public class AddressController {
 

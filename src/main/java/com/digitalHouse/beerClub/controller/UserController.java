@@ -2,7 +2,7 @@ package com.digitalHouse.beerClub.controller;
 
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
-import com.digitalHouse.beerClub.model.dto.UserAuthRequest;
+import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +28,7 @@ import java.util.Map;
 
 @RestController
 @Tag(name = "Users")
-@RequestMapping("/api/v1/users")
+@RequestMapping("/users")
 @Validated
 public class UserController {
 
