@@ -19,7 +19,6 @@ import org.modelmapper.ModelMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -49,9 +48,26 @@ class SubscriptionServiceTest {
     @DisplayName("✅ - Search all the subscriptions")
     void searchAll() {
         //ARRANGE
+        Subscription subscription = new Subscription();
+        subscription.setId(1L);
+        subscription.setName("Novato");
+        subscription.setPrice(100.0);
+        subscription.setDescription("Disfrutas de la cerveza y quieres conocer más acerca de ella");
+        subscription.setIsRecommended(false);
+        subscription.setIsActive(true);
+
+        Subscription subscription2 = new Subscription();
+        subscription2.setId(2L);
+        subscription2.setName("Experto");
+        subscription2.setPrice(200.0);
+        subscription2.setDescription("Disfrutas de la cerveza y quieres conocer más acerca de ella");
+        subscription2.setIsRecommended(false);
+        subscription2.setIsActive(true);
+
         List<Subscription> expected = new ArrayList<>();
-        expected.add(new Subscription(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, List.of(), false, true, Set.of()));
-        expected.add(new Subscription(2L, "Experto", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 300.0, List.of(), true, true, Set.of()));
+        expected.add(subscription);
+        expected.add(subscription2);
+
         when(subscriptionRepository.findAll()).thenReturn(expected);
 
         //ACT
@@ -66,7 +82,12 @@ class SubscriptionServiceTest {
     void searchById() throws NotFoundException {
         //ARRANGE
         Long id = 1L;
-        Subscription subscription = new Subscription(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, List.of(), false, true, Set.of());
+        Subscription subscription = new Subscription();
+        subscription.setId(id);
+        subscription.setName("Novato");
+        subscription.setDescription("Disfrutas de la cerveza y quieres conocer más acerca de ella");
+        subscription.setIsRecommended(false);
+        subscription.setIsActive(true);
         when(subscriptionRepository.findById(any())).thenReturn(Optional.of(subscription));
 
         //ACT
@@ -91,8 +112,19 @@ class SubscriptionServiceTest {
     @DisplayName("✅ - Create subscription")
     void create() throws BadRequestException {
         //ARRANGE
-        SubscriptionDTO expected = new SubscriptionDTO(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, List.of(), false, true);
-        Subscription subscription = new Subscription(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, List.of(), false, true, Set.of());
+        SubscriptionDTO expected = new SubscriptionDTO();
+        expected.setId(1L);
+        expected.setName("Novato");
+        expected.setDescription("Disfrutas de la cerveza y quieres conocer más acerca de ella");
+        expected.setIsRecommended(false);
+        expected.setIsActive(true);
+
+        Subscription subscription = new Subscription();
+        subscription.setId(1L);
+        subscription.setName("Novato");
+        subscription.setDescription("Disfrutas de la cerveza y quieres conocer más acerca de ella");
+        subscription.setIsRecommended(false);
+        subscription.setIsActive(true);
         when(subscriptionRepository.save(subscription)).thenReturn(subscription);
 
         //ACT
@@ -117,7 +149,14 @@ class SubscriptionServiceTest {
 
         SubscriptionDTO subscriptionDTO = new SubscriptionDTO(1L, "Novato-up", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, benefitsDTO, false, true);
 
-        Subscription subscription = new Subscription(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 100.0, benefits, false, true, Set.of());
+        Subscription subscription = new Subscription();
+        subscription.setId(id);
+        subscription.setName("Novato");
+        subscription.setDescription("Disfrutas de la cerveza y quieres conocer más acerca de ella");
+        subscription.setIsRecommended(false);
+        subscription.setBenefits(benefits);
+        subscription.setIsActive(true);
+
         when(subscriptionRepository.findById(any())).thenReturn(Optional.of(subscription));
         //ACT
         SubscriptionDTO result = subscriptionService.update(subscriptionDTO,id);
@@ -130,7 +169,13 @@ class SubscriptionServiceTest {
     void delete() throws ServiceException, NotFoundException {
         //ARRANGE
         Long id = 1L;
-        Subscription subscription = new Subscription(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, List.of(), false, true, Set.of());
+
+        Subscription subscription = new Subscription();
+        subscription.setId(id);
+        subscription.setName("Novato");
+        subscription.setDescription("Disfrutas de la cerveza y quieres conocer más acerca de ella");
+        subscription.setIsRecommended(false);
+        subscription.setIsActive(true);
         when(subscriptionRepository.findById(any())).thenReturn(Optional.of(subscription));
 
         //ACT
