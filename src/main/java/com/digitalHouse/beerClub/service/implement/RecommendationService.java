@@ -16,9 +16,7 @@ import com.digitalHouse.beerClub.service.interfaces.IRecommendationService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class RecommendationService implements IRecommendationService {
@@ -37,7 +35,15 @@ public class RecommendationService implements IRecommendationService {
 
     @Override
     public List<RecommendationDTO> searchAll() {
-        return recommendationRepository.findAll().stream().filter(Recommendation::getIsActive).map(r -> mapper.converter(r, RecommendationDTO.class)).toList();
+        return recommendationRepository.findAll().stream().filter(Recommendation::getIsActive)
+                .map(r -> {
+                    RecommendationDTO recommendationDTO = mapper.converter(r, RecommendationDTO.class);
+                    // Obtener el primer subscriptionId si existe
+                    Optional<Subscription> firstSubscription = r.getSubscriptions().stream().findFirst();
+                    firstSubscription.ifPresent(subscription -> recommendationDTO.setSubscriptionId(subscription.getId()));
+                    return recommendationDTO;
+                })
+                .toList();
     }
 
     @Override
@@ -84,7 +90,34 @@ public class RecommendationService implements IRecommendationService {
 
     @Override
     public RecommendationDTO update(RecommendationDTO recommendationDTO, Long id) throws NotFoundException {
-        return null;
+        Recommendation recommendation = recommendationRepository.findById(id).orElseThrow(()-> new NotFoundException("Recommendation not found"));
+
+        if(!recommendation.getIsActive()){
+            throw new NotFoundException("Recommendation not found");
+        }
+
+        Subscription subscription = subscriptionRepository.findById(recommendationDTO.getSubscriptionId()).orElseThrow(()-> new NotFoundException("Subscription not found"));
+
+        recommendation.setTitle(recommendationDTO.getTitle());
+        recommendation.setDescription(recommendationDTO.getDescription());
+        recommendation.setCreateDate(recommendationDTO.getCreateDate());
+        recommendation.setImageUrl(recommendationDTO.getImageUrl());
+
+        ProductDTO productDTO = recommendationDTO.getProduct();
+        if (productDTO == null) {
+            throw new NotFoundException("Product information is missing");
+        }
+        Product product = mapper.converter(productDTO, Product.class);
+        Product  newProduct = productRepository.save(product);
+        recommendation.setProduct(newProduct);
+
+        recommendation.getSubscriptions().add(subscription);
+
+        Recommendation newRecommendation = recommendationRepository.save(recommendation);
+        RecommendationDTO recommendationResponse= mapper.converter(newRecommendation, RecommendationDTO.class);
+        recommendationResponse.setSubscriptionId(recommendationDTO.getSubscriptionId());
+
+        return  recommendationResponse;
     }
 
     @Override

@@ -17,41 +17,41 @@ import java.util.List;
 @CrossOrigin("*")
 public class RecommendationController {
 
-    private final IRecommendationService recomendationService;
+    private final IRecommendationService recommendationService;
 
-    public RecommendationController(IRecommendationService recomendationService) {
-        this.recomendationService = recomendationService;
+    public RecommendationController(IRecommendationService recommendationService) {
+        this.recommendationService = recommendationService;
     }
 
     @GetMapping
     public ResponseEntity<List<RecommendationDTO>> getAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(recomendationService.searchAll());
+        return ResponseEntity.status(HttpStatus.OK).body(recommendationService.searchAll());
     }
 
     @PostMapping
-    public ResponseEntity<RecommendationDTO> save (@RequestBody RecommendationDTO recomendationDTO) throws BadRequestException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(recomendationService.create(recomendationDTO));
+    public ResponseEntity<RecommendationDTO> save (@RequestBody RecommendationDTO recommendationDTO) throws BadRequestException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(recommendationService.create(recommendationDTO));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<RecommendationDTO> getById(@PathVariable
                                                     Long id) throws NotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(recomendationService.searchById(id));
+        return ResponseEntity.status(HttpStatus.OK).body(recommendationService.searchById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RecommendationDTO> update (@RequestBody RecommendationDTO recomendationDTO, @PathVariable Long id) throws NotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(recomendationService.update(recomendationDTO,id));
+    public ResponseEntity<RecommendationDTO> update (@RequestBody RecommendationDTO recommendationDTO, @PathVariable Long id) throws NotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(recommendationService.update(recommendationDTO,id));
     }
 
     @DeleteMapping("/{id}")
     public  ResponseEntity<?> delete (@PathVariable Long id) throws ServiceException, NotFoundException {
-        recomendationService.delete(id);
+        recommendationService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/{subscriptionId}/{date}")
     public ResponseEntity<RecommendationDTO> getBySubscriptionAndDate (@PathVariable Long subscriptionId, @PathVariable LocalDate date) throws NotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(recomendationService.searchBySubscriptionAndDate(subscriptionId,date));
+        return ResponseEntity.status(HttpStatus.OK).body(recommendationService.searchBySubscriptionAndDate(subscriptionId,date));
     }
 }
