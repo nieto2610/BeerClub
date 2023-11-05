@@ -1,10 +1,10 @@
-//package com.digitalHouse.beerClub.model;
+package com.digitalHouse.beerClub.model;
 
-//import jakarta.persistence.*;
-//import lombok.AllArgsConstructor;
-//import lombok.Data;
-//import lombok.NoArgsConstructor;
-/*
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,4 +18,3 @@ public class Benefit {
     private Long id;
     private String name;
 }
-*/

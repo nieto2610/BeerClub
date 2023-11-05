@@ -25,11 +25,9 @@ public class Subscription {
     private String description;
     private Double price;
 
-    //@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    //@JoinColumn(name = "subscription_id")
-    //private List<Benefit> benefits = new ArrayList<>();
-    @ElementCollection
-    private List<String> benefits = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "subscription_id")
+    private List<Benefit> benefits = new ArrayList<>();
 
     private Boolean isRecommended;
     private Boolean isActive;
@@ -39,15 +37,25 @@ public class Subscription {
     private Set<User> users = new HashSet<>();
 
     @OneToMany(mappedBy = "subscription", fetch = FetchType.EAGER)
-    private Set<Transaction> transactions = new HashSet<>();
+    private Set<Payment> payments = new HashSet<>();
+
+    public Subscription(Long id, String name, String description, Double price, List<Benefit> benefits, Boolean isRecommended, Boolean isActive) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.benefits = benefits;
+        this.isRecommended = isRecommended;
+        this.isActive = isActive;
+    }
 
     public void addUser(User user) {
         user.setSubscription(this);
         users.add(user);
     }
 
-    public void addTransaction(Transaction transaction) {
-        transaction.setSubscription(this);
-        transactions.add(transaction);
+    public void addTransaction(Payment payment) {
+        payment.setSubscription(this);
+        payments.add(payment);
     }
 }

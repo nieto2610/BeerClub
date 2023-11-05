@@ -1,7 +1,5 @@
 package com.digitalHouse.beerClub.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -9,6 +7,8 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -62,6 +62,9 @@ public class User {
     @JoinColumn(name = "subscription_id")
     private Subscription subscription;
 
+    @OneToMany(mappedBy="user", fetch=FetchType.EAGER)
+    private Set<CardPayment> cardPayments = new HashSet<>();
+
     public User(String firstName, String lastName, String email, LocalDate birthdate, String telephone, LocalDate subscriptionDate, String password, Address address) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -73,6 +76,11 @@ public class User {
         this.address = address;
         role = RoleType.USER;
         active = true;
+    }
+
+    public void addCard(CardPayment cardPayment) {
+        cardPayment.setUser(this);
+        cardPayments.add(cardPayment);
     }
 
     public void assignRole(RoleType roleType) {

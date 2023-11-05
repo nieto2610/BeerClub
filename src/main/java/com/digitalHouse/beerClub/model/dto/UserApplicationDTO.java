@@ -1,5 +1,6 @@
 package com.digitalHouse.beerClub.model.dto;
 
+import com.digitalHouse.beerClub.model.CardPayment;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -61,4 +62,7 @@ public class UserApplicationDTO {
     private String password;
 
     private Long subscriptionId;
+
+    private CardPaymentDTO cardPayment;
+
 }

@@ -3,12 +3,15 @@ package com.digitalHouse.beerClub.service.implement;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Address;
+import com.digitalHouse.beerClub.model.CardPayment;
 import com.digitalHouse.beerClub.model.Subscription;
 import com.digitalHouse.beerClub.model.User;
+import com.digitalHouse.beerClub.model.dto.CardPaymentDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.model.dto.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.repository.IAddressRepository;
+import com.digitalHouse.beerClub.repository.ICardPaymentRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,10 +51,13 @@ class UserServiceImplementTest {
     @Mock
     private ISubscriptionRepository subscriptionRepository;
 
+    @Mock
+    private ICardPaymentRepository cardPaymentRepository;
+
     @BeforeEach
     void setUp() {
         mapper = new Mapper(new ModelMapper());
-        userServiceImplement = new UserServiceImplement(userRepository,addressRepository,subscriptionRepository,mapper);
+        userServiceImplement = new UserServiceImplement(userRepository,addressRepository,subscriptionRepository, cardPaymentRepository, mapper);
     }
 
     @Test
@@ -114,10 +120,11 @@ class UserServiceImplementTest {
     @DisplayName("Save User")
     void saveUser() throws NotFoundException {
         // ARRANGE
-        Subscription subscription = new Subscription(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, List.of(), false, true, Set.of());
+        Subscription subscription = new Subscription(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, List.of(), false, true);
         subscriptionRepository.save(subscription);
+        CardPaymentDTO cardPayment = new CardPaymentDTO();
         UserApplicationDTO userDto = new UserApplicationDTO("Juan", "Perez", "juan@beerClub.com",
-                LocalDate.now().minusYears(23), "123456789", "Argentina", "Santa Fe", "Rosario", "Roca", 1200, 15, "A3", "3400","Juan123#", 1L);
+                LocalDate.now().minusYears(23), "123456789", "Argentina", "Santa Fe", "Rosario", "Roca", 1200, 15, "A3", "3400","Juan123#",1L,cardPayment);
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
             User savedUser = invocation.getArgument(0);
             savedUser.setId(1L);
@@ -141,9 +148,10 @@ class UserServiceImplementTest {
         Address address = new Address("Argentina", "Santa Fe", "Rosario", "Roca", 1200, 15, "A3", "3400");
         User existingUser = new User("Juan", "Perez", "juan@beerClub.com", LocalDate.now().minusYears(23), "123456789", LocalDate.now().plusMonths(1).withDayOfMonth(1), "Juan123#", address);
         existingUser.setId(userId);
+        CardPaymentDTO cardPayment = new CardPaymentDTO();
 
         // Configura el DTO con los datos de actualización
-        UserApplicationDTO updatedUserData = new UserApplicationDTO("Juana", "Pérez", "juana@beerClub.com", LocalDate.now().minusYears(23), "987654321", "Argentina", "Santa Fe", "Rosario", "Roca", 1200, 15, "A3", "3400","Juana123#", 1L);
+        UserApplicationDTO updatedUserData = new UserApplicationDTO("Juana", "Pérez", "juana@beerClub.com", LocalDate.now().minusYears(23), "987654321", "Argentina", "Santa Fe", "Rosario", "Roca", 1200, 15, "A3", "3400","Juana123#", 1L, cardPayment);
         when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
 
         // ACT

@@ -4,11 +4,11 @@ import com.digitalHouse.beerClub.exceptions.BadRequestException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.mapper.Mapper;
-//import com.digitalHouse.beerClub.model.Benefit;
+import com.digitalHouse.beerClub.model.Benefit;
 import com.digitalHouse.beerClub.model.Subscription;
 import com.digitalHouse.beerClub.model.dto.BenefitDTO;
 import com.digitalHouse.beerClub.model.dto.SubscriptionDTO;
-//import com.digitalHouse.beerClub.repository.IBenefitRepository;
+import com.digitalHouse.beerClub.repository.IBenefitRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.service.interfaces.ISubscriptionService;
 import org.springframework.stereotype.Service;
@@ -20,19 +20,14 @@ import java.util.List;
 public class SubscriptionService implements ISubscriptionService {
 
     private final ISubscriptionRepository subscriptionRepository;
-    //private final IBenefitRepository benefitRepository;
+    private final IBenefitRepository benefitRepository;
     private final Mapper mapper;
 
-    /*public SubscriptionService(ISubscriptionRepository subscriptionRepository, IBenefitRepository benefitRepository, Mapper mapper) {
+    public SubscriptionService(ISubscriptionRepository subscriptionRepository, IBenefitRepository benefitRepository, Mapper mapper) {
         this.subscriptionRepository = subscriptionRepository;
         this.benefitRepository = benefitRepository;
         this.mapper = mapper;
-    }*/
-    public SubscriptionService(ISubscriptionRepository subscriptionRepository, Mapper mapper) {
-        this.subscriptionRepository = subscriptionRepository;
-        this.mapper = mapper;
     }
-
 
     @Override
     public List<SubscriptionDTO> searchAll() {
@@ -60,12 +55,10 @@ public class SubscriptionService implements ISubscriptionService {
         subscription.setPrice(subscriptionDTO.getPrice());
         subscription.setIsRecommended(subscriptionDTO.getIsRecommended());
 
-        // set new benefits
-       /* List<BenefitDTO> newBenefits = new ArrayList<>(subscriptionDTO.getBenefits());
+       List<BenefitDTO> newBenefits = new ArrayList<>(subscriptionDTO.getBenefits());
         subscription.getBenefits().clear();
         subscription.getBenefits().addAll(newBenefits.stream().map(b -> mapper.converter(b, Benefit.class)).toList());
-        */
-        subscription.setBenefits(subscriptionDTO.getBenefits());
+
         Subscription subscriptionUpdated = subscriptionRepository.save(subscription);
         return mapper.converter(subscriptionUpdated, SubscriptionDTO.class);
     }

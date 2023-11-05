@@ -3,12 +3,14 @@ package com.digitalHouse.beerClub.service.implement;
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Address;
+import com.digitalHouse.beerClub.model.CardPayment;
 import com.digitalHouse.beerClub.model.Subscription;
 import com.digitalHouse.beerClub.model.User;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.model.dto.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.repository.IAddressRepository;
+import com.digitalHouse.beerClub.repository.ICardPaymentRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
@@ -22,22 +24,22 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImplement implements IUserService {
 
-    @Autowired
-    private IUserRepository userRepository;
+    private final IUserRepository userRepository;
 
-    @Autowired
-    private IAddressRepository addressRepository;
+    private final IAddressRepository addressRepository;
 
-    @Autowired
-    private ISubscriptionRepository subscriptionRepository;
+    private final ISubscriptionRepository subscriptionRepository;
+
+    private final ICardPaymentRepository cardPaymentRepository;
 
     private final Mapper userMapper;
 
     @Autowired
-    public UserServiceImplement(IUserRepository userRepository, IAddressRepository addressRepository, ISubscriptionRepository subscriptionRepository,Mapper userMapper) {
+    public UserServiceImplement(IUserRepository userRepository, IAddressRepository addressRepository, ISubscriptionRepository subscriptionRepository, ICardPaymentRepository cardPaymentRepository, Mapper userMapper) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
         this.subscriptionRepository = subscriptionRepository;
+        this.cardPaymentRepository = cardPaymentRepository;
         this.userMapper = userMapper;
     }
 
@@ -74,6 +76,8 @@ public class UserServiceImplement implements IUserService {
     public UserDTO saveUser(UserApplicationDTO user) throws NotFoundException {
         Address address = new Address(user.getCountry(), user.getProvince(), user.getCity(), user.getStreet(), user.getNumber(), user.getFloor(), user.getApartment(), user.getZipCode());
         addressRepository.save(address);
+        CardPayment cardPayment = new CardPayment(user.getCardPayment().getCardHolder(),user.getCardPayment().getNumber(),user.getCardPayment().getCvv(),user.getCardPayment().getExpDate());
+        cardPaymentRepository.save(cardPayment);
         LocalDate subscriptionDate = LocalDate.now();
         if (subscriptionDate.getDayOfMonth() >= 20) {
             // Si es el día 20 o posterior, establece la fecha de suscripción en el primer día del mes siguiente
@@ -82,6 +86,7 @@ public class UserServiceImplement implements IUserService {
         User newUser = new User(user.getName(), user.getLastName(), user.getEmail(), user.getBirthdate(), user.getTelephone(), subscriptionDate, user.getPassword(), address);
         Subscription subscription = subscriptionRepository.findById(user.getSubscriptionId()).orElseThrow(() -> new NotFoundException("Subscription not found."));
         newUser.setSubscription(subscription);
+        newUser.addCard(cardPayment);
         userRepository.save(newUser);
         subscription.addUser(newUser);
         UserDTO userDTO = userMapper.converter(newUser, UserDTO.class);
