@@ -1,5 +1,6 @@
 package com.digitalHouse.beerClub.auth;
 
+import com.digitalHouse.beerClub.exceptions.CustomUserAlreadyExistsException;
 import com.digitalHouse.beerClub.jwt.JwtService;
 import com.digitalHouse.beerClub.model.User;
 import com.digitalHouse.beerClub.repository.IUserRepository;
@@ -9,6 +10,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,22 +30,25 @@ public class AuthService {
     }
 
     public AuthResponse register(User request) {
-        User user = new User(
-                request.getFirstName(),
-                request.getLastName(),
-                request.getEmail(),
-                request.getBirthdate(),
-                request.getTelephone(),
-                request.getSubscriptionDate(),
-                passwordEncoder.encode(request.getPassword()),
-                request.getAddress()
-        );
+        Optional<User> existingUser = repository.findByUserEmail(request.getEmail());
 
-        repository.save(user);
-
-        return  AuthResponse
-                .builder()
-                .token(jwtService.getToken(user))
-                .build();
+        if (existingUser.isPresent()) {
+            throw new CustomUserAlreadyExistsException("El email ya está registrado.");
+        } else {
+            User userClass = new User(
+                    request.getFirstName(),
+                    request.getLastName(),
+                    request.getEmail(),
+                    request.getBirthdate(),
+                    request.getTelephone(),
+                    request.getSubscriptionDate(),
+                    passwordEncoder.encode(request.getPassword()),
+                    request.getAddress()
+            );
+            repository.save(userClass);
+            return AuthResponse.builder()
+                    .token(jwtService.getToken(userClass))
+                    .build();
+        }
     }
 }

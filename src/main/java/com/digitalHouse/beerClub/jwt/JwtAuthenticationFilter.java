@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             Claims claims = jwtService.getClaimsFromToken(token);
             boolean isTokenValid = jwtService.isTokenValid(token, userDetails);
-            if (claims != null && isTokenValid) {
+            if (claims != null && isTokenValid && userDetails.isEnabled()) {
                 List<GrantedAuthority> authorities = Arrays.stream(claims.get("role").toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
