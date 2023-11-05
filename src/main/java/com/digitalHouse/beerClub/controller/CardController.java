@@ -58,4 +58,9 @@ public class CardController {
     public ResponseEntity<CardDTO> activateCard(@PathVariable @Positive(message = "Id must be greater than 0") Long id) throws NotFoundException{
         return ResponseEntity.status(HttpStatus.OK).body(cardService.activeCard(id));
     }
+
+    @GetMapping("/cardNumber/{cardNumber}")
+    public ResponseEntity<CardDTO> getByCardNumber(@PathVariable String cardNumber) throws NotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(cardService.searchByCardNumber(cardNumber));
+    }
 }

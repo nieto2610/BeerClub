@@ -116,5 +116,10 @@ public class CardService implements ICardService {
         return mapper.converter(card, CardDTO.class);
     }
 
-
+    @Override
+    public CardDTO searchByCardNumber(String cardNumber) throws NotFoundException {
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new NotFoundException("Card not found"));
+        return mapper.converter(card, CardDTO.class);
+    }
 }

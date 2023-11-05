@@ -8,4 +8,5 @@ import com.digitalHouse.beerClub.model.dto.CardDTO;
 public interface ICardService extends IService<CardDTO> {
     CardDTO createCard(CardAppDTO cardAppDTO) throws BadRequestException, NotFoundException;
     CardDTO activeCard(Long cardId) throws NotFoundException;
+    CardDTO searchByCardNumber(String cardNumber) throws NotFoundException;
 }
