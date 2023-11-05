@@ -5,6 +5,7 @@ import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.model.dto.AgeVerificationAppDTO;
 import com.digitalHouse.beerClub.model.dto.AgeVerificationDTO;
 import com.digitalHouse.beerClub.service.implement.AgeVerificationService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@Tag(name = "Age Verification")
 @RequestMapping("/ageVerification")
 @CrossOrigin("*")
 public class AgeVerificationController {
