@@ -15,7 +15,7 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     private String name;
     private String description;
 
@@ -24,5 +24,5 @@ public class Product {
     private List<ProductImage> imageUrl;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<Recomendation> recomendationList;
+    private List<Recommendation> recommendationList;
 }

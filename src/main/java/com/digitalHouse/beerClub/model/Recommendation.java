@@ -12,11 +12,11 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Recomendation {
+public class Recommendation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     private String title;
     private String description;
     private LocalDate createDate;
@@ -27,10 +27,10 @@ public class Recomendation {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
-            name = "recomendation_subscription",
-            joinColumns = @JoinColumn(name = "recomendation_id"),
+            name = "recommendation_subscription",
+            joinColumns = @JoinColumn(name = "recommendation_id"),
             inverseJoinColumns = @JoinColumn(name = "subscription_id"))
     Set<Subscription> subscriptions;
 

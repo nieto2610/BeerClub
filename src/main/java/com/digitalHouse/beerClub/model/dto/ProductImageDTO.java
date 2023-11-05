@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProductImageDTO {
 
-    private Integer id;
     private String url;
 }

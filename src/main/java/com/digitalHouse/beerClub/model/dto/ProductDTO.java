@@ -1,7 +1,7 @@
 package com.digitalHouse.beerClub.model.dto;
 
-import com.digitalHouse.beerClub.model.Product;
-import com.digitalHouse.beerClub.model.Recomendation;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,9 +13,12 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductDTO {
 
-    private Integer id;
+    @JsonIgnore
+    private Long id;
     private String name;
     private String description;
+    @JsonProperty("image_url")
     private List<ProductImageDTO> imageUrl;
-    private List<RecomendationDTO> recomendationList;
+    @JsonIgnore
+    private List<RecommendationDTO> recommendationList;
 }

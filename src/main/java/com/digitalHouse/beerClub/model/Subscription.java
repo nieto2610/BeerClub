@@ -30,5 +30,5 @@ public class Subscription {
     private Boolean isActive;
 
     @ManyToMany(mappedBy = "subscriptions")
-    Set<Recomendation> recomendations;
+    Set<Recommendation> recommendations;
 }
