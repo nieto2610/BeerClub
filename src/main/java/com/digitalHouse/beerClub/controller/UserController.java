@@ -130,12 +130,6 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("delete/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable Long id) {
-        iUserService.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {

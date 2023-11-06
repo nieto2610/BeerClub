@@ -27,5 +27,4 @@ public interface IUserService extends IService<UserDTO>{
 
     void activateUserSubscription(Long userId) throws NotFoundException, UserActiveException;
 
-    void deleteById(Long id);
 }
