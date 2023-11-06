@@ -3,10 +3,10 @@ name: Docker Build & Push
 on:
   push:
     branches:
-      - development
+      - devops
   pull_request:
     branches:
-      - development
+      - devops
 
 jobs:
   build:
