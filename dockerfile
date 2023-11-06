@@ -13,8 +13,11 @@ COPY . .
 # Otorga permisos de ejecución al script mvnw
 RUN chmod +x mvnw
 
-# Ejecuta el comando para construir la aplicación con Maven Wrapper
+# Ejecuta el comando para descargar las dependencias con Maven Wrapper
 RUN ./mvnw clean install -DskipTests
+
+# Ejecuta el comando para construir la aplicación con Maven Wrapper
+RUN ./mvnw package -DskipTests
 
 # Crea una imagen de Java para ejecutar la aplicación
 FROM openjdk:11-jre-slim
