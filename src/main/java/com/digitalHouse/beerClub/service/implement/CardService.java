@@ -15,6 +15,8 @@ import com.digitalHouse.beerClub.utils.CardUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,9 +57,7 @@ public class CardService implements ICardService {
 
         String cardNumber = CardUtils.getCardNumber();
         int cvv = CardUtils.getCVV();
-        LocalDate expirationDate = CardUtils.parseStringToLocalDate(cardAppDTO.getExpirationDate());
-        cardAppDTO.setIsActive(true);
-
+        LocalDate expirationDate = LocalDate.now().plusYears(5).with(TemporalAdjusters.lastDayOfMonth());
         Long id = cardAppDTO.getAccountId();
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Account not found"));
@@ -65,7 +65,7 @@ public class CardService implements ICardService {
         if(!account.getIsActive()){
             throw new NotFoundException("The Account is not active and cannot be modified.");
         }
-        Card newCard = new Card(cardNumber, cardAppDTO.getCardHolderName(), expirationDate, cvv, account, cardAppDTO.getIsActive());
+        Card newCard = new Card(cardNumber, cardAppDTO.getCardHolderName(), expirationDate, cvv, account, true);
         Card card = cardRepository.save(newCard);
         return mapper.converter(card, CardDTO.class);
     }

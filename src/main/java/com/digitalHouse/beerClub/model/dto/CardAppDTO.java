@@ -12,8 +12,5 @@ import lombok.NoArgsConstructor;
 public class CardAppDTO {
     @NotBlank(message = "Card cardHolderName must not be blank")
     private String cardHolderName;
-    @Pattern(regexp = "^(0[1-9]|1[0-2])([0-9]{2})$", message = "Card expirationDate must be in the format MMyy")
-    private String expirationDate;
     private Long accountId;
-    private Boolean isActive;
 }
