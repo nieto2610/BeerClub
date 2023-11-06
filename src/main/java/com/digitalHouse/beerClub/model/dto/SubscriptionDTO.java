@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -25,8 +24,8 @@ public class SubscriptionDTO {
     @NotNull(message = "Subscription price must not be null")
     @Positive(message = "Subscription price must be greater than 0")
     private Double price;
-    //private List<@Valid BenefitDTO> benefits = new ArrayList<>();
-    private List<@Valid String> benefits = new ArrayList<>();
+
+    private List<@Valid BenefitDTO> benefits = new ArrayList<>();
 
     @NotNull(message = "Subscription isRecommended must not be null")
     @AssertTrue(message = "Subscription isRecommended must be true or false")

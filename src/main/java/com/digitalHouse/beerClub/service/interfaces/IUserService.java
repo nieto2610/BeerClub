@@ -26,4 +26,6 @@ public interface IUserService extends IService<UserDTO>{
     void updatePasswordUser(UserAuthRequest user) throws NotFoundException;
 
     void activateUserSubscription(Long userId) throws NotFoundException, UserActiveException;
+
+    void deleteById(Long id);
 }

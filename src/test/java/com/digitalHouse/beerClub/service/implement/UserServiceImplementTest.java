@@ -27,7 +27,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -114,8 +113,9 @@ class UserServiceImplementTest {
     @DisplayName("Save User")
     void saveUser() throws NotFoundException {
         // ARRANGE
-        Subscription subscription = new Subscription(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, List.of(), false, true, Set.of());
-        subscriptionRepository.save(subscription);
+        Subscription subscription = new Subscription(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, List.of(), false, true);
+        when(subscriptionRepository.findById(1L)).thenReturn(Optional.of(subscription));
+
         UserApplicationDTO userDto = new UserApplicationDTO("Juan", "Perez", "juan@beerClub.com",
                 LocalDate.now().minusYears(23), "123456789", "Argentina", "Santa Fe", "Rosario", "Roca", 1200, 15, "A3", "3400","Juan123#", 1L);
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
@@ -131,6 +131,7 @@ class UserServiceImplementTest {
         assertNotNull(result);
         assertNotNull(result.getId());
         assertEquals(userDto.getName(), result.getFirstName());
+        //assertTrue(subscription.getUsers().contains(result));
     }
 
     @Test

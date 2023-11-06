@@ -146,4 +146,9 @@ public class UserServiceImplement implements IUserService {
         userRepository.save(user);
     }
 
+    @Override
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
+    }
+
 }
