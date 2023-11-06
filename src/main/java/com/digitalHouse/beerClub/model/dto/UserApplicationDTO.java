@@ -63,6 +63,15 @@ public class UserApplicationDTO {
 
     private Long subscriptionId;
 
-    private CardPaymentDTO cardPayment;
+    private String cardHolder;
+
+    @NotNull(message = "Number cannot be null")
+    private String cardNumber;
+
+    @NotNull(message = "Cvv cannot be null")
+    private int cvv;
+
+    @Column(nullable = false, updatable = false)
+    private String expDate;
 
 }

@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @Tag(name = "Cards")
-@RequestMapping("/api/v1/cards")
+@RequestMapping("/cards")
 @Validated
 public class CardController {
 

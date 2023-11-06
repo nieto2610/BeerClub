@@ -16,13 +16,13 @@ public class CardPayment {
     private String cardHolder;
     private String number;
     private int cvv;
-    private LocalDate expDate;
+    private String expDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="user_id")
     private  User user;
 
-    public CardPayment(String cardHolder, String number, int cvv, LocalDate expDate) {
+    public CardPayment(String cardHolder, String number, int cvv,String expDate) {
         this.cardHolder = cardHolder;
         this.number = number;
         this.cvv = cvv;

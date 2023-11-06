@@ -76,7 +76,7 @@ public class UserServiceImplement implements IUserService {
     public UserDTO saveUser(UserApplicationDTO user) throws NotFoundException {
         Address address = new Address(user.getCountry(), user.getProvince(), user.getCity(), user.getStreet(), user.getNumber(), user.getFloor(), user.getApartment(), user.getZipCode());
         addressRepository.save(address);
-        CardPayment cardPayment = new CardPayment(user.getCardPayment().getCardHolder(),user.getCardPayment().getNumber(),user.getCardPayment().getCvv(),user.getCardPayment().getExpDate());
+        CardPayment cardPayment = new CardPayment(user.getCardHolder(),user.getCardNumber(),user.getCvv(),user.getExpDate());
         cardPaymentRepository.save(cardPayment);
         LocalDate subscriptionDate = LocalDate.now();
         if (subscriptionDate.getDayOfMonth() >= 20) {
