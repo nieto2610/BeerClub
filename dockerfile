@@ -1,5 +1,5 @@
 # Usa una imagen de Maven para compilar la aplicación
-FROM maven:3.9.5-jdk-11 AS builder
+FROM maven:3.8.4-openjdk-11 AS builder
 
 # Establece el directorio de trabajo en /app
 WORKDIR /app
