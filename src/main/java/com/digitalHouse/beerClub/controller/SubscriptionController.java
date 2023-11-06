@@ -16,6 +16,7 @@ import java.util.List;
 
 @Validated
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/subscriptions")
 public class SubscriptionController {
 
