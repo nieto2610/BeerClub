@@ -60,4 +60,5 @@ public class UserApplicationDTO {
     )
     private String password;
 
+    private Long subscriptionId;
 }

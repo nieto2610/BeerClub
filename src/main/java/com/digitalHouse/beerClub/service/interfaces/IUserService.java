@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface IUserService extends IService<UserDTO>{
 
-    UserDTO saveUser(UserApplicationDTO user);
+    UserDTO saveUser(UserApplicationDTO user) throws NotFoundException;
 
     List<UserDTO> getAllActiveUsers();
 
@@ -26,4 +26,5 @@ public interface IUserService extends IService<UserDTO>{
     void updatePasswordUser(UserAuthRequest user) throws NotFoundException;
 
     void activateUserSubscription(Long userId) throws NotFoundException, UserActiveException;
+
 }

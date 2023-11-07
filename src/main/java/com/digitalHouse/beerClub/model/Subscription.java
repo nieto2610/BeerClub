@@ -1,12 +1,15 @@
 package com.digitalHouse.beerClub.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -25,6 +28,26 @@ public class Subscription {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "subscription_id")
     private List<Benefit> benefits = new ArrayList<>();
+
     private Boolean isRecommended;
     private Boolean isActive;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY)
+    private Set<User> users = new HashSet<>();
+
+    public Subscription(Long id, String name, String description, Double price, List<Benefit> benefits, Boolean isRecommended, Boolean isActive) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.benefits = benefits;
+        this.isRecommended = isRecommended;
+        this.isActive = isActive;
+    }
+
+    public void addUser(User user) {
+        user.setSubscription(this);
+        users.add(user);
+    }
 }

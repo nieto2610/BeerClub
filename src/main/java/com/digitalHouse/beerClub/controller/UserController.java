@@ -34,6 +34,7 @@ public class UserController {
 
     @Autowired
     private IUserService IUserService;
+
     @Operation(summary="List all users", description="List all users", responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @GetMapping("/all")
@@ -52,7 +53,7 @@ public class UserController {
     @Operation(summary="Add user", description="Add a new user", responses = {
             @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @PostMapping("/create")
-    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) {
+    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) throws NotFoundException {
         UserDTO userDTO = IUserService.saveUser(user);
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
