@@ -6,7 +6,7 @@ import com.digitalHouse.beerClub.model.Address;
 import com.digitalHouse.beerClub.model.Subscription;
 import com.digitalHouse.beerClub.model.User;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
-import com.digitalHouse.beerClub.model.dto.UserAuthRequest;
+import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.repository.IAddressRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
