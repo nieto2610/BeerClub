@@ -1,4 +1,4 @@
-package com.digitalHouse.beerClub.model.dto;
+package com.digitalHouse.beerClub.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
