@@ -1,5 +1,6 @@
 package com.digitalHouse.beerClub.model.dto;
 
+import com.digitalHouse.beerClub.model.Account;
 import com.digitalHouse.beerClub.model.Card;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
@@ -23,4 +24,6 @@ public class AccountDTO {
     @Positive(message = "Account balance must be greater or equal than 0")
     private Double balance;
     private Boolean isActive;
+
+
 }
