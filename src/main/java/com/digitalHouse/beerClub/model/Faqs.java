@@ -15,7 +15,7 @@ public class Faqs {
     private Long id;
     @Column
     private String question;
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String answer;
 
     public void setId(Long id) {

@@ -1,5 +1,6 @@
 package com.digitalHouse.beerClub.model.dto;
 
+import jakarta.persistence.Column;
 import lombok.*;
 
 @Data
@@ -8,6 +9,7 @@ import lombok.*;
 public class FaqsDTO {
     private Long id;
     private String question;
+    @Column(columnDefinition = "TEXT")
     private String answer;
 
 
