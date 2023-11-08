@@ -1,5 +1,6 @@
 package com.digitalHouse.beerClub.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -7,6 +8,8 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -56,6 +59,10 @@ public class User {
     @JoinColumn(name = "address_id")
     private Address address;
 
+    @OneToMany( mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List <Review> reviewList;
+
     public User(String firstName, String lastName, String email, LocalDate birthdate, String telephone, LocalDate subscriptionDate, String password, Address address) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -72,4 +79,7 @@ public class User {
     public void assignRole(RoleType roleType) {
         this.role = roleType;
     }
+
+
+
 }

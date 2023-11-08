@@ -1,6 +1,8 @@
 package com.digitalHouse.beerClub.model.dto;
 
 
+
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,8 +13,8 @@ import lombok.NoArgsConstructor;
 public class ReviewDTO {
 
     private Long id;
-    private  Long product_id;
-    private  Long user_id;
+    private @Valid ProductDTO product;
+    private @Valid UserDTO user;
     private Integer rating;
     private String comments;
 

@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductDTO {
 
-    @JsonIgnore
+    //@JsonIgnore
     private Long id;
     @NotBlank(message = "Product name must not be blank")
     private String name;

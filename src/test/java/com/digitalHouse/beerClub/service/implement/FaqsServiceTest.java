@@ -1,16 +1,22 @@
 package com.digitalHouse.beerClub.service.implement;
 
+import com.digitalHouse.beerClub.exceptions.BadRequestException;
 import com.digitalHouse.beerClub.mapper.Mapper;
-import org.junit.jupiter.api.Test;
+import com.digitalHouse.beerClub.model.Benefit;
+import com.digitalHouse.beerClub.model.Subscription;
+import com.digitalHouse.beerClub.model.dto.BenefitDTO;
+import com.digitalHouse.beerClub.model.dto.SubscriptionDTO;
+import org.junit.jupiter.api.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.model.Faqs;
 import com.digitalHouse.beerClub.model.dto.FaqsDTO;
 import com.digitalHouse.beerClub.repository.IFaqsRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,41 +63,6 @@ class FaqsServiceTest {
         assertEquals(id, result.getId());
     }
 
-    /*
-    @Test
-    void create() throws BadRequestException {
-        Long id = 1L;
-        FaqsDTO faqsDTO = new FaqsDTO();
-        faqsDTO.setQuestion("Q1");
-        faqsDTO.setAnswer("A1");
-
-        when(faqsRepository.save(org.mockito.ArgumentMatchers.any(Faqs.class)))
-                .thenReturn(new Faqs(id, faqsDTO.getQuestion(), faqsDTO.getAnswer()));
-
-        FaqsDTO result = faqsService.create(faqsDTO);
-
-        assertNotNull(result);
-        assertEquals(id, result.getId());
-    }
-    @Test
-    void update() throws NotFoundException {
-        Long id = 1L;
-        Faqs faqs = new Faqs();
-        faqs.setQuestion("Q1");
-        faqs.setAnswer("A1");
-
-        FaqsDTO faqsDTO = new FaqsDTO();
-        faqsDTO.setId(1L);
-        faqsDTO.setQuestion("Q1");
-        faqsDTO.setAnswer("A1");
-
-        Mockito.when(faqsRepository.findById(id)).thenReturn(Optional.of(faqs));
-        Mockito.when(faqsRepository.save(Mockito.any(Faqs.class))).thenReturn(faqs);
-
-        FaqsDTO result = faqsService.update(faqsDTO, faqsDTO.getId());
-
-        assertEquals(id, result.getId());
-    }*/
 
 
     @Test
