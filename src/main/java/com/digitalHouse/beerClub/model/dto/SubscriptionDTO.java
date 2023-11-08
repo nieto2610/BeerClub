@@ -27,8 +27,7 @@ public class SubscriptionDTO {
 
     private List<@Valid BenefitDTO> benefits = new ArrayList<>();
 
-    @NotNull(message = "Subscription isRecommended must not be null")
-    @AssertTrue(message = "Subscription isRecommended must be true or false")
+    @NotNull(message = "Subscription isRecommended must be true or false")
     private Boolean isRecommended;
 
     @AssertTrue(message = "Subscription isActive must be true or false")
