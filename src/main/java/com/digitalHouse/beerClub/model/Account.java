@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 @Entity
 @Data
 @NoArgsConstructor
@@ -19,14 +18,14 @@ public class Account {
     private String accountNumber;
     private Double balance;
     @OneToOne(mappedBy = "account")
-    private Card cards;
+    private Card card;
     private Boolean isActive;
 
-    public Account(String accountHolder, String accountNumber, Double balance, Card cards, Boolean isActive) {
+    public Account(String accountHolder, String accountNumber, Double balance, Card card, Boolean isActive) {
         this.accountHolder = accountHolder;
         this.accountNumber = accountNumber;
         this.balance = balance;
-        this.cards = cards;
+        this.card = card;
         this.isActive = isActive;
     }
 

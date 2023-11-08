@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 public class PaymentDTO {
     private Long id;
     private Double amount;
-    private PaymentType type;
+    //private PaymentType type;
     private String description;
     private LocalDateTime date;
+    private String invoiceNumber;
 }

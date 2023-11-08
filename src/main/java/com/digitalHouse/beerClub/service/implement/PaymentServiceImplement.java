@@ -15,12 +15,17 @@ import com.digitalHouse.beerClub.model.dto.PaymentDTO;
 import com.digitalHouse.beerClub.repository.IPaymentRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.service.interfaces.IPaymentService;
+import com.digitalHouse.beerClub.utils.AccountUtils;
+import com.digitalHouse.beerClub.utils.CardUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
 public class PaymentServiceImplement implements IPaymentService {
 
     private final IPaymentRepository paymentRepository;
@@ -51,61 +56,75 @@ public class PaymentServiceImplement implements IPaymentService {
 
     @Transactional
     @Override
-    public PaymentDTO savePayment(PaymentApplicationDTO paymentApplicationDTO) throws NotFoundException, EntityInactiveException, BadRequestException, InsufficientBalanceException {
+    public PaymentDTO savePayment(Long subscriptionId, String cardHolder, String cardNumber,int cvv, String expDate, Long userId) throws NotFoundException {
         Long accountBeerClubId = 1L;
 
-        Subscription subscription = subscriptionRepository.findById(paymentApplicationDTO.getSubscriptionId()).orElseThrow(() -> new NotFoundException("Subscription not found"));
+        Subscription subscription = subscriptionRepository.findById(subscriptionId).orElseThrow(() -> new NotFoundException("Subscription not found"));
 
         Double amount = subscription.getPrice();
         String description = subscription.getName();
-        String cardHolder = paymentApplicationDTO.getCardHolder();
-        String cardNumber = paymentApplicationDTO.getCardNumber();
-        String expDate = paymentApplicationDTO.getExpDate();
-        int cvv = paymentApplicationDTO.getCvv();
+        String invoiceNumber = AccountUtils.getInvoiceNumber();
 
         Payment payment = new Payment();
         payment.setAmount(amount);
         payment.setDescription(description);
         payment.setDate(LocalDateTime.now());
         payment.setCardNumber(cardNumber);
+        payment.setUserId(userId);
+        payment.setInvoiceNumber(invoiceNumber);
         payment.setSubscription(subscription);
-
-        cardValidation(cardHolder, cardNumber, cvv, expDate);
 
         CardDTO cardDTO = cardService.searchByCardNumber(cardNumber);
         Long accountId = cardDTO.getAccountId();
 
-        accountValidation(accountId, amount);
-
         accountService.debit(accountId,amount);
         accountService.credit(accountBeerClubId, amount);
-        return null;
+
+        paymentRepository.save(payment);
+
+        PaymentDTO paymentDTO = transactionMapper.converter(payment, PaymentDTO.class);
+        return paymentDTO;
     }
 
     private void cardValidation(String cardHolder, String number, int cvv, String expDate) throws NotFoundException, EntityInactiveException, BadRequestException {
         CardDTO cardDTO = cardService.searchByCardNumber(number);
+        LocalDate expDateTime = CardUtils.parseStringToLocalDate(expDate);
+
         if(!cardDTO.getIsActive()) {
-            throw new EntityInactiveException("The card is not actived");
+            throw new EntityInactiveException("La tarjeta no está activa");
         }
-        if(!expDate.equals(cardDTO.getExpirationDate())) {
-            throw new BadRequestException("The expDate is wrong");
+        if(!expDateTime.equals(cardDTO.getExpirationDate())) {
+            throw new BadRequestException("La fecha de vencimiento de la tarjeta no es correcta");
         }
         if(!cardHolder.equals(cardDTO.getCardHolderName())) {
-            throw new BadRequestException("The cardHolder is wrong");
+            throw new BadRequestException("El nombre del titular de la tarjeta no coincide");
         }
         if(cvv != cardDTO.getCvv()) {
-            throw new BadRequestException("The cvv is wrong");
+            throw new BadRequestException("El cvv de la tarjeta no es correcto");
         }
     }
 
     private void accountValidation(Long accountId, Double amount) throws NotFoundException, EntityInactiveException, InsufficientBalanceException {
         AccountDTO accountDTO = accountService.searchById(accountId);
         if(!accountDTO.getIsActive()) {
-            throw new EntityInactiveException("The account is not actived");
+            throw new EntityInactiveException("La cuenta no está activa");
         }
         if(accountDTO.getBalance() < amount) {
-            throw new InsufficientBalanceException("The balance is lower than the amount");
+            throw new InsufficientBalanceException("La cuenta no tiene saldo suficiente");
         }
+    }
+
+    @Override
+    public void paymentValidation(Long subscriptionId, String cardHolder, String cardNumber,int cvv, String expDate ) throws EntityInactiveException, NotFoundException, BadRequestException, InsufficientBalanceException {
+        Subscription subscription = subscriptionRepository.findById(subscriptionId).orElseThrow(() -> new NotFoundException("Subscription not found"));
+
+        Double amount = subscription.getPrice();
+        cardValidation(cardHolder, cardNumber, cvv, expDate);
+
+        CardDTO cardDTO = cardService.searchByCardNumber(cardNumber);
+        Long accountId = cardDTO.getAccountId();
+
+        accountValidation(accountId, amount);
     }
 }
 

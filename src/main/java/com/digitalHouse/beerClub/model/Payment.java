@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "transactions")
+@Table(name = "payments")
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,8 +19,8 @@ public class Payment {
     @Positive(message = "Transaction amount must be greater than 0")
     private Double amount;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentType type;
+   /* @Enumerated(EnumType.STRING)
+    private PaymentType type;*/
 
     private String description;
 
@@ -29,11 +29,13 @@ public class Payment {
 
     private String cardNumber;
 
+    private Long userId;
+
+    private String invoiceNumber;
+
     @ManyToOne
     @JoinColumn(name = "subscription_id")
     private Subscription subscription;
 
-    @ManyToOne()
-    @JoinColumn(name = "account_id")
-    private AccountClub account;
+
 }

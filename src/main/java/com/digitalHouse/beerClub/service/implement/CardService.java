@@ -76,7 +76,7 @@ public class CardService implements ICardService {
         if (!card.getIsActive()) {
             throw new NotFoundException("The Card is not active and cannot be modified.");
         }
-        LocalDate expirationDate = CardUtils.parseStringToLocalDate(cardDTO.getExpirationDate());
+        LocalDate expirationDate = cardDTO.getExpirationDate();
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Account not found"));
         if(!account.getIsActive()){

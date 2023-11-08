@@ -12,4 +12,14 @@ public final class AccountUtils {
         }
         return accountNumber.toString();
     }
+
+    public static String getInvoiceNumber(){
+        Random random = new Random();
+        StringBuilder accountNumber = new StringBuilder();
+        for (int i=0; i<13; i++){
+            int digit = random.nextInt(10);
+            accountNumber.append(digit);
+        }
+        return accountNumber.toString();
+    }
 }

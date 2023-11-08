@@ -48,7 +48,7 @@ public class UserApplicationDTO {
     @NotBlank(message = "Street cannot be null")
     private String street;
 
-    private int number, floor;
+    private String number, floor;
 
     private String apartment;
 
@@ -69,7 +69,7 @@ public class UserApplicationDTO {
     private String cardNumber;
 
     @NotNull(message = "Cvv cannot be null")
-    private int cvv;
+    private String cvv;
 
     @Column(nullable = false, updatable = false)
     private String expDate;

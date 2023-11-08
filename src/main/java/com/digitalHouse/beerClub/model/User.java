@@ -1,5 +1,6 @@
 package com.digitalHouse.beerClub.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -62,6 +63,7 @@ public class User {
     @JoinColumn(name = "subscription_id")
     private Subscription subscription;
 
+    @JsonIgnore
     @OneToMany(mappedBy="user", fetch=FetchType.EAGER)
     private Set<CardPayment> cardPayments = new HashSet<>();
 
@@ -79,7 +81,6 @@ public class User {
     }
 
     public void addCard(CardPayment cardPayment) {
-        cardPayment.setUser(this);
         cardPayments.add(cardPayment);
     }
 

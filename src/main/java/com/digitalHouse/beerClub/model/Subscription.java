@@ -49,13 +49,4 @@ public class Subscription {
         this.isActive = isActive;
     }
 
-    public void addUser(User user) {
-        user.setSubscription(this);
-        users.add(user);
-    }
-
-    public void addTransaction(Payment payment) {
-        payment.setSubscription(this);
-        payments.add(payment);
-    }
 }

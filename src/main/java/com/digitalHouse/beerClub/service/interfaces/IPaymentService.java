@@ -12,8 +12,7 @@ import java.util.List;
 public interface IPaymentService {
 
         List<PaymentDTO> searchAll();
-
         PaymentDTO searchById(Long id) throws NotFoundException;
-        PaymentDTO savePayment(PaymentApplicationDTO paymentApplicationDTO) throws NotFoundException, EntityInactiveException, BadRequestException, InsufficientBalanceException;
-
+        PaymentDTO savePayment(Long subscriptionId, String cardHolder, String cardNumber,int cvv, String expDate, Long userId) throws NotFoundException;
+        void paymentValidation(Long subscriptionId, String cardHolder, String cardNumber,int cvv, String expDate ) throws EntityInactiveException, NotFoundException, BadRequestException, InsufficientBalanceException;
 }

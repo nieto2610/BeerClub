@@ -23,7 +23,7 @@ public final class CardUtils {
         for (int i = 0; i < 4; i++) {
             cardNumber.append(String.format("%04d", (int) (Math.random() * 10000)));
             if (i < 3) {
-                cardNumber.append(" ");
+                cardNumber.append("");
             }
         }
         String number = cardNumber.toString();
