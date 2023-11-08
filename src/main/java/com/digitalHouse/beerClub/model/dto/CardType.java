@@ -1,6 +1,6 @@
 package com.digitalHouse.beerClub.model.dto;
 
-public enum TransactionType {
+public enum CardType {
     CREDIT,
     DEBIT
 }

@@ -9,7 +9,6 @@ import com.digitalHouse.beerClub.model.dto.*;
 import com.digitalHouse.beerClub.repository.IAccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.any;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -150,7 +148,7 @@ class AccountServiceTest {
         AccountResponseDTO response = accountService.debit(accountId, debitAmount);
 
         assertNotNull(response);
-        assertEquals(TransactionType.DEBIT, response.getType());
+        assertEquals(CardType.DEBIT, response.getType());
         assertEquals("Successful", response.getDescription());
         assertEquals(initialBalance - debitAmount, account.getBalance());
     }
@@ -171,7 +169,7 @@ class AccountServiceTest {
         AccountResponseDTO response = accountService.credit(accountId, debitAmount);
 
         assertNotNull(response);
-        assertEquals(TransactionType.CREDIT, response.getType());
+        assertEquals(CardType.CREDIT, response.getType());
         assertEquals("Successful", response.getDescription());
         assertEquals(initialBalance + debitAmount, account.getBalance());
     }

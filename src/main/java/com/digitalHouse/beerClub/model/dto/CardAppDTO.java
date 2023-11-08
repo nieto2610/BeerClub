@@ -13,4 +13,6 @@ public class CardAppDTO {
     @NotBlank(message = "Card cardHolderName must not be blank")
     private String cardHolderName;
     private Long accountId;
+    private CardType cardType;
+    private Double creditLimit;
 }

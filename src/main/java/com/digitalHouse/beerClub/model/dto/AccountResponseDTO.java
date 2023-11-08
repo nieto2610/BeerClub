@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class AccountResponseDTO {
     private Double amount;
     private String description;
-    private TransactionType type;
+    private CardType type;
 }
 

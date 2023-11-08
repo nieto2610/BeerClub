@@ -8,7 +8,7 @@ import com.digitalHouse.beerClub.model.Account;
 import com.digitalHouse.beerClub.model.dto.AccountAppDTO;
 import com.digitalHouse.beerClub.model.dto.AccountDTO;
 import com.digitalHouse.beerClub.model.dto.AccountResponseDTO;
-import com.digitalHouse.beerClub.model.dto.TransactionType;
+import com.digitalHouse.beerClub.model.dto.CardType;
 import com.digitalHouse.beerClub.repository.IAccountRepository;
 import com.digitalHouse.beerClub.service.interfaces.IAccountService;
 import com.digitalHouse.beerClub.utils.AccountUtils;
@@ -99,7 +99,7 @@ public class AccountService implements IAccountService {
 
         AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
         accountResponseDTO.setAmount(amount);
-        accountResponseDTO.setType(TransactionType.DEBIT);
+        accountResponseDTO.setType(CardType.DEBIT);
         accountResponseDTO.setDescription("Successful");
 
         return accountResponseDTO;
@@ -118,7 +118,7 @@ public class AccountService implements IAccountService {
 
         AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
         accountResponseDTO.setAmount(amount);
-        accountResponseDTO.setType(TransactionType.CREDIT);
+        accountResponseDTO.setType(CardType.CREDIT);
         accountResponseDTO.setDescription("Successful");
 
         return accountResponseDTO;

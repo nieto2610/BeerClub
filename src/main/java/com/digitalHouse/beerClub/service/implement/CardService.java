@@ -8,6 +8,7 @@ import com.digitalHouse.beerClub.model.Account;
 import com.digitalHouse.beerClub.model.Card;
 import com.digitalHouse.beerClub.model.dto.CardAppDTO;
 import com.digitalHouse.beerClub.model.dto.CardDTO;
+import com.digitalHouse.beerClub.model.dto.CardType;
 import com.digitalHouse.beerClub.repository.IAccountRepository;
 import com.digitalHouse.beerClub.repository.ICardRepository;
 import com.digitalHouse.beerClub.service.interfaces.ICardService;
@@ -55,19 +56,29 @@ public class CardService implements ICardService {
     @Override
     public CardDTO createCard(CardAppDTO cardAppDTO) throws BadRequestException, NotFoundException {
 
+        String cardHolderName = cardAppDTO.getCardHolderName();
         String cardNumber = CardUtils.getCardNumber();
         int cvv = CardUtils.getCVV();
         LocalDate expirationDate = LocalDate.now().plusYears(5).with(TemporalAdjusters.lastDayOfMonth());
-        Long id = cardAppDTO.getAccountId();
-        Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Account not found"));
+        CardType cardType = cardAppDTO.getCardType();
 
-        if(!account.getIsActive()){
-            throw new NotFoundException("The Account is not active and cannot be modified.");
+        if(cardAppDTO.getCardType().equals(CardType.DEBIT)){
+            Long id = cardAppDTO.getAccountId();
+            Account account = accountRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Account not found"));
+
+            if(!account.getIsActive()){
+                throw new NotFoundException("The Account is not active and cannot be modified.");
+            }
+            Card newCard = new Card(cardNumber, cardHolderName, expirationDate, cvv, account, cardType, true);
+            Card card = cardRepository.save(newCard);
+            return mapper.converter(card, CardDTO.class);
+        }else{
+            Double creditLimit = cardAppDTO.getCreditLimit();
+            Card newCard = new Card(cardNumber, cardHolderName, expirationDate, cvv, cardType, creditLimit, true);
+            Card card = cardRepository.save(newCard);
+            return mapper.converter(card, CardDTO.class);
         }
-        Card newCard = new Card(cardNumber, cardAppDTO.getCardHolderName(), expirationDate, cvv, account, true);
-        Card card = cardRepository.save(newCard);
-        return mapper.converter(card, CardDTO.class);
     }
 
     @Override
@@ -76,7 +87,7 @@ public class CardService implements ICardService {
         if (!card.getIsActive()) {
             throw new NotFoundException("The Card is not active and cannot be modified.");
         }
-        LocalDate expirationDate = CardUtils.parseStringToLocalDate(cardDTO.getExpirationDate());
+        LocalDate expirationDate = cardDTO.getExpirationDate();
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Account not found"));
         if(!account.getIsActive()){
