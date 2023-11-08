@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 @Validated
 @RestController
-@RequestMapping("faqs")
+@RequestMapping("/faqs")
 public class FaqsController {
     final static Logger logger = Logger.getLogger(String.valueOf(FaqsController.class));
     private final FaqsService faqsService;

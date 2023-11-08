@@ -13,6 +13,7 @@ import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.service.interfaces.ISubscriptionService;
 import org.springframework.stereotype.Service;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,6 @@ public class SubscriptionService implements ISubscriptionService {
         this.benefitRepository = benefitRepository;
         this.mapper = mapper;
     }
-
 
     @Override
     public List<SubscriptionDTO> searchAll() {
