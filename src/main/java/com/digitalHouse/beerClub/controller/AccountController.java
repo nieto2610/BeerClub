@@ -5,6 +5,7 @@ import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.model.dto.AccountAppDTO;
 import com.digitalHouse.beerClub.model.dto.AccountDTO;
+import com.digitalHouse.beerClub.model.dto.AccountResponseDTO;
 import com.digitalHouse.beerClub.service.interfaces.IAccountService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -55,7 +56,7 @@ public class AccountController {
     }
 
     @PostMapping("/{id}/debit")
-    public ResponseEntity<AccountDTO> debit(
+    public ResponseEntity<AccountResponseDTO> debit(
             @PathVariable @Positive(message = "Id must be greater than 0") Long id,
             @RequestParam @Positive(message = "Amount must be greater than 0") Double amount
     ) throws NotFoundException, Exception {
@@ -63,7 +64,7 @@ public class AccountController {
     }
 
     @PostMapping("/{id}/credit")
-    public ResponseEntity<AccountDTO> credit(
+    public ResponseEntity<AccountResponseDTO> credit(
             @PathVariable @Positive(message = "Id must be greater than 0") Long id,
             @RequestParam @Positive(message = "Amount must be greater than 0") Double amount
     ) throws NotFoundException {

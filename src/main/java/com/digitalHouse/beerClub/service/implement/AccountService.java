@@ -7,6 +7,8 @@ import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Account;
 import com.digitalHouse.beerClub.model.dto.AccountAppDTO;
 import com.digitalHouse.beerClub.model.dto.AccountDTO;
+import com.digitalHouse.beerClub.model.dto.AccountResponseDTO;
+import com.digitalHouse.beerClub.model.dto.CardType;
 import com.digitalHouse.beerClub.repository.IAccountRepository;
 import com.digitalHouse.beerClub.service.interfaces.IAccountService;
 import com.digitalHouse.beerClub.utils.AccountUtils;
@@ -82,7 +84,7 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    public AccountDTO debit(Long accountId, Double amount) throws NotFoundException{
+    public AccountResponseDTO debit(Long accountId, Double amount) throws NotFoundException{
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new NotFoundException("Account not found"));
         if (!account.getIsActive()) {
             throw new NotFoundException("The Account is not active and cannot be modified.");
@@ -94,11 +96,17 @@ public class AccountService implements IAccountService {
         balance -= amount;
         account.setBalance(balance);
         Account accountUpdated = accountRepository.save(account);
-        return mapper.converter(accountUpdated, AccountDTO.class);
+
+        AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
+        accountResponseDTO.setAmount(amount);
+        accountResponseDTO.setType(CardType.DEBIT);
+        accountResponseDTO.setDescription("Successful");
+
+        return accountResponseDTO;
     }
 
     @Override
-    public AccountDTO credit(Long accountId, Double amount) throws NotFoundException{
+    public AccountResponseDTO credit(Long accountId, Double amount) throws NotFoundException{
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new NotFoundException("Account not found"));
         if (!account.getIsActive()) {
             throw new NotFoundException("The Account is not active and cannot be modified.");
@@ -107,8 +115,15 @@ public class AccountService implements IAccountService {
         balance += amount;
         account.setBalance(balance);
         Account accountUpdated = accountRepository.save(account);
-        return mapper.converter(accountUpdated, AccountDTO.class);
+
+        AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
+        accountResponseDTO.setAmount(amount);
+        accountResponseDTO.setType(CardType.CREDIT);
+        accountResponseDTO.setDescription("Successful");
+
+        return accountResponseDTO;
     }
+
     @Override
     public AccountDTO activateAccount(Long accountId) throws NotFoundException {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new NotFoundException("Account not found"));

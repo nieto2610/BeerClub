@@ -23,5 +23,7 @@ public class CardDTO {
     private LocalDate expirationDate;
     private int cvv;
     private Long accountId;
+    private CardType cardType;
+    private Double creditLimit;
     private Boolean isActive;
 }
