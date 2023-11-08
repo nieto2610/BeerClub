@@ -24,6 +24,7 @@ public class SubscriptionDTO {
     @NotNull(message = "Subscription price must not be null")
     @Positive(message = "Subscription price must be greater than 0")
     private Double price;
+
     private List<@Valid BenefitDTO> benefits = new ArrayList<>();
 
     @NotNull(message = "Subscription isRecommended must not be null")
@@ -32,4 +33,5 @@ public class SubscriptionDTO {
 
     @AssertTrue(message = "Subscription isActive must be true or false")
     private Boolean isActive;
+
 }

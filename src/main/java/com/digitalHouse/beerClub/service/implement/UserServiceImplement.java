@@ -6,7 +6,7 @@ import com.digitalHouse.beerClub.model.Address;
 import com.digitalHouse.beerClub.model.Subscription;
 import com.digitalHouse.beerClub.model.User;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
-import com.digitalHouse.beerClub.model.dto.UserAuthRequest;
+import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.repository.IAddressRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
@@ -28,14 +28,16 @@ public class UserServiceImplement implements IUserService {
     @Autowired
     private IAddressRepository addressRepository;
 
+    @Autowired
     private ISubscriptionRepository subscriptionRepository;
 
     private final Mapper userMapper;
 
     @Autowired
-    public UserServiceImplement(IUserRepository userRepository, IAddressRepository addressRepository, Mapper userMapper) {
+    public UserServiceImplement(IUserRepository userRepository, IAddressRepository addressRepository, ISubscriptionRepository subscriptionRepository,Mapper userMapper) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
+        this.subscriptionRepository = subscriptionRepository;
         this.userMapper = userMapper;
     }
 
@@ -69,7 +71,7 @@ public class UserServiceImplement implements IUserService {
     public UserDTO update(UserDTO entity, Long id) throws NotFoundException { return null; }
 
     @Override
-    public UserDTO saveUser(UserApplicationDTO user) {
+    public UserDTO saveUser(UserApplicationDTO user) throws NotFoundException {
         Address address = new Address(user.getCountry(), user.getProvince(), user.getCity(), user.getStreet(), user.getNumber(), user.getFloor(), user.getApartment(), user.getZipCode());
         addressRepository.save(address);
         LocalDate subscriptionDate = LocalDate.now();
@@ -78,7 +80,10 @@ public class UserServiceImplement implements IUserService {
             subscriptionDate = subscriptionDate.plusMonths(1).withDayOfMonth(1);
         }
         User newUser = new User(user.getName(), user.getLastName(), user.getEmail(), user.getBirthdate(), user.getTelephone(), subscriptionDate, user.getPassword(), address);
+        Subscription subscription = subscriptionRepository.findById(user.getSubscriptionId()).orElseThrow(() -> new NotFoundException("Subscription not found."));
+        newUser.setSubscription(subscription);
         userRepository.save(newUser);
+        subscription.addUser(newUser);
         UserDTO userDTO = userMapper.converter(newUser, UserDTO.class);
         return userDTO;
     }

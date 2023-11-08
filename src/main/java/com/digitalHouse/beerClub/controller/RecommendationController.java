@@ -5,6 +5,7 @@ import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.model.dto.RecommendationDTO;
 import com.digitalHouse.beerClub.service.interfaces.IRecommendationService;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,7 +24,7 @@ import java.util.List;
 
 @Validated
 @RestController
-@RequestMapping("/recomendations")
+@RequestMapping("/recommendations")
 @CrossOrigin("*")
 @Tag(name = "Recommendations")
 public class RecommendationController {
@@ -78,7 +79,7 @@ public class RecommendationController {
             @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = RecommendationDTO.class))),
             @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "Recommendation not found")))})
     @GetMapping("/{subscriptionId}/{date}")
-    public ResponseEntity<RecommendationDTO> getBySubscriptionAndDate (@PathVariable @Positive(message = "Id must be greater than 0") Long subscriptionId, @PathVariable LocalDate date) throws NotFoundException {
+    public ResponseEntity<RecommendationDTO> getBySubscriptionAndDate (@PathVariable @Positive(message = "Id must be greater than 0") Long subscriptionId, @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) throws NotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(recommendationService.searchBySubscriptionAndDate(subscriptionId,date));
     }
 }

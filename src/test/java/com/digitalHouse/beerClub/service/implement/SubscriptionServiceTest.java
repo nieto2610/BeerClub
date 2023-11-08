@@ -16,9 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -42,7 +40,6 @@ class SubscriptionServiceTest {
         mapper = new Mapper(new ModelMapper());
         subscriptionService = new SubscriptionService(subscriptionRepository, benefitRepository, mapper);
     }
-
 
     @Test
     @DisplayName("✅ - Search all the subscriptions")

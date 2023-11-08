@@ -1,6 +1,5 @@
 package com.digitalHouse.beerClub.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name= "products")
+@Table(name = "products")
 public class Product {
 
     @Id
@@ -26,10 +25,5 @@ public class Product {
     private List<ProductImage> imageUrl;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<Recommendation> recommendationList;
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<Review> reviewList ;
 }
