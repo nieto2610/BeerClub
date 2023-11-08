@@ -1,6 +1,7 @@
 package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.exceptions.BadRequestException;
+import com.digitalHouse.beerClub.exceptions.InsufficientBalanceException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.mapper.Mapper;
@@ -8,6 +9,7 @@ import com.digitalHouse.beerClub.model.Account;
 import com.digitalHouse.beerClub.model.Card;
 import com.digitalHouse.beerClub.model.dto.CardAppDTO;
 import com.digitalHouse.beerClub.model.dto.CardDTO;
+import com.digitalHouse.beerClub.model.dto.CardResponseDTO;
 import com.digitalHouse.beerClub.model.dto.CardType;
 import com.digitalHouse.beerClub.repository.IAccountRepository;
 import com.digitalHouse.beerClub.repository.ICardRepository;
@@ -79,6 +81,30 @@ public class CardService implements ICardService {
             Card card = cardRepository.save(newCard);
             return mapper.converter(card, CardDTO.class);
         }
+    }
+
+    @Override
+    public CardResponseDTO cardDebit(Long cardId, Double amount) throws NotFoundException, InsufficientBalanceException {
+        Card card = cardRepository.findById(cardId).orElseThrow(() -> new NotFoundException("Card not found"));
+
+        if(card.getCardType().equals(CardType.CREDIT)){
+            if(card.getCreditLimit() < amount) {
+                throw new InsufficientBalanceException("La tarjeta no tiene crédito suficiente");
+            }
+
+            Double balance = card.getCreditLimit() - amount;
+            card.setCreditLimit(balance);
+            cardRepository.save(card);
+
+            CardResponseDTO cardResponseDTO = new CardResponseDTO();
+            cardResponseDTO.setAmount(amount);
+            cardResponseDTO.setDescription("Successful");
+
+            return cardResponseDTO;
+        }else {
+            throw new NotFoundException("El tipo de tarjeta no es válido");
+        }
+
     }
 
     @Override

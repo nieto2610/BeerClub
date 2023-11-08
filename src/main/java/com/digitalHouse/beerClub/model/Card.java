@@ -23,6 +23,7 @@ public class Card {
     @OneToOne
     @JoinColumn(name = "account_id")
     private Account account;
+    @Enumerated(EnumType.STRING)
     private CardType cardType;
     private Double creditLimit;
     private Boolean isActive;

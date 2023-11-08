@@ -8,10 +8,7 @@ import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Payment;
 import com.digitalHouse.beerClub.model.Subscription;
-import com.digitalHouse.beerClub.model.dto.AccountDTO;
-import com.digitalHouse.beerClub.model.dto.CardDTO;
-import com.digitalHouse.beerClub.model.dto.PaymentApplicationDTO;
-import com.digitalHouse.beerClub.model.dto.PaymentDTO;
+import com.digitalHouse.beerClub.model.dto.*;
 import com.digitalHouse.beerClub.repository.IPaymentRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.service.interfaces.IPaymentService;
@@ -56,7 +53,7 @@ public class PaymentServiceImplement implements IPaymentService {
 
     @Transactional
     @Override
-    public PaymentDTO savePayment(Long subscriptionId, String cardHolder, String cardNumber,int cvv, String expDate, Long userId) throws NotFoundException {
+    public PaymentDTO savePayment(Long subscriptionId, String cardHolder, String cardNumber,int cvv, String expDate, Long userId) throws NotFoundException, InsufficientBalanceException {
         Long accountBeerClubId = 1L;
 
         Subscription subscription = subscriptionRepository.findById(subscriptionId).orElseThrow(() -> new NotFoundException("Subscription not found"));
@@ -75,9 +72,14 @@ public class PaymentServiceImplement implements IPaymentService {
         payment.setSubscription(subscription);
 
         CardDTO cardDTO = cardService.searchByCardNumber(cardNumber);
-        Long accountId = cardDTO.getAccountId();
 
-        accountService.debit(accountId,amount);
+        if(cardDTO.getCardType().equals(CardType.DEBIT)) {
+            Long accountId = cardDTO.getAccountId();
+            accountService.debit(accountId, amount);
+        }else {
+            cardService.cardDebit(cardDTO.getId(), amount);
+        }
+
         accountService.credit(accountBeerClubId, amount);
 
         paymentRepository.save(payment);
@@ -102,6 +104,7 @@ public class PaymentServiceImplement implements IPaymentService {
         if(cvv != cardDTO.getCvv()) {
             throw new BadRequestException("El cvv de la tarjeta no es correcto");
         }
+
     }
 
     private void accountValidation(Long accountId, Double amount) throws NotFoundException, EntityInactiveException, InsufficientBalanceException {
@@ -122,9 +125,17 @@ public class PaymentServiceImplement implements IPaymentService {
         cardValidation(cardHolder, cardNumber, cvv, expDate);
 
         CardDTO cardDTO = cardService.searchByCardNumber(cardNumber);
-        Long accountId = cardDTO.getAccountId();
+        CardType cardType = cardDTO.getCardType();
 
-        accountValidation(accountId, amount);
+        if(cardType.equals(CardType.CREDIT)) {
+            if(cardDTO.getCreditLimit() < amount ){
+                throw new InsufficientBalanceException("La tarjeta no tiene crédito suficiente");
+            }
+        }else {
+            Long accountId = cardDTO.getAccountId();
+            accountValidation(accountId, amount);
+        }
+
     }
 }
 

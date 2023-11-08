@@ -75,9 +75,18 @@ public class UserServiceImplement implements IUserService {
 
     @Override
     public UserResponseDTO saveUser(UserApplicationDTO user) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException {
-        int number = Integer.parseInt(user.getNumber());
-        int floor = Integer.parseInt(user.getFloor());
-        int cvv =  Integer.parseInt(user.getCvv());
+        int number = 0;
+        int floor = 0;
+        int cvv = 0;
+        if(user.getNumber().length() > 0) {
+            number = Integer.parseInt(user.getNumber());
+        }
+        if(user.getFloor().length() > 0) {
+            floor = Integer.parseInt(user.getFloor());
+        }
+        if(user.getCvv().length() > 0) {
+             cvv =  Integer.parseInt(user.getCvv());
+        }
 
         //verificación de pago
         paymentServiceImplement.paymentValidation(user.getSubscriptionId(), user.getCardHolder(), user.getCardNumber(), cvv, user.getExpDate() );
