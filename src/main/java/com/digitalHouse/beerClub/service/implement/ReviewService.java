@@ -47,7 +47,6 @@ public class ReviewService implements IReviewService{
     public ReviewDTO create(ReviewDTO reviewDTO) throws BadRequestException {
         Review review = mapper.converter(reviewDTO, Review.class);
         Optional<Product> product= productRepository.findById(review.getProduct().getId());
-        Optional<User> user = userRepository.findById(review.getUser().getId());
 
         if (product.isEmpty()) {
             throw new BadRequestException("Product information is missing");
@@ -69,7 +68,6 @@ public class ReviewService implements IReviewService{
     public ReviewDTO update(ReviewDTO reviewDTO, Long id) throws NotFoundException {
         Review review = reviewRepository.findById(id).orElseThrow(() -> new NotFoundException("Review not found"));
         Review reviewA=mapper.converter(reviewDTO,Review.class);
-        Optional<User> user = userRepository.findById(reviewA.getUser().getId());
         Optional<Product> product= productRepository.findById(reviewA.getProduct().getId());
 
         if (product.isEmpty()) {
