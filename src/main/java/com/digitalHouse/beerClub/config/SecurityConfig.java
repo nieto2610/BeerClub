@@ -35,7 +35,7 @@ public class SecurityConfig {
         HttpSecurity configuredHttp = http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                /*.authorizeHttpRequests(authRequest ->
+                .authorizeHttpRequests(authRequest ->
                         authRequest
                                 //Los endpoint Post que se pueden user sin autenticación
                                 .requestMatchers(HttpMethod.POST,"/auth/**", "/ageVerification/**").permitAll()
@@ -56,7 +56,7 @@ public class SecurityConfig {
                                 //Los endpoint que se pueden Modificar datos siendo USER
                                 .requestMatchers(HttpMethod.PATCH,"/users/update/passwword").hasAnyRole("USER", "ADMIN")
                                 //.anyRequest().authenticated()
-                )*/
+                )
                 .sessionManagement(sessionManager ->
                         sessionManager
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
