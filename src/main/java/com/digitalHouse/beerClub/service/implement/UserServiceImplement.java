@@ -13,6 +13,7 @@ import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -30,6 +31,8 @@ public class UserServiceImplement implements IUserService {
 
     @Autowired
     private ISubscriptionRepository subscriptionRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private final Mapper userMapper;
 
@@ -79,7 +82,7 @@ public class UserServiceImplement implements IUserService {
             // Si es el día 20 o posterior, establece la fecha de suscripción en el primer día del mes siguiente
             subscriptionDate = subscriptionDate.plusMonths(1).withDayOfMonth(1);
         }
-        User newUser = new User(user.getName(), user.getLastName(), user.getEmail(), user.getBirthdate(), user.getTelephone(), subscriptionDate, user.getPassword(), address);
+        User newUser = new User(user.getName(), user.getLastName(), user.getEmail(), user.getBirthdate(), user.getTelephone(), subscriptionDate, passwordEncoder.encode(user.getPassword()), address);
         Subscription subscription = subscriptionRepository.findById(user.getSubscriptionId()).orElseThrow(() -> new NotFoundException("Subscription not found."));
         newUser.setSubscription(subscription);
         userRepository.save(newUser);
