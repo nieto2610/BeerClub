@@ -5,14 +5,9 @@ import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.*;
-
-import com.digitalHouse.beerClub.model.dto.RecommendationDTO;
 import com.digitalHouse.beerClub.model.dto.ReviewDTO;
-
-import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.repository.IProductRepository;
 import com.digitalHouse.beerClub.repository.IReviewRepository;
-
 import com.digitalHouse.beerClub.repository.IUserRepository;
 import com.digitalHouse.beerClub.service.interfaces.IReviewService;
 import org.springframework.stereotype.Service;
