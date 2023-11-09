@@ -74,20 +74,9 @@ public class UserController {
         @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @PostMapping("/create")
     public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException {
-
-        // validar si se puede hacer el pago
-        // Esto debe moverse al controller
         paymentServiceImplement.paymentValidation(user.getSubscriptionId(), user.getCardHolder(), user.getCardNumber(), user.getCvv(), user.getExpDate() );
-
-
-        try {
-            Payment userDTO = IUserService.saveUser(user);
-            return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
-        }catch (NotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }catch (EntityInactiveException | InsufficientBalanceException | BadRequestException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        Payment userDTO = IUserService.saveUser(user);
+        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
     @Operation(summary ="Find user by Email", description ="Find user by Email",  responses = {

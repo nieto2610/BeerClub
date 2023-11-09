@@ -38,4 +38,14 @@ public class GlobalExceptionHandler {
                 .stream().map(ConstraintViolation::getMessage).toList());
         return new ResponseEntity<>(errors, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(EntityInactiveException.class)
+    public ResponseEntity<?> entityInactiveException(EntityInactiveException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<?> insufficientBalanceException(InsufficientBalanceException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
 }
