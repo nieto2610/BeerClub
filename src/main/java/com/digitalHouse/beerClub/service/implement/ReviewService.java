@@ -57,8 +57,13 @@ public class ReviewService implements IReviewService{
         if (product.isEmpty()) {
             throw new BadRequestException("Product information is missing");
         }
-        else if(!userRepository.existsById(review.getUser().getId())){
+
+        else if(!userRepository.existsById(review.getUser().getId())) {
             throw new BadRequestException("The user doesn't exist");
+        }
+
+        else if(review.getRating()<1 || review.getRating()>5){
+                throw new BadRequestException("The rating must be a number between 1 and 5");
 
         } else {
             reviewRepository.save(review);
@@ -69,8 +74,24 @@ public class ReviewService implements IReviewService{
     public ReviewDTO update(ReviewDTO reviewDTO, Long id) throws NotFoundException {
         Review review = reviewRepository.findById(id).orElseThrow(() -> new NotFoundException("Review not found"));
         Review reviewA=mapper.converter(reviewDTO,Review.class);
-        reviewRepository.save(reviewA);
-        return mapper.converter(review, ReviewDTO.class);
+        Optional<User> user = userRepository.findById(reviewA.getUser().getId());
+        Optional<Product> product= productRepository.findById(reviewA.getProduct().getId());
+
+        if (product.isEmpty()) {
+            throw new NotFoundException("Product information is missing");
+        }
+
+        else if(!userRepository.existsById(reviewA.getUser().getId())) {
+            throw new NotFoundException("The user doesn't exist");
+        }
+
+        else if(reviewA.getRating()<1 || reviewA.getRating()>5){
+            throw new NotFoundException("The rating must be a number between 1 and 5");
+
+        } else {
+            reviewRepository.save(reviewA);
+            return mapper.converter(reviewA, ReviewDTO.class);
+        }
     }
     @Override
     public void delete(Long id) throws ServiceException, NotFoundException {
