@@ -12,7 +12,5 @@ public class FaqsDTO {
     @Column(columnDefinition = "TEXT")
     private String answer;
 
-    public Long getId() {
-        return id;
-    }
+
 }
