@@ -16,4 +16,5 @@ public class PaymentDTO {
     private String description;
     private LocalDateTime date;
     private String invoiceNumber;
+    private Long userId;
 }

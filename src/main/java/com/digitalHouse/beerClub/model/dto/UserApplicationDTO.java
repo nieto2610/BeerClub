@@ -1,6 +1,7 @@
 package com.digitalHouse.beerClub.model.dto;
 
 import com.digitalHouse.beerClub.model.CardPayment;
+import com.digitalHouse.beerClub.model.User;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

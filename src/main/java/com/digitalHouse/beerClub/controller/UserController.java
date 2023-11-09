@@ -1,10 +1,12 @@
 package com.digitalHouse.beerClub.controller;
 
 import com.digitalHouse.beerClub.exceptions.*;
+import com.digitalHouse.beerClub.model.Payment;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.model.dto.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.model.dto.UserResponseDTO;
+import com.digitalHouse.beerClub.service.implement.PaymentServiceImplement;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,6 +36,10 @@ public class UserController {
 
     @Autowired
     private IUserService IUserService;
+
+    @Autowired
+    private PaymentServiceImplement paymentServiceImplement;
+
 
     @Operation(summary="List all users", description="List all users", responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
@@ -68,8 +74,14 @@ public class UserController {
         @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @PostMapping("/create")
     public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException {
+
+        // validar si se puede hacer el pago
+        // Esto debe moverse al controller
+        paymentServiceImplement.paymentValidation(user.getSubscriptionId(), user.getCardHolder(), user.getCardNumber(), user.getCvv(), user.getExpDate() );
+
+
         try {
-            UserResponseDTO userDTO = IUserService.saveUser(user);
+            Payment userDTO = IUserService.saveUser(user);
             return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
         }catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);

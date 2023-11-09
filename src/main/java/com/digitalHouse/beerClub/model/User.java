@@ -1,5 +1,6 @@
 package com.digitalHouse.beerClub.model;
 
+import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
@@ -76,6 +77,16 @@ public class User {
         this.subscriptionDate = subscriptionDate;
         this.password = password;
         this.address = address;
+        role = RoleType.USER;
+        active = true;
+    }
+
+    public User(UserApplicationDTO user) {
+        this.firstName = user.getName();
+        this.lastName = user.getLastName();
+        this.email = user.getEmail();
+        this.birthdate = user.getBirthdate();
+        this.telephone = user.getTelephone();
         role = RoleType.USER;
         active = true;
     }

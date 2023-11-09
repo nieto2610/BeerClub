@@ -6,14 +6,17 @@ import com.digitalHouse.beerClub.exceptions.EntityInactiveException;
 import com.digitalHouse.beerClub.exceptions.InsufficientBalanceException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.mapper.Mapper;
+import com.digitalHouse.beerClub.model.CardPayment;
 import com.digitalHouse.beerClub.model.Payment;
 import com.digitalHouse.beerClub.model.Subscription;
+import com.digitalHouse.beerClub.model.User;
 import com.digitalHouse.beerClub.model.dto.*;
 import com.digitalHouse.beerClub.repository.IPaymentRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.service.interfaces.IPaymentService;
 import com.digitalHouse.beerClub.utils.AccountUtils;
 import com.digitalHouse.beerClub.utils.CardUtils;
+import com.digitalHouse.beerClub.utils.TransformationUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,8 +42,6 @@ public class PaymentServiceImplement implements IPaymentService {
         this.accountService = accountService;
         this.transactionMapper = mapper;
     }
-
-
     @Override
     public List<PaymentDTO> searchAll() {
         return null;
@@ -53,10 +54,10 @@ public class PaymentServiceImplement implements IPaymentService {
 
     @Transactional
     @Override
-    public PaymentDTO savePayment(Long subscriptionId, String cardHolder, String cardNumber,int cvv, String expDate, Long userId) throws NotFoundException, InsufficientBalanceException {
+    public Payment savePayment(CardPayment card, User user) throws NotFoundException, InsufficientBalanceException {
         Long accountBeerClubId = 1L;
 
-        Subscription subscription = subscriptionRepository.findById(subscriptionId).orElseThrow(() -> new NotFoundException("Subscription not found"));
+        Subscription subscription = subscriptionRepository.findById(user.getSubscription().getId()).orElseThrow(() -> new NotFoundException("Subscription not found"));
 
         Double amount = subscription.getPrice();
         String description = subscription.getName();
@@ -66,12 +67,13 @@ public class PaymentServiceImplement implements IPaymentService {
         payment.setAmount(amount);
         payment.setDescription(description);
         payment.setDate(LocalDateTime.now());
-        payment.setCardNumber(cardNumber);
-        payment.setUserId(userId);
+        // Guardar los ultimos 4 digitos
+        payment.setCardNumber(card.getNumber());
+        payment.setUserId(user.getId());
         payment.setInvoiceNumber(invoiceNumber);
         payment.setSubscription(subscription);
 
-        CardDTO cardDTO = cardService.searchByCardNumber(cardNumber);
+        CardDTO cardDTO = cardService.searchByCardNumber(card.getNumber());
 
         if(cardDTO.getCardType().equals(CardType.DEBIT)) {
             Long accountId = cardDTO.getAccountId();
@@ -80,14 +82,31 @@ public class PaymentServiceImplement implements IPaymentService {
             cardService.cardDebit(cardDTO.getId(), amount);
         }
 
+        // accountService.addCredit
         accountService.credit(accountBeerClubId, amount);
 
-        paymentRepository.save(payment);
-
-        PaymentDTO paymentDTO = transactionMapper.converter(payment, PaymentDTO.class);
-        return paymentDTO;
+        return paymentRepository.save(payment);
     }
 
+    @Override
+    public void paymentValidation(Long subscriptionId, String cardHolder, String cardNumber,String cvv, String expDate ) throws EntityInactiveException, NotFoundException, BadRequestException, InsufficientBalanceException {
+        Subscription subscription = subscriptionRepository.findById(subscriptionId).orElseThrow(() -> new NotFoundException("Subscription not found"));
+
+        Double amount = subscription.getPrice();
+        cardValidation(cardHolder, cardNumber, TransformationUtils.getNumber(cvv), expDate);
+
+        CardDTO cardDTO = cardService.searchByCardNumber(cardNumber);
+        CardType cardType = cardDTO.getCardType();
+
+        if(cardType.equals(CardType.CREDIT)) {
+            if(cardDTO.getCreditLimit() < amount ){
+                throw new InsufficientBalanceException("La tarjeta no tiene crédito suficiente");
+            }
+        }else {
+            Long accountId = cardDTO.getAccountId();
+            accountValidation(accountId, amount);
+        }
+    }
     private void cardValidation(String cardHolder, String number, int cvv, String expDate) throws NotFoundException, EntityInactiveException, BadRequestException {
         CardDTO cardDTO = cardService.searchByCardNumber(number);
         LocalDate expDateTime = CardUtils.parseStringToLocalDate(expDate);
@@ -115,27 +134,6 @@ public class PaymentServiceImplement implements IPaymentService {
         if(accountDTO.getBalance() < amount) {
             throw new InsufficientBalanceException("La cuenta no tiene saldo suficiente");
         }
-    }
-
-    @Override
-    public void paymentValidation(Long subscriptionId, String cardHolder, String cardNumber,int cvv, String expDate ) throws EntityInactiveException, NotFoundException, BadRequestException, InsufficientBalanceException {
-        Subscription subscription = subscriptionRepository.findById(subscriptionId).orElseThrow(() -> new NotFoundException("Subscription not found"));
-
-        Double amount = subscription.getPrice();
-        cardValidation(cardHolder, cardNumber, cvv, expDate);
-
-        CardDTO cardDTO = cardService.searchByCardNumber(cardNumber);
-        CardType cardType = cardDTO.getCardType();
-
-        if(cardType.equals(CardType.CREDIT)) {
-            if(cardDTO.getCreditLimit() < amount ){
-                throw new InsufficientBalanceException("La tarjeta no tiene crédito suficiente");
-            }
-        }else {
-            Long accountId = cardDTO.getAccountId();
-            accountValidation(accountId, amount);
-        }
-
     }
 }
 

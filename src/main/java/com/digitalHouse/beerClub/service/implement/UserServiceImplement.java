@@ -2,16 +2,14 @@ package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.mapper.Mapper;
-import com.digitalHouse.beerClub.model.Address;
-import com.digitalHouse.beerClub.model.CardPayment;
-import com.digitalHouse.beerClub.model.Subscription;
-import com.digitalHouse.beerClub.model.User;
+import com.digitalHouse.beerClub.model.*;
 import com.digitalHouse.beerClub.model.dto.*;
 import com.digitalHouse.beerClub.repository.IAddressRepository;
 import com.digitalHouse.beerClub.repository.ICardPaymentRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
+import com.digitalHouse.beerClub.utils.TransformationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -74,52 +72,23 @@ public class UserServiceImplement implements IUserService {
     public UserDTO update(UserDTO entity, Long id) throws NotFoundException { return null; }
 
     @Override
-    public UserResponseDTO saveUser(UserApplicationDTO user) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException {
-        int number = 0;
-        int floor = 0;
-        int cvv = 0;
-        if(user.getNumber().length() > 0) {
-            number = Integer.parseInt(user.getNumber());
-        }
-        if(user.getFloor().length() > 0) {
-            floor = Integer.parseInt(user.getFloor());
-        }
-        if(user.getCvv().length() > 0) {
-             cvv =  Integer.parseInt(user.getCvv());
-        }
+    public Payment saveUser(UserApplicationDTO user) throws NotFoundException, InsufficientBalanceException {
 
-        //verificación de pago
-        paymentServiceImplement.paymentValidation(user.getSubscriptionId(), user.getCardHolder(), user.getCardNumber(), cvv, user.getExpDate() );
-
-        Address address = new Address(user.getCountry(), user.getProvince(), user.getCity(), user.getStreet(), number, floor, user.getApartment(), user.getZipCode());
+        Address address = new Address(user.getCountry(), user.getProvince(), user.getCity(), user.getStreet(), TransformationUtils.getNumber(user.getNumber()), TransformationUtils.getNumber(user.getFloor()), user.getApartment(), user.getZipCode());
         addressRepository.save(address);
-
-        CardPayment cardPayment = new CardPayment(user.getCardHolder(),user.getCardNumber(),cvv,user.getExpDate());
-        cardPaymentRepository.save(cardPayment);
-
-        LocalDate subscriptionDate = LocalDate.now();
-        if (subscriptionDate.getDayOfMonth() >= 20) {
-            // Si es el día 20 o posterior, establece la fecha de suscripción en el primer día del mes siguiente
-            subscriptionDate = subscriptionDate.plusMonths(1).withDayOfMonth(1);
-        }
-
-        User newUser = new User(user.getName(), user.getLastName(), user.getEmail(), user.getBirthdate(), user.getTelephone(), subscriptionDate, user.getPassword(), address);
         Subscription subscription = subscriptionRepository.findById(user.getSubscriptionId()).orElseThrow(() -> new NotFoundException("Subscription not found."));
+        CardPayment cardPayment = new CardPayment(user.getCardHolder(),user.getCardNumber(), TransformationUtils.getNumber(user.getCvv()),user.getExpDate());
+
+        User newUser = new User(user);
+        newUser.setSubscriptionDate(getSubscriptionDate());
+        newUser.setAddress(address);
         newUser.setSubscription(subscription);
-        newUser.addCard(cardPayment);
+        //newUser.addCard(cardPayment);
         User createdUser = userRepository.save(newUser);
 
-        //guardar payment
-        PaymentDTO paymentDTO = paymentServiceImplement.savePayment(user.getSubscriptionId(), user.getCardHolder(), user.getCardNumber(), cvv, user.getExpDate(),createdUser.getId());
-
-        UserResponseDTO userResponseDTO = new UserResponseDTO();
-        userResponseDTO.setAmount(paymentDTO.getAmount());
-        userResponseDTO.setInvoiceDate(paymentDTO.getDate());
-        userResponseDTO.setPlan(paymentDTO.getDescription());
-        userResponseDTO.setInvoiceNumber(paymentDTO.getInvoiceNumber());
-
-        return userResponseDTO;
+        return paymentServiceImplement.savePayment(cardPayment, createdUser);
     }
+
 
     @Override
     public UserDTO updateUser(UserApplicationDTO user, Long id) throws NotFoundException {
@@ -178,5 +147,8 @@ public class UserServiceImplement implements IUserService {
         user.setActive(true);
         userRepository.save(user);
     }
-
+    private LocalDate getSubscriptionDate() {
+        LocalDate currentDate = LocalDate.now();
+        return currentDate.getDayOfMonth() >= 20 ? currentDate.plusMonths(1).withDayOfMonth(1) : currentDate;
+    }
 }

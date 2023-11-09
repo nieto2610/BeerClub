@@ -7,20 +7,13 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Data
-@Entity
 @NoArgsConstructor
 public class CardPayment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     private String cardHolder;
     private String number;
     private int cvv;
     private String expDate;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="user_id")
-    private  User user;
 
     public CardPayment(String cardHolder, String number, int cvv,String expDate) {
         this.cardHolder = cardHolder;
