@@ -13,6 +13,7 @@ import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.service.interfaces.ISubscriptionService;
 import org.springframework.stereotype.Service;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +56,9 @@ public class SubscriptionService implements ISubscriptionService {
         subscription.setPrice(subscriptionDTO.getPrice());
         subscription.setIsRecommended(subscriptionDTO.getIsRecommended());
 
-       List<BenefitDTO> newBenefits = new ArrayList<>(subscriptionDTO.getBenefits());
+        // set new benefits
+        List<BenefitDTO> newBenefits = new ArrayList<>(subscriptionDTO.getBenefits());
+
         subscription.getBenefits().clear();
         subscription.getBenefits().addAll(newBenefits.stream().map(b -> mapper.converter(b, Benefit.class)).toList());
 

@@ -5,7 +5,13 @@ import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Address;
 import com.digitalHouse.beerClub.model.Subscription;
 import com.digitalHouse.beerClub.model.User;
+<<<<<<< HEAD
 import com.digitalHouse.beerClub.model.dto.*;
+=======
+import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
+import com.digitalHouse.beerClub.auth.UserAuthRequest;
+import com.digitalHouse.beerClub.model.dto.UserDTO;
+>>>>>>> development
 import com.digitalHouse.beerClub.repository.IAddressRepository;
 import com.digitalHouse.beerClub.repository.ICardPaymentRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
@@ -116,8 +122,13 @@ class UserServiceImplementTest {
     void saveUser() throws NotFoundException {
         // ARRANGE
         Subscription subscription = new Subscription(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, List.of(), false, true);
+<<<<<<< HEAD
         subscriptionRepository.save(subscription);
         CardPaymentDTO cardPayment = new CardPaymentDTO();
+=======
+        when(subscriptionRepository.findById(1L)).thenReturn(Optional.of(subscription));
+
+>>>>>>> development
         UserApplicationDTO userDto = new UserApplicationDTO("Juan", "Perez", "juan@beerClub.com",
                 LocalDate.now().minusYears(23), "123456789", "Argentina", "Santa Fe", "Rosario", "Roca", 1200, 15, "A3", "3400","Juan123#",1L,cardPayment);
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
@@ -130,9 +141,16 @@ class UserServiceImplementTest {
         //UserResponseDTO result = userServiceImplement.saveUser(userDto);
 
         // ASSERT
+<<<<<<< HEAD
         //assertNotNull(result);
        // assertNotNull(result.getId());
        // assertEquals(userDto.getName(), result.getFirstName());
+=======
+        assertNotNull(result);
+        assertNotNull(result.getId());
+        assertEquals(userDto.getName(), result.getFirstName());
+        //assertTrue(subscription.getUsers().contains(result));
+>>>>>>> development
     }
 
     @Test
