@@ -156,6 +156,7 @@ class AccountServiceTest {
     @Test
     void credit() throws NotFoundException {
         Long accountId = 1L;
+        String accountBeerClubNumber = "5430185489";
         Double initialBalance = 1000.0;
         Double debitAmount = 500.0;
 
@@ -166,7 +167,7 @@ class AccountServiceTest {
 
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
 
-        AccountResponseDTO response = accountService.credit(accountId, debitAmount);
+        AccountResponseDTO response = accountService.addCredit(accountBeerClubNumber, debitAmount);
 
         assertNotNull(response);
         assertEquals(CardType.CREDIT, response.getType());

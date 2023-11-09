@@ -12,6 +12,7 @@ import com.digitalHouse.beerClub.model.dto.CardType;
 import com.digitalHouse.beerClub.repository.IAccountRepository;
 import com.digitalHouse.beerClub.service.interfaces.IAccountService;
 import com.digitalHouse.beerClub.utils.AccountUtils;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -106,8 +107,9 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    public AccountResponseDTO credit(Long accountId, Double amount) throws NotFoundException{
-        Account account = accountRepository.findById(accountId).orElseThrow(() -> new NotFoundException("Account not found"));
+    public AccountResponseDTO addCredit(String  accountNumber, Double amount) throws NotFoundException{
+        Account account = accountRepository.findByAccountNumber(accountNumber).orElseThrow(() -> new NotFoundException("Account not found"));
+
         if (!account.getIsActive()) {
             throw new NotFoundException("The Account is not active and cannot be modified.");
         }
@@ -132,6 +134,11 @@ public class AccountService implements IAccountService {
         }
         account.setIsActive(true);
         accountRepository.save(account);
+        return mapper.converter(account, AccountDTO.class);
+    }
+
+    public AccountDTO searchByAccountNumber(String number) throws NotFoundException {
+        Account account = accountRepository.findByAccountNumber(number).orElseThrow(() -> new NotFoundException("Account not found"));
         return mapper.converter(account, AccountDTO.class);
     }
 }

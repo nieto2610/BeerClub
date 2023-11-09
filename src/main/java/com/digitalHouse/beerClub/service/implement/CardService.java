@@ -15,6 +15,8 @@ import com.digitalHouse.beerClub.repository.IAccountRepository;
 import com.digitalHouse.beerClub.repository.ICardRepository;
 import com.digitalHouse.beerClub.service.interfaces.ICardService;
 import com.digitalHouse.beerClub.utils.CardUtils;
+import jakarta.transaction.Transactional;
+import jdk.jfr.StackTrace;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -83,6 +85,7 @@ public class CardService implements ICardService {
         }
     }
 
+    @Transactional
     @Override
     public CardResponseDTO cardDebit(Long cardId, Double amount) throws NotFoundException, InsufficientBalanceException {
         Card card = cardRepository.findById(cardId).orElseThrow(() -> new NotFoundException("Card not found"));

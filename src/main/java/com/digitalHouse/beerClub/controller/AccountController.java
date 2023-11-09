@@ -63,12 +63,12 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).body(accountService.debit(id, amount));
     }
 
-    @PostMapping("/{id}/credit")
+    @PostMapping("/{number}/credit")
     public ResponseEntity<AccountResponseDTO> credit(
-            @PathVariable @Positive(message = "Id must be greater than 0") Long id,
+            @PathVariable String number,
             @RequestParam @Positive(message = "Amount must be greater than 0") Double amount
     ) throws NotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(accountService.credit(id, amount));
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.addCredit(number, amount));
     }
 
     @PostMapping("/{id}/activate")

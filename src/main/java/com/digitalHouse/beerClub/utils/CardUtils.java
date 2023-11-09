@@ -34,6 +34,10 @@ public final class CardUtils {
         return (int) (Math.random() * (max - min)) + min;
     }
 
+    public static String getLastFourDigits(String cardNumber) {
+        return cardNumber.substring(cardNumber.length() - 4);
+    }
+
     public static LocalDate parseStringToLocalDate(String date){
         try {
             int month = Integer.parseInt(date.substring(0,2));

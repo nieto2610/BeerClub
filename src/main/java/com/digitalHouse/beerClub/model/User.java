@@ -31,7 +31,6 @@ public class User {
 
     @Column(unique = true)
     @NotBlank(message = "Email cannot be null")
-    @Email(message = "Email should be valid")
     private String email;
 
     @Column(nullable = false)
@@ -64,9 +63,6 @@ public class User {
     @JoinColumn(name = "subscription_id")
     private Subscription subscription;
 
-    @JsonIgnore
-    @OneToMany(mappedBy="user", fetch=FetchType.EAGER)
-    private Set<CardPayment> cardPayments = new HashSet<>();
 
     public User(String firstName, String lastName, String email, LocalDate birthdate, String telephone, LocalDate subscriptionDate, String password, Address address) {
         this.firstName = firstName;
@@ -89,10 +85,6 @@ public class User {
         this.telephone = user.getTelephone();
         role = RoleType.USER;
         active = true;
-    }
-
-    public void addCard(CardPayment cardPayment) {
-        cardPayments.add(cardPayment);
     }
 
     public void assignRole(RoleType roleType) {

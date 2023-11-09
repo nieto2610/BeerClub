@@ -1,6 +1,7 @@
 
 package com.digitalHouse.beerClub.service.implement;
 
+import com.digitalHouse.beerClub.config.MyAppConfig;
 import com.digitalHouse.beerClub.exceptions.BadRequestException;
 import com.digitalHouse.beerClub.exceptions.EntityInactiveException;
 import com.digitalHouse.beerClub.exceptions.InsufficientBalanceException;
@@ -33,14 +34,16 @@ public class PaymentServiceImplement implements IPaymentService {
     private final CardService cardService;
     private final AccountService accountService;
     private final Mapper transactionMapper;
+    private final MyAppConfig myAppConfig;
 
     @Autowired
-    public PaymentServiceImplement(IPaymentRepository paymentRepository, ISubscriptionRepository subscriptionRepository, CardService cardService, AccountService accountService, Mapper mapper) {
+    public PaymentServiceImplement(IPaymentRepository paymentRepository, ISubscriptionRepository subscriptionRepository, CardService cardService, AccountService accountService, Mapper mapper, MyAppConfig myAppConfig) {
         this.paymentRepository = paymentRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.cardService = cardService;
         this.accountService = accountService;
         this.transactionMapper = mapper;
+        this.myAppConfig = myAppConfig;
     }
     @Override
     public List<PaymentDTO> searchAll() {
@@ -55,8 +58,8 @@ public class PaymentServiceImplement implements IPaymentService {
     @Transactional
     @Override
     public Payment savePayment(CardPayment card, User user) throws NotFoundException, InsufficientBalanceException {
-        Long accountBeerClubId = 1L;
-
+        //Long accountBeerClubId = 1L;
+        String accountBeerClubNumber = myAppConfig.getAccountNumber();
         Subscription subscription = subscriptionRepository.findById(user.getSubscription().getId()).orElseThrow(() -> new NotFoundException("Subscription not found"));
 
         Double amount = subscription.getPrice();
@@ -67,8 +70,7 @@ public class PaymentServiceImplement implements IPaymentService {
         payment.setAmount(amount);
         payment.setDescription(description);
         payment.setDate(LocalDateTime.now());
-        // Guardar los ultimos 4 digitos
-        payment.setCardNumber(card.getNumber());
+        payment.setCardNumber(CardUtils.getLastFourDigits(card.getNumber()));
         payment.setUserId(user.getId());
         payment.setInvoiceNumber(invoiceNumber);
         payment.setSubscription(subscription);
@@ -82,14 +84,14 @@ public class PaymentServiceImplement implements IPaymentService {
             cardService.cardDebit(cardDTO.getId(), amount);
         }
 
-        // accountService.addCredit
-        accountService.credit(accountBeerClubId, amount);
+        accountService.addCredit(accountBeerClubNumber, amount);
 
         return paymentRepository.save(payment);
     }
 
     @Override
     public void paymentValidation(Long subscriptionId, String cardHolder, String cardNumber,String cvv, String expDate ) throws EntityInactiveException, NotFoundException, BadRequestException, InsufficientBalanceException {
+        String accountBeerClubNumber = myAppConfig.getAccountNumber();
         Subscription subscription = subscriptionRepository.findById(subscriptionId).orElseThrow(() -> new NotFoundException("Subscription not found"));
 
         Double amount = subscription.getPrice();
@@ -106,7 +108,15 @@ public class PaymentServiceImplement implements IPaymentService {
             Long accountId = cardDTO.getAccountId();
             accountValidation(accountId, amount);
         }
+
+        try{
+            accountService.searchByAccountNumber(accountBeerClubNumber);
+        }catch (NotFoundException e) {
+            throw new NotFoundException("La cuenta de destino no está disponible");
+        }
+
     }
+
     private void cardValidation(String cardHolder, String number, int cvv, String expDate) throws NotFoundException, EntityInactiveException, BadRequestException {
         CardDTO cardDTO = cardService.searchByCardNumber(number);
         LocalDate expDateTime = CardUtils.parseStringToLocalDate(expDate);

@@ -48,4 +48,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> insufficientBalanceException(InsufficientBalanceException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
+
+    @ExceptionHandler(UserActiveException.class)
+    public ResponseEntity<?> userActiveException(UserActiveException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
 }

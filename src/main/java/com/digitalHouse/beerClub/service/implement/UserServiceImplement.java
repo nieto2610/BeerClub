@@ -5,7 +5,6 @@ import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.*;
 import com.digitalHouse.beerClub.model.dto.*;
 import com.digitalHouse.beerClub.repository.IAddressRepository;
-import com.digitalHouse.beerClub.repository.ICardPaymentRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
@@ -26,18 +25,15 @@ public class UserServiceImplement implements IUserService {
 
     private final ISubscriptionRepository subscriptionRepository;
 
-    private final ICardPaymentRepository cardPaymentRepository;
-
     private final PaymentServiceImplement paymentServiceImplement;
 
     private final Mapper userMapper;
 
     @Autowired
-    public UserServiceImplement(IUserRepository userRepository, IAddressRepository addressRepository, ISubscriptionRepository subscriptionRepository, ICardPaymentRepository cardPaymentRepository, PaymentServiceImplement paymentServiceImplement, Mapper userMapper) {
+    public UserServiceImplement(IUserRepository userRepository, IAddressRepository addressRepository, ISubscriptionRepository subscriptionRepository,  PaymentServiceImplement paymentServiceImplement, Mapper userMapper) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
         this.subscriptionRepository = subscriptionRepository;
-        this.cardPaymentRepository = cardPaymentRepository;
         this.paymentServiceImplement = paymentServiceImplement;
         this.userMapper = userMapper;
     }
@@ -83,7 +79,6 @@ public class UserServiceImplement implements IUserService {
         newUser.setSubscriptionDate(getSubscriptionDate());
         newUser.setAddress(address);
         newUser.setSubscription(subscription);
-        //newUser.addCard(cardPayment);
         User createdUser = userRepository.save(newUser);
 
         return paymentServiceImplement.savePayment(cardPayment, createdUser);
@@ -123,7 +118,6 @@ public class UserServiceImplement implements IUserService {
     @Override
     public UserDTO getUserAuth(String email) {
         User user = this.findByEmail(email);
-        System.out.println("USER:" + user);
         UserDTO userDTO = userMapper.converter(user, UserDTO.class);
         return userDTO;
     }

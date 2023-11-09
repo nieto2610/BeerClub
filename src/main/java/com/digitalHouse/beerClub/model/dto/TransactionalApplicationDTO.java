@@ -4,20 +4,19 @@ import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.time.LocalDate;
-
 @Data
-public class CardPaymentDTO {
-    private Long id;
+public class TransactionalApplicationDTO {
+    @NotNull(message = "SubscriptionId cannot be null")
+    private Long subscriptionId;
 
     private String cardHolder;
 
     @NotNull(message = "Number cannot be null")
-    private String number;
+    private String cardNumber;
 
     @NotNull(message = "Cvv cannot be null")
     private int cvv;
 
     @Column(nullable = false, updatable = false)
-    private LocalDate expDate;
+    private String expDate;
 }

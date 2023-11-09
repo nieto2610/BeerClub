@@ -9,6 +9,6 @@ import com.digitalHouse.beerClub.model.dto.AccountResponseDTO;
 public interface IAccountService extends IService<AccountDTO>{
     AccountDTO createAccount(AccountAppDTO accountAppDTO) throws BadRequestException;
     AccountResponseDTO debit(Long accountId, Double amount) throws NotFoundException;
-    AccountResponseDTO credit(Long accountId, Double amount) throws NotFoundException;
+    AccountResponseDTO addCredit(String  accountNumber, Double amount) throws NotFoundException;
     AccountDTO activateAccount(Long accountId) throws NotFoundException;
 }
