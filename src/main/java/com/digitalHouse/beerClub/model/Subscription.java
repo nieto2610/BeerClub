@@ -39,6 +39,9 @@ public class Subscription {
     @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY)
     private Set<User> users = new HashSet<>();
 
+    @OneToMany(mappedBy = "subscription", fetch = FetchType.EAGER)
+    private Set<Payment> payments = new HashSet<>();
+
     public Subscription(Long id, String name, String description, Double price, List<Benefit> benefits, Boolean isRecommended, Boolean isActive) {
         this.id = id;
         this.name = name;
@@ -49,8 +52,4 @@ public class Subscription {
         this.isActive = isActive;
     }
 
-    public void addUser(User user) {
-        user.setSubscription(this);
-        users.add(user);
-    }
 }

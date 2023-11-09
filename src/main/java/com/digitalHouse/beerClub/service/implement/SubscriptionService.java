@@ -58,6 +58,7 @@ public class SubscriptionService implements ISubscriptionService {
 
         // set new benefits
         List<BenefitDTO> newBenefits = new ArrayList<>(subscriptionDTO.getBenefits());
+
         subscription.getBenefits().clear();
         subscription.getBenefits().addAll(newBenefits.stream().map(b -> mapper.converter(b, Benefit.class)).toList());
 

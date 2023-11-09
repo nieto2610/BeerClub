@@ -62,6 +62,7 @@ class SubscriptionServiceTest {
         subscription2.setIsActive(true);
 
         List<Subscription> expected = new ArrayList<>();
+
         expected.add(subscription);
         expected.add(subscription2);
 
@@ -79,12 +80,14 @@ class SubscriptionServiceTest {
     void searchById() throws NotFoundException {
         //ARRANGE
         Long id = 1L;
+
         Subscription subscription = new Subscription();
         subscription.setId(id);
         subscription.setName("Novato");
         subscription.setDescription("Disfrutas de la cerveza y quieres conocer más acerca de ella");
         subscription.setIsRecommended(false);
         subscription.setIsActive(true);
+
         when(subscriptionRepository.findById(any())).thenReturn(Optional.of(subscription));
 
         //ACT
@@ -109,6 +112,7 @@ class SubscriptionServiceTest {
     @DisplayName("✅ - Create subscription")
     void create() throws BadRequestException {
         //ARRANGE
+
         SubscriptionDTO expected = new SubscriptionDTO();
         expected.setId(1L);
         expected.setName("Novato");
@@ -122,6 +126,7 @@ class SubscriptionServiceTest {
         subscription.setDescription("Disfrutas de la cerveza y quieres conocer más acerca de ella");
         subscription.setIsRecommended(false);
         subscription.setIsActive(true);
+
         when(subscriptionRepository.save(subscription)).thenReturn(subscription);
 
         //ACT
@@ -173,6 +178,7 @@ class SubscriptionServiceTest {
         subscription.setDescription("Disfrutas de la cerveza y quieres conocer más acerca de ella");
         subscription.setIsRecommended(false);
         subscription.setIsActive(true);
+
         when(subscriptionRepository.findById(any())).thenReturn(Optional.of(subscription));
 
         //ACT

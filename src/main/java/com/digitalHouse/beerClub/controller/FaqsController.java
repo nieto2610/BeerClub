@@ -5,6 +5,7 @@ import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.model.dto.FaqsDTO;
 import com.digitalHouse.beerClub.service.implement.FaqsService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -16,7 +17,8 @@ import java.util.logging.Logger;
 
 @Validated
 @RestController
-@RequestMapping("/faqs")
+@Tag(name = "Faqs")
+@RequestMapping("faqs")
 public class FaqsController {
     final static Logger logger = Logger.getLogger(String.valueOf(FaqsController.class));
     private final FaqsService faqsService;

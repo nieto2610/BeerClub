@@ -1,9 +1,12 @@
 package com.digitalHouse.beerClub.controller;
 
 import com.digitalHouse.beerClub.exceptions.*;
+import com.digitalHouse.beerClub.model.Payment;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
+import com.digitalHouse.beerClub.model.dto.UserResponseDTO;
+import com.digitalHouse.beerClub.service.implement.PaymentServiceImplement;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,6 +38,10 @@ public class UserController {
     @Autowired
     private IUserService IUserService;
 
+    @Autowired
+    private PaymentServiceImplement paymentServiceImplement;
+
+
     @Operation(summary="List all users", description="List all users", responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @GetMapping("/all")
@@ -50,26 +57,23 @@ public class UserController {
         List<UserDTO> userDTOS = IUserService.getAllActiveUsers();
         return new ResponseEntity<>(userDTOS, HttpStatus.OK);
     }
-    @Operation(summary="Add user", description="Add a new user", responses = {
-            @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
-    @PostMapping("/create")
-    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) throws NotFoundException {
-
-        UserDTO userDTO = IUserService.saveUser(user);
-        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
-    }
 
     @Operation(summary ="Find user by ID", description ="Find user by ID", responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @GetMapping("/id/{id}")
     public ResponseEntity<Object> getUserById(@Parameter(description = "ID del usuario a obtener", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long id) throws NotFoundException{
-       try {
-            UserDTO userDTO = IUserService.searchById(id);
-            return new ResponseEntity<>(userDTO, HttpStatus.OK);
-       } catch (NotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-       }
+        UserDTO userDTO = IUserService.searchById(id);
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    }
+
+    @Operation(summary="Add user", description="Add a new user", responses = {
+        @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
+    @PostMapping("/create")
+    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException {
+        paymentServiceImplement.paymentValidation(user.getSubscriptionId(), user.getCardHolder(), user.getCardNumber(), user.getCvv(), user.getExpDate() );
+        Payment userDTO = IUserService.saveUser(user);
+        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
     @Operation(summary ="Find user by Email", description ="Find user by Email",  responses = {
@@ -85,12 +89,8 @@ public class UserController {
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateUser(@Parameter(description = "ID del usuario a actualizar", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long id, @Valid @RequestBody UserApplicationDTO user) throws NotFoundException {
-        try {
-            UserDTO userDTO = IUserService.updateUser(user, id);
-            return new ResponseEntity<>(userDTO, HttpStatus.OK);
-        }catch (NotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
+        UserDTO userDTO = IUserService.updateUser(user, id);
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
     @Operation(summary = "Update user password", description = "Update the password of an existing user",responses = {
@@ -105,30 +105,18 @@ public class UserController {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "User subscription activated successfully"))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @PutMapping("/activate/{userId}")
-    public ResponseEntity<String> activateUserSubscription(@Parameter(description = "ID del usuario a activar", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long userId) {
-        try {
-            IUserService.activateUserSubscription(userId);
-            return new ResponseEntity<>("User subscription activated successfully", HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }catch (UserActiveException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<String> activateUserSubscription(@Parameter(description = "ID del usuario a activar", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException, UserActiveException {
+        IUserService.activateUserSubscription(userId);
+        return new ResponseEntity<>("User subscription activated successfully", HttpStatus.OK);
     }
 
     @Operation(summary = "Delete user", description = "Delete a user by ID",responses = {
         @ApiResponse(responseCode = "204",description = "NO_CONTENT",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "1"))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @DeleteMapping("/{userId}")
-    public ResponseEntity<String> softDeleteUser(@Parameter(description = "ID del usuario a eliminar", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long userId) {
-        try {
-            IUserService.delete(userId);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }catch (ServiceException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<String> softDeleteUser(@Parameter(description = "ID del usuario a eliminar", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws ServiceException, NotFoundException {
+        IUserService.delete(userId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

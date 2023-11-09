@@ -2,9 +2,7 @@ package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.mapper.Mapper;
-import com.digitalHouse.beerClub.model.Address;
-import com.digitalHouse.beerClub.model.Subscription;
-import com.digitalHouse.beerClub.model.User;
+import com.digitalHouse.beerClub.model.*;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
@@ -12,6 +10,7 @@ import com.digitalHouse.beerClub.repository.IAddressRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
+import com.digitalHouse.beerClub.utils.TransformationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,24 +22,25 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImplement implements IUserService {
 
-    @Autowired
-    private IUserRepository userRepository;
+    private final IUserRepository userRepository;
 
-    @Autowired
-    private IAddressRepository addressRepository;
+    private final IAddressRepository addressRepository;
 
-    @Autowired
-    private ISubscriptionRepository subscriptionRepository;
+    private final ISubscriptionRepository subscriptionRepository;
+
+    private final PaymentServiceImplement paymentServiceImplement;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     private final Mapper userMapper;
 
     @Autowired
-    public UserServiceImplement(IUserRepository userRepository, IAddressRepository addressRepository, ISubscriptionRepository subscriptionRepository,Mapper userMapper) {
+    public UserServiceImplement(IUserRepository userRepository, IAddressRepository addressRepository, ISubscriptionRepository subscriptionRepository,  PaymentServiceImplement paymentServiceImplement, Mapper userMapper) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
         this.subscriptionRepository = subscriptionRepository;
+        this.paymentServiceImplement = paymentServiceImplement;
         this.userMapper = userMapper;
     }
 
@@ -74,22 +74,23 @@ public class UserServiceImplement implements IUserService {
     public UserDTO update(UserDTO entity, Long id) throws NotFoundException { return null; }
 
     @Override
-    public UserDTO saveUser(UserApplicationDTO user) throws NotFoundException {
-        Address address = new Address(user.getCountry(), user.getProvince(), user.getCity(), user.getStreet(), user.getNumber(), user.getFloor(), user.getApartment(), user.getZipCode());
+    public Payment saveUser(UserApplicationDTO user) throws NotFoundException, InsufficientBalanceException {
+
+        Address address = new Address(user.getCountry(), user.getProvince(), user.getCity(), user.getStreet(), TransformationUtils.getNumber(user.getNumber()), TransformationUtils.getNumber(user.getFloor()), user.getApartment(), user.getZipCode());
         addressRepository.save(address);
-        LocalDate subscriptionDate = LocalDate.now();
-        if (subscriptionDate.getDayOfMonth() >= 20) {
-            // Si es el día 20 o posterior, establece la fecha de suscripción en el primer día del mes siguiente
-            subscriptionDate = subscriptionDate.plusMonths(1).withDayOfMonth(1);
-        }
-        User newUser = new User(user.getName(), user.getLastName(), user.getEmail(), user.getBirthdate(), user.getTelephone(), subscriptionDate, passwordEncoder.encode(user.getPassword()), address);
+
         Subscription subscription = subscriptionRepository.findById(user.getSubscriptionId()).orElseThrow(() -> new NotFoundException("Subscription not found."));
+        CardPayment cardPayment = new CardPayment(user.getCardHolder(),user.getCardNumber(), TransformationUtils.getNumber(user.getCvv()),user.getExpDate());
+
+        User newUser = new User(user);
+        newUser.setSubscriptionDate(getSubscriptionDate());
+        newUser.setAddress(address);
         newUser.setSubscription(subscription);
-        userRepository.save(newUser);
-        subscription.addUser(newUser);
-        UserDTO userDTO = userMapper.converter(newUser, UserDTO.class);
-        return userDTO;
+        User createdUser = userRepository.save(newUser);
+
+        return paymentServiceImplement.savePayment(cardPayment, createdUser);
     }
+
 
     @Override
     public UserDTO updateUser(UserApplicationDTO user, Long id) throws NotFoundException {
@@ -124,7 +125,6 @@ public class UserServiceImplement implements IUserService {
     @Override
     public UserDTO getUserAuth(String email) {
         User user = this.findByEmail(email);
-        System.out.println("USER:" + user);
         UserDTO userDTO = userMapper.converter(user, UserDTO.class);
         return userDTO;
     }
@@ -148,5 +148,8 @@ public class UserServiceImplement implements IUserService {
         user.setActive(true);
         userRepository.save(user);
     }
-
+    private LocalDate getSubscriptionDate() {
+        LocalDate currentDate = LocalDate.now();
+        return currentDate.getDayOfMonth() >= 20 ? currentDate.plusMonths(1).withDayOfMonth(1) : currentDate;
+    }
 }

@@ -1,7 +1,6 @@
 package com.digitalHouse.beerClub.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -14,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+
 
 @Data
 @NoArgsConstructor
@@ -34,7 +34,6 @@ public class User implements UserDetails {
 
     @Column(unique = true)
     @NotBlank(message = "Email cannot be null")
-    @Email(message = "Email should be valid")
     private String email;
 
     @Column(nullable = false)
@@ -67,6 +66,7 @@ public class User implements UserDetails {
     @JoinColumn(name = "subscription_id")
     private Subscription subscription;
 
+
     public User(String firstName, String lastName, String email, LocalDate birthdate, String telephone, LocalDate subscriptionDate, String password, Address address) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -76,6 +76,16 @@ public class User implements UserDetails {
         this.subscriptionDate = subscriptionDate;
         this.password = password;
         this.address = address;
+        role = RoleType.USER;
+        active = true;
+    }
+
+    public User(UserApplicationDTO user) {
+        this.firstName = user.getName();
+        this.lastName = user.getLastName();
+        this.email = user.getEmail();
+        this.birthdate = user.getBirthdate();
+        this.telephone = user.getTelephone();
         role = RoleType.USER;
         active = true;
     }

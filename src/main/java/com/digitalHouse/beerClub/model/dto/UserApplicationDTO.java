@@ -1,5 +1,7 @@
 package com.digitalHouse.beerClub.model.dto;
 
+import com.digitalHouse.beerClub.model.CardPayment;
+import com.digitalHouse.beerClub.model.User;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -47,7 +49,7 @@ public class UserApplicationDTO {
     @NotBlank(message = "Street cannot be null")
     private String street;
 
-    private int number, floor;
+    private String number, floor;
 
     private String apartment;
 
@@ -61,4 +63,16 @@ public class UserApplicationDTO {
     private String password;
 
     private Long subscriptionId;
+
+    private String cardHolder;
+
+    @NotNull(message = "Number cannot be null")
+    private String cardNumber;
+
+    @NotNull(message = "Cvv cannot be null")
+    private String cvv;
+
+    @Column(nullable = false, updatable = false)
+    private String expDate;
+
 }

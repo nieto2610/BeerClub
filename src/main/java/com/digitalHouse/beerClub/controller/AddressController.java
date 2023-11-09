@@ -29,26 +29,18 @@ public class AddressController {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = AddressDTO.class))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "Address not found with userEmail: example@beerClub")))})
     @GetMapping("/{userEmail}")
-    public ResponseEntity<Object> getAddressByUserEmail(@Parameter(description = "Email del usuario a obtener dirección", example = "example@beerClub", required = true, schema = @Schema(type = "String")) @PathVariable String userEmail) {
-        try {
-            AddressDTO address = addressService.getAddressByUserAuth(userEmail);
-            return ResponseEntity.ok(address);
-        } catch (NotFoundException ex) {
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<Object> getAddressByUserEmail(@Parameter(description = "Email del usuario a obtener dirección", example = "example@beerClub", required = true, schema = @Schema(type = "String")) @PathVariable String userEmail) throws NotFoundException {
+        AddressDTO address = addressService.getAddressByUserAuth(userEmail);
+        return ResponseEntity.ok(address);
     }
 
     @Operation(summary ="Update address by user Email", description ="Update address by user Email", responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = AddressDTO.class))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "Address not found with userEmail: example@beerClub")))})
     @PutMapping("/update/{userEmail}")
-    public ResponseEntity<Object> updateAddressByUserEmail(@Parameter(description = "Email del usuario a obtener dirección", example = "example@beerClub", required = true, schema = @Schema(type = "String")) @PathVariable String userEmail, @Valid @RequestBody AddressDTO updatedAddress) {
-        try {
-            AddressDTO updated = addressService.updateAddressByUserEmail(userEmail, updatedAddress);
-            return ResponseEntity.ok(updated);
-        } catch (NotFoundException ex) {
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<Object> updateAddressByUserEmail(@Parameter(description = "Email del usuario a obtener dirección", example = "example@beerClub", required = true, schema = @Schema(type = "String")) @PathVariable String userEmail, @Valid @RequestBody AddressDTO updatedAddress) throws NotFoundException {
+        AddressDTO updated = addressService.updateAddressByUserEmail(userEmail, updatedAddress);
+        return ResponseEntity.ok(updated);
     }
 
 }
