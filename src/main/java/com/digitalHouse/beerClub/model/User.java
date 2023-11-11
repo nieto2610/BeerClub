@@ -24,23 +24,23 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Name cannot be null")
+    @NotBlank(message = "Nombre no puede ser nulo")
     @Size(min=3)
     private String firstName;
 
-    @NotBlank(message = "LastName cannot be null")
+    @NotBlank(message = "Apellido no puede ser nulo")
     @Size(min=2)
     private String lastName;
 
     @Column(unique = true)
-    @NotBlank(message = "Email cannot be null")
+    @NotBlank(message = "Correo no puede ser nulo")
     private String email;
 
     @Column(nullable = false)
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate birthdate;
 
-    @NotBlank(message = "Telephone cannot be null")
+    @NotBlank(message = "Telefono no puede ser nulo")
     private String telephone;
 
     @Column(nullable = false, updatable = false)
@@ -49,7 +49,7 @@ public class User implements UserDetails {
 
     @Pattern(
         regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$",
-        message = "The password must contain at least 8 characters and meet the following criteria: at least one uppercase letter, one lowercase letter, one number, and one special character @#$%^&+=!)."
+        message = "La contraseña debe contener al menos 8 caracteres y cumplir las siguientes condiciones: al menos una mayúscula, una minúscula, un número, y un carácter especial (@#$%^&+=!)."
     )
     private String password;
 

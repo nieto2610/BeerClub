@@ -14,15 +14,15 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class UserApplicationDTO {
 
-    @NotBlank(message = "Name cannot be null")
+    @NotBlank(message = "Nombre es obligatorio")
     @Size(min=3, max = 50, message = "Name must be between 3 and 50 characters")
     private String name;
 
-    @NotBlank(message = "LastName cannot be null")
+    @NotBlank(message = "Apellido es obligatorio")
     @Size(min=2, max = 50, message = "LastName must be between 2 and 50 characters")
     private String lastName;
 
-    @NotBlank(message = "Email cannot be null")
+    @NotBlank(message = "Correo electrónico es obligatorio")
     @Email(message = "Email should be valid")
     private String email;
 
@@ -31,34 +31,34 @@ public class UserApplicationDTO {
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate birthdate;
 
-    @NotBlank(message = "Telephone cannot be null")
+    @NotBlank(message = "Telefono es obligatorio")
     private String telephone;
 
-    @NotBlank(message = "Country cannot be null")
+    @NotBlank(message = "País es obligatorio")
     @Size(min=4)
     private String country;
 
-    @NotBlank(message = "Province cannot be null")
+    @NotBlank(message = "Provincia es obligatorio")
     @Size(min=4)
     private String province;
 
-    @NotBlank(message = "City cannot be null")
+    @NotBlank(message = "Ciudad es obligatorio")
     @Size(min=4)
     private String city;
 
-    @NotBlank(message = "Street cannot be null")
+    @NotBlank(message = "Dirección es obligatorio")
     private String street;
 
     private String number, floor;
 
     private String apartment;
 
-    @NotBlank(message = "ZipCode cannot be null")
+    @NotBlank(message = "ZipCode es obligatorio")
     private String zipCode;
 
     @Pattern(
         regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$",
-        message = "The password must contain at least 8 characters and meet the following criteria: at least one uppercase letter, one lowercase letter, one number, and one special character @#$%^&+=!)."
+            message = "La contraseña debe contener al menos 8 caracteres y cumplir las siguientes condiciones: al menos una mayúscula, una minúscula, un número, y un carácter especial (@#$%^&+=!)."
     )
     private String password;
 
@@ -66,10 +66,10 @@ public class UserApplicationDTO {
 
     private String cardHolder;
 
-    @NotNull(message = "Number cannot be null")
+    @NotNull(message = "Número de tarjeta es obligatorio")
     private String cardNumber;
 
-    @NotNull(message = "Cvv cannot be null")
+    @NotNull(message = "Cvv es obligatorio")
     private String cvv;
 
     @Column(nullable = false, updatable = false)
