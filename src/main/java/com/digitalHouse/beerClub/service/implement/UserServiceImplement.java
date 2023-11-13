@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,6 +76,12 @@ public class UserServiceImplement implements IUserService {
 
     @Override
     public Payment saveUser(UserApplicationDTO user) throws NotFoundException, InsufficientBalanceException {
+
+        Optional<User> existingUser = userRepository.findByUserEmail(user.getEmail());
+
+        if (existingUser.isPresent()) {
+            throw new CustomUserAlreadyExistsException("El email ya está registrado.");
+        }
 
         Address address = new Address(user.getCountry(), user.getProvince(), user.getCity(), user.getStreet(), TransformationUtils.getNumber(user.getNumber()), TransformationUtils.getNumber(user.getFloor()), user.getApartment(), user.getZipCode());
         addressRepository.save(address);

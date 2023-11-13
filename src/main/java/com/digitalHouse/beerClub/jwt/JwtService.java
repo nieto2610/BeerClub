@@ -18,11 +18,11 @@ import java.util.function.Function;
 @Service
 public class JwtService {
     private static final String SECRET_KEY="586E3272357538782F413F4428472B4B6250655368566B597033733676397924";
-    public String getToken(UserDetails user) {
-        return getToken(new HashMap<>(), user);
+    public String getToken(UserDetails user, String email) {
+        return getToken(new HashMap<>(), user, email);
     }
 
-    private String getToken(Map<String,Object> extraClaims, UserDetails user) {
+    private String getToken(Map<String,Object> extraClaims, UserDetails user, String email) {
         Claims claims = Jwts.claims(extraClaims);
         claims.setSubject(user.getUsername());
         String role = user.getAuthorities().stream()
@@ -30,6 +30,7 @@ public class JwtService {
                 .map(authority -> "ROLE_" + authority.getAuthority())
                 .orElse(null);
         claims.put("role", role);
+        claims.put("email", email);
 
         return Jwts.builder()
                 .setClaims(claims)
