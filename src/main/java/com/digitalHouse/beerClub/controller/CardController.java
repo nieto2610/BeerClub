@@ -41,8 +41,8 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(cardService.createCard(cardAppDTO));
     }
 
-    @PostMapping("/{id}/debit")
-    public ResponseEntity<Object> debit(
+    @PatchMapping("/{id}/debit")
+    public ResponseEntity<Object> processDebitOperation(
             @PathVariable @Positive(message = "Id must be greater than 0") Long id,
             @RequestParam @Positive(message = "Amount must be greater than 0") Double amount
     ) throws NotFoundException, InsufficientBalanceException {
@@ -53,6 +53,18 @@ public class CardController {
        }catch (InsufficientBalanceException e) {
            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
        }
+    }
+
+    @PatchMapping("/{id}/credit")
+    public ResponseEntity<Object> processCreditOperation(
+            @PathVariable @Positive(message = "Id must be greater than 0") Long id,
+            @RequestParam @Positive(message = "Amount must be greater than 0") Double amount
+    ) throws NotFoundException {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(cardService.cardCredit(id, amount));
+        }catch (NotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/{id}")

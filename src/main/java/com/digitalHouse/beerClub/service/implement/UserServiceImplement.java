@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,7 +75,9 @@ public class UserServiceImplement implements IUserService {
     public UserDTO update(UserDTO entity, Long id) throws NotFoundException { return null; }
 
     @Override
-    public Payment saveUser(UserApplicationDTO user) throws NotFoundException, InsufficientBalanceException {
+    public Payment saveUser(UserApplicationDTO user) throws NotFoundException, InsufficientBalanceException, CustomUserAlreadyExistsException {
+
+        emailValidation(user.getEmail());
 
         Address address = new Address(user.getCountry(), user.getProvince(), user.getCity(), user.getStreet(), TransformationUtils.getNumber(user.getNumber()), TransformationUtils.getNumber(user.getFloor()), user.getApartment(), user.getZipCode());
         addressRepository.save(address);
@@ -148,8 +151,17 @@ public class UserServiceImplement implements IUserService {
         user.setActive(true);
         userRepository.save(user);
     }
+
     private LocalDate getSubscriptionDate() {
         LocalDate currentDate = LocalDate.now();
         return currentDate.getDayOfMonth() >= 20 ? currentDate.plusMonths(1).withDayOfMonth(1) : currentDate;
+    }
+
+    private void emailValidation(String email) {
+        User existingUser = userRepository.findByEmail(email);
+
+        if (existingUser != null) {
+            throw new CustomUserAlreadyExistsException("El correo electrónico '"+ email +"' ya está registrado. Por favor, ingresa otro.");
+        }
     }
 }

@@ -5,7 +5,6 @@ import com.digitalHouse.beerClub.model.Payment;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
-import com.digitalHouse.beerClub.model.dto.UserResponseDTO;
 import com.digitalHouse.beerClub.service.implement.PaymentServiceImplement;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +12,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -70,7 +68,7 @@ public class UserController {
     @Operation(summary="Add user", description="Add a new user", responses = {
         @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @PostMapping("/create")
-    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException {
+    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException, CustomUserAlreadyExistsException {
         paymentServiceImplement.paymentValidation(user.getSubscriptionId(), user.getCardHolder(), user.getCardNumber(), user.getCvv(), user.getExpDate() );
         Payment userDTO = IUserService.saveUser(user);
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);

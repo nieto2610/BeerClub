@@ -25,7 +25,7 @@ public class User implements UserDetails {
     private Long id;
 
     @NotBlank(message = "Name cannot be null")
-    @Size(min=3)
+    @Size(min=2)
     private String firstName;
 
     @NotBlank(message = "LastName cannot be null")
@@ -37,18 +37,16 @@ public class User implements UserDetails {
     private String email;
 
     @Column(nullable = false)
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate birthdate;
 
     @NotBlank(message = "Telephone cannot be null")
     private String telephone;
 
     @Column(nullable = false, updatable = false)
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate subscriptionDate;
 
     @Pattern(
-        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$",
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!*?.])(?=\\S+$).{8,16}$",
         message = "The password must contain at least 8 characters and meet the following criteria: at least one uppercase letter, one lowercase letter, one number, and one special character @#$%^&+=!)."
     )
     private String password;
@@ -65,7 +63,6 @@ public class User implements UserDetails {
     @ManyToOne
     @JoinColumn(name = "subscription_id")
     private Subscription subscription;
-
 
     public User(String firstName, String lastName, String email, LocalDate birthdate, String telephone, LocalDate subscriptionDate, String password, Address address) {
         this.firstName = firstName;
