@@ -6,6 +6,7 @@ import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Product;
 import com.digitalHouse.beerClub.model.Recommendation;
+import com.digitalHouse.beerClub.model.Review;
 import com.digitalHouse.beerClub.model.Subscription;
 import com.digitalHouse.beerClub.model.dto.ProductDTO;
 import com.digitalHouse.beerClub.model.dto.RecommendationDTO;
@@ -130,12 +131,19 @@ public class RecommendationService implements IRecommendationService {
 
     @Override
     public RecommendationDTO searchBySubscriptionAndDate(Long subscriptionId, LocalDate date) throws NotFoundException {
-
+        Float productScore= (float) 0.0;
         Recommendation recommendation = recommendationRepository.findBySubscriptionIdAndCreateDate(subscriptionId,date.getMonthValue(), date.getYear());
-
         if(recommendation == null) {
             throw new NotFoundException("Recommendation not found");
         }
+        Product product= recommendation.getProduct();
+        List<Review> reviewListProduct= recommendation.getProduct().getReviewList();
+        for(Review r :reviewListProduct) {
+            productScore+=r.getRating();
+        }
+        productScore = productScore/reviewListProduct.size();
+        product.setProductScore(productScore);
+        recommendation.setProduct(product);
 
         RecommendationDTO recommendationDTO = mapper.converter(recommendation,RecommendationDTO.class);
         recommendationDTO.setSubscriptionId(subscriptionId);

@@ -19,6 +19,7 @@ public class Product {
     private Long id;
     private String name;
     private String description;
+    private Float productScore;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")
