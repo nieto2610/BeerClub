@@ -144,7 +144,7 @@ public class RecommendationService implements IRecommendationService {
         productScore = productScore/reviewListProduct.size();
         product.setProductScore(productScore);
         recommendation.setProduct(product);
-
+        productRepository.save(product);
         RecommendationDTO recommendationDTO = mapper.converter(recommendation,RecommendationDTO.class);
         recommendationDTO.setSubscriptionId(subscriptionId);
         return recommendationDTO;
