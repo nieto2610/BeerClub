@@ -131,22 +131,32 @@ public class RecommendationService implements IRecommendationService {
 
     @Override
     public RecommendationDTO searchBySubscriptionAndDate(Long subscriptionId, LocalDate date) throws NotFoundException {
-        Float productScore= (float) 0.0;
+
         Recommendation recommendation = recommendationRepository.findBySubscriptionIdAndCreateDate(subscriptionId,date.getMonthValue(), date.getYear());
         if(recommendation == null) {
             throw new NotFoundException("Recommendation not found");
         }
         Product product= recommendation.getProduct();
         List<Review> reviewListProduct= recommendation.getProduct().getReviewList();
-        for(Review r :reviewListProduct) {
-            productScore+=r.getRating();
-        }
-        productScore = productScore/reviewListProduct.size();
-        product.setProductScore(productScore);
+        product.setProductScore(getProductAverage(reviewListProduct));
         recommendation.setProduct(product);
         productRepository.save(product);
         RecommendationDTO recommendationDTO = mapper.converter(recommendation,RecommendationDTO.class);
         recommendationDTO.setSubscriptionId(subscriptionId);
         return recommendationDTO;
+    }
+
+    public Float getProductAverage(List<Review> reviewList){
+        Float productScore= 0.0F;
+        for(Review r :reviewList) {
+            if(r.getRating()==null){
+                productScore+=0.0F;
+            }
+            else{
+                productScore+=r.getRating();
+            }
+        }
+        productScore = productScore/reviewList.size();
+        return productScore;
     }
 }

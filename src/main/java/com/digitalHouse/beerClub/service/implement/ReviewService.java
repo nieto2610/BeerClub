@@ -52,7 +52,9 @@ public class ReviewService implements IReviewService{
 
         Product product= productRepository.findById(reviewDTO.getProductId()).orElseThrow(()-> new BadRequestException("Product information is missing"));
         review.setProduct(product);
-
+        if(reviewDTO.getRating()==null){
+            throw new BadRequestException("The rating can't be null");
+        }
         if(reviewDTO.getRating()<1 || reviewDTO.getRating()>5){
             throw new BadRequestException("The rating must be a number between 1 and 5");
         }
