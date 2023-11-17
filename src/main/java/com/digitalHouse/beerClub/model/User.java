@@ -24,31 +24,20 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Name cannot be null")
-    @Size(min=2)
     private String firstName;
 
-    @NotBlank(message = "LastName cannot be null")
-    @Size(min=2)
     private String lastName;
 
-    @Column(unique = true)
-    @NotBlank(message = "Email cannot be null")
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDate birthdate;
 
-    @NotBlank(message = "Telephone cannot be null")
     private String telephone;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = true)
     private LocalDate subscriptionDate;
 
-    @Pattern(
-        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!*?.])(?=\\S+$).{8,16}$",
-        message = "The password must contain at least 8 characters and meet the following criteria: at least one uppercase letter, one lowercase letter, one number, and one special character @#$%^&+=!)."
-    )
     private String password;
 
     private boolean active;
@@ -85,6 +74,14 @@ public class User implements UserDetails {
         this.telephone = user.getTelephone();
         role = RoleType.USER;
         active = true;
+    }
+
+    public User(String firstName, String lastName, String email, String password, boolean active) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.active = active;
     }
 
     public void assignRole(RoleType roleType) {

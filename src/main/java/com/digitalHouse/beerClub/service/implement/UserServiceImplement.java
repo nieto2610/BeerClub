@@ -64,7 +64,8 @@ public class UserServiceImplement implements IUserService {
 
     @Override
     public UserDTO searchById(Long id) throws NotFoundException{
-        UserDTO userDTO = userMapper.converter(this.findById(id), UserDTO.class);
+        User user = this.findById(id);
+        UserDTO userDTO = userMapper.converter(user, UserDTO.class);
         return userDTO;
     }
 

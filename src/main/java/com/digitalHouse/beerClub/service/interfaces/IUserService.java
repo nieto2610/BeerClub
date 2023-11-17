@@ -14,15 +14,21 @@ public interface IUserService extends IService<UserDTO>{
 
     Payment saveUser(UserApplicationDTO user) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException;
 
+    List<UserDTO> searchAll();
+
     List<UserDTO> getAllActiveUsers();
 
     User findById(Long id) throws NotFoundException;
+
+    UserDTO searchById(Long id) throws NotFoundException;
 
     User findByEmail(String email);
 
     UserDTO getUserAuth(String email);
 
     UserDTO updateUser(UserApplicationDTO user, Long id) throws NotFoundException;
+
+    void delete(Long id) throws NotFoundException;
 
     void updatePasswordUser(UserAuthRequest user) throws NotFoundException;
 
