@@ -30,8 +30,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        //TODO: me falta subscription-controller
-        //TODO: Realizar pruebas sobre si solo con el endpoint o con todo "user/id/{id}" o "user/id/**"
         HttpSecurity configuredHttp = http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
@@ -42,7 +40,7 @@ public class SecurityConfig {
                                 //Los endpoint Post que se pueden ADMIN con autenticación
                                 .requestMatchers(HttpMethod.POST,"/users/**", "/faqs/**", "/users/create", "/subscriptions").permitAll()
                                 //Los endpoint que se pueden ver sin autenticación
-                                .requestMatchers(HttpMethod.GET,"/swagger-ui/**", "/v3/api-docs/**", "/subscriptions", "/faqs").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/swagger-ui/**", "/v3/api-docs/**", "/subscriptions", "/faqs", "/filters/**").permitAll()
                                 //Los endpoint que se pueden ver siendo USER
                                 .requestMatchers(HttpMethod.GET,"/users/email/**", "/address/**").hasAnyRole("USER", "ADMIN")
                                 //Los endpoint que se pueden ver siendo ADMIN

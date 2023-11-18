@@ -74,4 +74,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
 
+    @ExceptionHandler(NoDataFoundException.class)
+    public ResponseEntity<?> NoDataFoundException(NoDataFoundException e) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
+    }
+
 }
