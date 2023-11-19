@@ -47,19 +47,19 @@ public class UserServiceImplement implements IUserService {
 
     @Override
     public List<UserDTO> searchAll() {
-        return userRepository.findAll().stream().map(user -> userMapper.converter(user, UserDTO.class)).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(user -> userMapper.converter(user, UserDTO.class)).toList();
     }
 
     @Override
     public List<UserDTO> getAllActiveUsers() {
         // Filtrar usuarios activos
-        List<UserDTO> users = userRepository.findByActiveTrue().stream().map(user -> userMapper.converter(user, UserDTO.class)).collect(Collectors.toList());
+        List<UserDTO> users = userRepository.findByActiveTrue().stream().map(user -> userMapper.converter(user, UserDTO.class)).toList();
         return users;
     }
 
     @Override
     public User findById(Long id) throws NotFoundException {
-        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("No se encontró el usuario con ID: " + id));
     }
 
     @Override
@@ -99,7 +99,7 @@ public class UserServiceImplement implements IUserService {
     public UserDTO updateUser(UserApplicationDTO user, Long id) throws NotFoundException {
         User searchedUser = this.findById(id);
         if (!searchedUser.isActive()) {
-            throw new NotFoundException("The user is not active and cannot be modified.");
+            throw new NotFoundException("El usuario no está activo y no se puede modificar");
         }
         searchedUser.setFirstName(user.getName());
         searchedUser.setLastName(user.getLastName());
@@ -114,7 +114,7 @@ public class UserServiceImplement implements IUserService {
     public void delete(Long id) throws NotFoundException {
         User user = this.findById(id);
         if (!user.isActive()) {
-            throw new NotFoundException("The user is not active and cannot be deleted.");
+            throw new NotFoundException("El usuario no está activo y no se puede eliminar");
         }
         user.setActive(false);
         userRepository.save(user);
@@ -136,17 +136,17 @@ public class UserServiceImplement implements IUserService {
     public void updatePasswordUser(UserAuthRequest user) throws NotFoundException {
         User searchedUser = userRepository.findByEmail(user.getEmail());
         if (!searchedUser.isActive()) {
-            throw new NotFoundException("The user is not active.");
+            throw new NotFoundException("El usuario no está activo");
         }
         searchedUser.setPassword(user.getPassword());
         userRepository.save(searchedUser);
     }
 
     @Override
-    public void activateUserSubscription(Long id) throws NotFoundException, UserActiveException {
+    public void activateUser(Long id) throws NotFoundException, UserActiveException {
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
         if (user.isActive()) {
-            throw new UserActiveException("The user is active.");
+            throw new UserActiveException("El usuario está activo");
         }
         user.setActive(true);
         userRepository.save(user);

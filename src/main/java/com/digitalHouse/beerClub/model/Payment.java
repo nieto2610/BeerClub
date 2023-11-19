@@ -30,6 +30,9 @@ public class Payment {
 
     private String invoiceNumber;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status = PaymentStatus.PENDIENTE;
+
     @ManyToOne
     @JoinColumn(name = "subscription_id")
     private Subscription subscription;

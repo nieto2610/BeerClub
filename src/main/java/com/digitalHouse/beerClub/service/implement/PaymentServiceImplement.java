@@ -7,10 +7,7 @@ import com.digitalHouse.beerClub.exceptions.EntityInactiveException;
 import com.digitalHouse.beerClub.exceptions.InsufficientBalanceException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.mapper.Mapper;
-import com.digitalHouse.beerClub.model.CardPayment;
-import com.digitalHouse.beerClub.model.Payment;
-import com.digitalHouse.beerClub.model.Subscription;
-import com.digitalHouse.beerClub.model.User;
+import com.digitalHouse.beerClub.model.*;
 import com.digitalHouse.beerClub.model.dto.*;
 import com.digitalHouse.beerClub.repository.IPaymentRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
@@ -25,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PaymentServiceImplement implements IPaymentService {
@@ -52,8 +48,13 @@ public class PaymentServiceImplement implements IPaymentService {
     }
 
     @Override
+    public List<PaymentDTO> findPaymentsByUserId(Long userId) {
+        return paymentRepository.findByUserId(userId).stream().map(payment -> paymentMapper.converter(payment, PaymentDTO.class)).toList();
+    }
+
+    @Override
     public PaymentDTO searchById(Long id) throws NotFoundException {
-        Payment payment = paymentRepository.findById(id).orElseThrow(() -> new NotFoundException("Payment not found with ID: " + id));
+        Payment payment = paymentRepository.findById(id).orElseThrow(() -> new NotFoundException("No se encontró el pago con ID: " + id));
         return paymentMapper.converter(payment, PaymentDTO.class);
     }
 
@@ -62,7 +63,7 @@ public class PaymentServiceImplement implements IPaymentService {
     public Payment savePayment(CardPayment card, User user) throws NotFoundException, InsufficientBalanceException {
         //Long accountBeerClubId = 1L;
         String accountBeerClubNumber = myAppConfig.getAccountNumber();
-        Subscription subscription = subscriptionRepository.findById(user.getSubscription().getId()).orElseThrow(() -> new NotFoundException("Subscription not found"));
+        Subscription subscription = subscriptionRepository.findById(user.getSubscription().getId()).orElseThrow(() -> new NotFoundException("No se encontró la suscripción"));
 
         Double amount = subscription.getPrice();
         String description = subscription.getName();
@@ -117,6 +118,14 @@ public class PaymentServiceImplement implements IPaymentService {
             throw new NotFoundException("La cuenta de destino no está disponible");
         }
 
+    }
+
+    @Override
+    public PaymentDTO updatePaymentStatus(Long paymentId, PaymentStatus newStatus) throws NotFoundException {
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new NotFoundException("Payment not found with ID: " + paymentId));
+        payment.setStatus(newStatus);
+        paymentRepository.save(payment);
+        return paymentMapper.converter(payment, PaymentDTO.class);
     }
 
     private void cardValidation(String cardHolder, String number, int cvv, String expDate) throws NotFoundException, EntityInactiveException, BadRequestException {

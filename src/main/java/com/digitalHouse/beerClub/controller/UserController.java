@@ -5,10 +5,10 @@ import com.digitalHouse.beerClub.model.Payment;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
-import com.digitalHouse.beerClub.service.implement.PaymentServiceImplement;
+import com.digitalHouse.beerClub.service.interfaces.IPaymentService;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -37,11 +37,11 @@ public class UserController {
     private IUserService IUserService;
 
     @Autowired
-    private PaymentServiceImplement paymentServiceImplement;
+    private IPaymentService paymentService;
 
 
     @Operation(summary="List all users", description="List all users", responses = {
-        @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
+        @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",array = @ArraySchema(schema = @Schema(implementation = UserDTO.class))))})
     @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> getUsers() {
         List<UserDTO> userDTOS = IUserService.searchAll();
@@ -49,7 +49,7 @@ public class UserController {
     }
 
     @Operation(summary="List all active users", description="List all active users", responses = {
-        @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
+        @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class))))})
     @GetMapping("/active")
     public ResponseEntity<List<UserDTO>> getAllActiveUsers() {
         List<UserDTO> userDTOS = IUserService.getAllActiveUsers();
@@ -60,7 +60,7 @@ public class UserController {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getUserById(@Parameter(description = "ID del usuario a obtener", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long id) throws NotFoundException{
+    public ResponseEntity<UserDTO> getUserById(@PathVariable @Positive(message = "Id must be greater than 0") Long id) throws NotFoundException{
         UserDTO userDTO = IUserService.searchById(id);
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
@@ -68,16 +68,16 @@ public class UserController {
     @Operation(summary="Add user", description="Add a new user", responses = {
         @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @PostMapping("/create")
-    public ResponseEntity<Object> saveUser(@Valid @RequestBody UserApplicationDTO user) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException, CustomUserAlreadyExistsException {
-        paymentServiceImplement.paymentValidation(user.getSubscriptionId(), user.getCardHolder(), user.getCardNumber(), user.getCvv(), user.getExpDate() );
-        Payment userDTO = IUserService.saveUser(user);
-        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
+    public ResponseEntity<Payment> saveUser(@Valid @RequestBody UserApplicationDTO user) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException, CustomUserAlreadyExistsException {
+        paymentService.paymentValidation(user.getSubscriptionId(), user.getCardHolder(), user.getCardNumber(), user.getCvv(), user.getExpDate() );
+        Payment payment = IUserService.saveUser(user);
+        return new ResponseEntity<>(payment, HttpStatus.CREATED);
     }
 
     @Operation(summary ="Find user by Email", description ="Find user by Email",  responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @GetMapping("/email/{email}")
-    public ResponseEntity<UserDTO> getUserByEmail(@Parameter(description = "Email del usuario a obtener", example = "example@beerClub", required = true, schema = @Schema(type = "String")) @PathVariable String email) {
+    public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email) {
         UserDTO userDTO = IUserService.getUserAuth(email);
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
@@ -86,7 +86,7 @@ public class UserController {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateUser(@Parameter(description = "ID del usuario a actualizar", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long id, @Valid @RequestBody UserApplicationDTO user) throws NotFoundException {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable @Positive(message = "Id must be greater than 0") Long id, @Valid @RequestBody UserApplicationDTO user) throws NotFoundException {
         UserDTO userDTO = IUserService.updateUser(user, id);
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
@@ -103,8 +103,8 @@ public class UserController {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "User subscription activated successfully"))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @PutMapping("/activate/{userId}")
-    public ResponseEntity<String> activateUserSubscription(@Parameter(description = "ID del usuario a activar", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException, UserActiveException {
-        IUserService.activateUserSubscription(userId);
+    public ResponseEntity<String> activateUser(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException, UserActiveException {
+        IUserService.activateUser(userId);
         return new ResponseEntity<>("User subscription activated successfully", HttpStatus.OK);
     }
 
@@ -112,7 +112,7 @@ public class UserController {
         @ApiResponse(responseCode = "204",description = "NO_CONTENT",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "1"))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @DeleteMapping("/{userId}")
-    public ResponseEntity<String> softDeleteUser(@Parameter(description = "ID del usuario a eliminar", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws ServiceException, NotFoundException {
+    public ResponseEntity<String> softDeleteUser(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws ServiceException, NotFoundException {
         IUserService.delete(userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
