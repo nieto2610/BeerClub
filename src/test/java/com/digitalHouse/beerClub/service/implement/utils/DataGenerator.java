@@ -2,8 +2,7 @@ package com.digitalHouse.beerClub.service.implement.utils;
 
 import com.digitalHouse.beerClub.model.Product;
 import com.digitalHouse.beerClub.model.Review;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import com.digitalHouse.beerClub.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +17,11 @@ public class DataGenerator {
         this.products = getAllProducts();
     }
 
-    Integer[] rating = {4, 5 ,5 , 3, 2, 1, 3, 5, 4, 3, 3, 2};
+    Integer[] rating = {4, 2 ,5 , 3, 5, 1, 3, 5, 4, 3, 5, 2};
 
     public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
-        for (Long i = Long.valueOf(1); i < 12; i++){
+        for (Long i = 1L; i < 12; i++){
             products.add(generateProduct(i));
         }
         return  products;
@@ -53,7 +52,35 @@ public class DataGenerator {
         review.setId(index);
         review.setComments("Comentarios sobre la cerveza " + index);
         review.setRating(rating[Math.toIntExact(index)]);
+        review.setProduct(new Product());
         return  review;
+    }
+
+    public User generateUser(Long index){
+        User user = new User();
+        user.setId(index);
+        user.setActive(true);
+        user.setFirstName("Usuario " + index);
+
+        List<Review> reviewList = new ArrayList<>();
+        for (int i = 1; i <= 5; i++){
+            reviewList.add(generateReview(index));
+        }
+        user.setReviewList(reviewList);
+
+        return user;
+    }
+
+    public User generateUserWithoutReviews(Long index){
+        User user = new User();
+        user.setId(index);
+        user.setActive(true);
+        user.setFirstName("usuario " + index);
+
+        List<Review> reviewList = new ArrayList<>();
+        user.setReviewList(reviewList);
+
+        return user;
     }
 
 
