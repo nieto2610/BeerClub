@@ -8,11 +8,15 @@ import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.EventPromotion;
 import com.digitalHouse.beerClub.model.EventPromotionType;
 import com.digitalHouse.beerClub.model.dto.EventPromotionDTO;
+import com.digitalHouse.beerClub.model.dto.EventPromotionFilterDTO;
 import com.digitalHouse.beerClub.repository.IEventPromotionRepository;
 import com.digitalHouse.beerClub.service.interfaces.IEventPromotionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -87,5 +91,25 @@ public class EventPromotionService implements IEventPromotionService {
         }
         eventPromotion.setIsActive(false);
         eventPromotionRepository.save(eventPromotion);
+    }
+
+    @Override
+    public List<EventPromotionDTO> filterEventPromotion(EventPromotionFilterDTO eventPromotionFilterDTO) {
+        List<EventPromotion> filteredEventPromotions;
+        LocalDate startDateTime = eventPromotionFilterDTO.getStartDateTime();
+        LocalDate endDateTime = eventPromotionFilterDTO.getEndDateTime();
+        LocalDate startValidUntil = eventPromotionFilterDTO.getStartValidUntil();
+        LocalDate endValidUntil = eventPromotionFilterDTO.getEndValidUntil();
+        String location = eventPromotionFilterDTO.getLocation();
+
+        LocalDateTime startOfDay = startDateTime != null ? LocalDateTime.of(startDateTime, LocalTime.MIN) : null;
+        LocalDateTime endOfDay = endDateTime != null ? LocalDateTime.of(endDateTime, LocalTime.MAX) : null;
+
+        if(eventPromotionFilterDTO.getType().equals(EventPromotionType.EVENT)){
+            filteredEventPromotions = eventPromotionRepository.findByFilters(startOfDay, endOfDay, null, null, location);
+        }else{
+            filteredEventPromotions = eventPromotionRepository.findByFilters(null, null, startValidUntil, endValidUntil, location);
+        }
+        return filteredEventPromotions.stream().map(s -> mapper.converter(s, EventPromotionDTO.class)).collect(Collectors.toList());
     }
 }
