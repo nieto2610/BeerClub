@@ -2,6 +2,8 @@ package com.digitalHouse.beerClub.controller;
 
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.model.Payment;
+import com.digitalHouse.beerClub.model.Product;
+import com.digitalHouse.beerClub.model.dto.ProductDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
@@ -117,6 +119,12 @@ public class UserController {
     public ResponseEntity<String> softDeleteUser(@Parameter(description = "ID del usuario a eliminar", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws ServiceException, NotFoundException {
         IUserService.delete(userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{userId}/top5")
+    public ResponseEntity<List<ProductDTO>> getTopFiveProductsByUser(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException {
+        List<ProductDTO> productDTOS = IUserService.getTopFiveProducts(userId);
+        return new ResponseEntity<>(productDTOS, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

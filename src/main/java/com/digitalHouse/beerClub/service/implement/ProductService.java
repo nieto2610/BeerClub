@@ -56,7 +56,7 @@ public class ProductService implements IProductService {
         List<Product> productList = productRepository.findAll();
 
         if(productList.isEmpty()){
-            throw new NotFoundException("there are no products for ranking");
+            return new ArrayList<>();
         }
 
         for (Product p: productList) {
@@ -76,7 +76,6 @@ public class ProductService implements IProductService {
 
             topTen.add(mapper.converter(productList.get(index), ProductDTO.class));
         }
-
         return topTen;
     }
 }

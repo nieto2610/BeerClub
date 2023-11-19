@@ -24,7 +24,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping("/topTen")
+    @GetMapping("/top10")
     public ResponseEntity<List<ProductDTO>> getTopTen() throws NotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(productService.getGlobalTopTen());
     }
