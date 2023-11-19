@@ -12,7 +12,7 @@ public class PaymentFilterDTORowMapper implements RowMapper<PaymentFilterDTO> {
         PaymentFilterDTO dto = new PaymentFilterDTO();
         dto.setAmount(rs.getDouble("amount"));
         dto.setCard_number(rs.getString("card_number"));
-        dto.setDate(rs.getTimestamp("date").toLocalDateTime()); // Asegúrate de que la conversión aquí sea adecuada
+        dto.setDate(rs.getTimestamp("date").toLocalDateTime()); // Se convierte el dato
         dto.setDescription(rs.getString("description"));
         dto.setInvoice_number(rs.getString("invoice_number"));
         dto.setEmail(rs.getString("email"));
