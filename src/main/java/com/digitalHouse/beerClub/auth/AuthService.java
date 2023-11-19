@@ -23,7 +23,7 @@ public class AuthService {
     public AuthResponse login(UserAuthRequest request){
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         UserDetails user = repository.findByUserEmail(request.getEmail()).orElseThrow();
-        String token = jwtService.getToken(user);
+        String token = jwtService.getToken(user, request.getEmail());
         return AuthResponse.builder()
                 .token(token)
                 .build();
@@ -47,7 +47,7 @@ public class AuthService {
             );
             repository.save(userClass);
             return AuthResponse.builder()
-                    .token(jwtService.getToken(userClass))
+                    .token(jwtService.getToken(userClass, request.getEmail()))
                     .build();
         }
     }
