@@ -1,13 +1,12 @@
 package com.digitalHouse.beerClub.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -19,6 +18,7 @@ public class Product {
     private Long id;
     private String name;
     private String description;
+    private Float productScore;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")
@@ -26,4 +26,9 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Recommendation> recommendationList;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Review> reviewList;
+
+
 }

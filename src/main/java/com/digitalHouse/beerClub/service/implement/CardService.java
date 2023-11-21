@@ -49,7 +49,7 @@ public class CardService implements ICardService {
     public CardDTO searchById(Long id) throws NotFoundException {
         return cardRepository.findById(id)
                 .stream().map(s -> mapper.converter(s, CardDTO.class)).findFirst()
-                .orElseThrow(() -> new NotFoundException("Card not found"));
+                .orElseThrow(() -> new NotFoundException("Tarjeta no valida"));
     }
 
     @Override
@@ -69,10 +69,10 @@ public class CardService implements ICardService {
         if(cardAppDTO.getCardType().equals(CardType.DEBIT)){
             Long id = cardAppDTO.getAccountId();
             Account account = accountRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundException("Account not found"));
+                    .orElseThrow(() -> new NotFoundException("Cuenta no valida"));
 
             if(!account.getIsActive()){
-                throw new NotFoundException("The Account is not active and cannot be modified.");
+                throw new NotFoundException("La cuenta no está activa y no puede ser modificada.");
             }
             Card newCard = new Card(cardNumber, cardHolderName, expirationDate, cvv, account, cardType, true);
             Card card = cardRepository.save(newCard);
@@ -135,13 +135,13 @@ public class CardService implements ICardService {
     public CardDTO update(CardDTO cardDTO, Long id) throws NotFoundException {
         Card card = cardRepository.findById(id).orElseThrow(() -> new NotFoundException("Card not found"));
         if (!card.getIsActive()) {
-            throw new NotFoundException("The Card is not active and cannot be modified.");
+            throw new NotFoundException("La tarjeta no está activa y no puede ser modificada.");
         }
         LocalDate expirationDate = cardDTO.getExpirationDate();
         Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Account not found"));
+                .orElseThrow(() -> new NotFoundException("Cuenta no valida"));
         if(!account.getIsActive()){
-            throw new NotFoundException("The Account is not active and cannot be modified.");
+            throw new NotFoundException("La cuenta no está activa y no puede ser modificada");
         }
 
         card.setCardNumber(cardDTO.getCardNumber());
@@ -158,9 +158,9 @@ public class CardService implements ICardService {
 
     @Override
     public void delete(Long id) throws ServiceException, NotFoundException {
-        Card card = cardRepository.findById(id).orElseThrow(() -> new NotFoundException("Card not found"));
+        Card card = cardRepository.findById(id).orElseThrow(() -> new NotFoundException("Tarjeta no válida"));
         if (!card.getIsActive()) {
-            throw new NotFoundException("The Card is not active and cannot be deleted.");
+            throw new NotFoundException("La tarjeta no es válida y no puede ser modificada.");
         }
         card.setIsActive(false);
         cardRepository.save(card);
@@ -168,9 +168,9 @@ public class CardService implements ICardService {
 
     @Override
     public CardDTO activeCard(Long cardId) throws NotFoundException {
-        Card card = cardRepository.findById(cardId).orElseThrow(() -> new NotFoundException("Card not found"));
+        Card card = cardRepository.findById(cardId).orElseThrow(() -> new NotFoundException("Tarjeta no válida"));
         if (card.getIsActive()) {
-            throw new NotFoundException("The Card is active and cannot be actived.");
+            throw new NotFoundException("La tarjeta no está activa y no puede ser modificada.");
         }
         card.setIsActive(true);
         cardRepository.save(card);
@@ -180,7 +180,7 @@ public class CardService implements ICardService {
     @Override
     public CardDTO searchByCardNumber(String cardNumber) throws NotFoundException {
         Card card = cardRepository.findByCardNumber(cardNumber)
-                .orElseThrow(() -> new NotFoundException("Card not found"));
+                .orElseThrow(() -> new NotFoundException("Tarjeta no válida"));
         return mapper.converter(card, CardDTO.class);
     }
 }

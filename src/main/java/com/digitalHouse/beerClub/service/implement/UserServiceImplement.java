@@ -4,6 +4,7 @@ import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.*;
 import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
+import com.digitalHouse.beerClub.model.dto.ProductDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
@@ -17,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -81,6 +84,12 @@ public class UserServiceImplement implements IUserService {
 
         emailValidation(user.getEmail());
 
+        Optional<User> existingUser = userRepository.findByUserEmail(user.getEmail());
+
+        if (existingUser.isPresent()) {
+            throw new CustomUserAlreadyExistsException("El email ya está registrado.");
+        }
+
         Address address = new Address(user.getCountry(), user.getProvince(), user.getCity(), user.getStreet(), TransformationUtils.getNumber(user.getNumber()), TransformationUtils.getNumber(user.getFloor()), user.getApartment(), user.getZipCode());
         addressRepository.save(address);
 
@@ -88,6 +97,7 @@ public class UserServiceImplement implements IUserService {
         CardPayment cardPayment = new CardPayment(user.getCardHolder(),user.getCardNumber(), TransformationUtils.getNumber(user.getCvv()),user.getExpDate());
 
         User newUser = new User(user);
+        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         newUser.setSubscriptionDate(getSubscriptionDate());
         newUser.setAddress(address);
         newUser.setSubscription(subscription);
@@ -159,6 +169,30 @@ public class UserServiceImplement implements IUserService {
         }
         user.setActive(true);
         userRepository.save(user);
+    }
+
+    @Override
+    public List<ProductDTO> getTopFiveProducts(Long userId) throws NotFoundException {
+        User searchedUser = this.findById(userId);
+        if (!searchedUser.isActive()) {
+            throw new NotFoundException("The user is not active.");
+        }
+
+        List<Review> reviewList = searchedUser.getReviewList();
+        if (reviewList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        int limit = Math.min(reviewList.size(), 5);
+
+        List<ProductDTO> productDTOS = reviewList.stream()
+                .sorted(Comparator.comparing(Review::getRating).reversed())
+                .limit(limit)
+                .map(review -> userMapper.converter(review.getProduct(), ProductDTO.class))
+                .collect(Collectors.toList());
+
+        return productDTOS;
+
     }
 
     private LocalDate getSubscriptionDate() {

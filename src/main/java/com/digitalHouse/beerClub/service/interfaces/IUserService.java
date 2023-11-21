@@ -4,6 +4,7 @@ import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.model.Payment;
 import com.digitalHouse.beerClub.model.User;
 import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
+import com.digitalHouse.beerClub.model.dto.ProductDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
@@ -37,4 +38,6 @@ public interface IUserService extends IService<UserDTO>{
 
     void activateUser(Long userId) throws NotFoundException, UserActiveException;
 
+    List<ProductDTO> getTopFiveProducts(Long userId) throws NotFoundException;
 }
+

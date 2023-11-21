@@ -1,5 +1,5 @@
-/*package com.digitalHouse.beerClub.service.implement;
-
+package com.digitalHouse.beerClub.service.implement;
+/*
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Address;
@@ -61,8 +61,8 @@ class UserServiceImplementTest {
         userServiceImplement = new UserServiceImplement(userRepository,addressRepository,subscriptionRepository, cardPaymentRepository, mapper);
     }
 */
-    //@Test
-    //@DisplayName("Search all the users")
+//@Test
+//@DisplayName("Search all the users")
    /* void searchAll() {
         //ARRANGE
         Address address = new Address("Argentina", "Santa Fe", "Rosario", "Roca", 1200, 15, "A3","3400");
@@ -248,3 +248,90 @@ class UserServiceImplementTest {
     }
 }
 */
+
+
+import com.digitalHouse.beerClub.exceptions.NotFoundException;
+import com.digitalHouse.beerClub.mapper.Mapper;
+import com.digitalHouse.beerClub.model.dto.ProductDTO;
+import com.digitalHouse.beerClub.repository.IAddressRepository;
+import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
+import com.digitalHouse.beerClub.repository.IUserRepository;
+import com.digitalHouse.beerClub.service.implement.utils.DataGenerator;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class UserServiceImplementTest {
+
+    DataGenerator dataGenerator;
+
+    @Mock
+    private IUserRepository userRepository;
+
+    @Mock
+    private IAddressRepository addressRepository;
+
+    @Mock
+    PaymentServiceImplement paymentService;
+
+    @Mock
+    private Mapper mapper;
+
+    @InjectMocks
+    private UserServiceImplement userServiceImplement;
+
+    @Mock
+    private ISubscriptionRepository subscriptionRepository;
+
+
+    @BeforeEach
+    void setUp() {
+        dataGenerator = new DataGenerator();
+        mapper = new Mapper(new ModelMapper());
+        userServiceImplement = new UserServiceImplement(userRepository, addressRepository, subscriptionRepository, paymentService, mapper);
+    }
+
+    @Test
+    @DisplayName("✅ - Search Top 5 of products")
+    void searchTop5() throws NotFoundException {
+
+        //ARRAGE
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(dataGenerator.generateUser(1L)));
+
+        //ACT
+        List<ProductDTO> top5 = userServiceImplement.getTopFiveProducts(1L);
+
+        //ASSERT
+        Assertions.assertEquals(5, top5.size());
+    }
+
+    @Test
+    @DisplayName("✅ - Search Top 5 of products - empty")
+    void searchTop5Empty() throws NotFoundException {
+
+        //ARRAGE
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(dataGenerator.generateUserWithoutReviews(1L)));
+
+        //ACT
+        List<ProductDTO> top5 = userServiceImplement.getTopFiveProducts(1L);
+
+        //ASSERT
+        Assertions.assertTrue(top5.isEmpty());
+
+    }
+
+
+}

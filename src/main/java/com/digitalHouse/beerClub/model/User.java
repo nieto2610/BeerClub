@@ -16,7 +16,8 @@ import java.util.Collection;
 import java.util.List;
 
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity
 @Table(name="users")
@@ -31,12 +32,10 @@ public class User implements UserDetails {
 
     private String email;
 
-    @Column(nullable = true)
     private LocalDate birthdate;
 
     private String telephone;
 
-    @Column(nullable = true)
     private LocalDate subscriptionDate;
 
     private String password;
@@ -53,6 +52,9 @@ public class User implements UserDetails {
     @ManyToOne
     @JoinColumn(name = "subscription_id")
     private Subscription subscription;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Review> reviewList;
 
     public User(String firstName, String lastName, String email, LocalDate birthdate, String telephone, LocalDate subscriptionDate, String password, Address address) {
         this.firstName = firstName;

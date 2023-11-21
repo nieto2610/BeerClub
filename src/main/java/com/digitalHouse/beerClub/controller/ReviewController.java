@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 @Validated
 @RestController
 @Tag(name = "Reviews")
-@RequestMapping("reviews")
+@RequestMapping("/reviews")
 public class ReviewController {
     final static Logger logger = Logger.getLogger(String.valueOf(ReviewController.class));
     private final ReviewService reviewService;
