@@ -1,5 +1,6 @@
 package com.digitalHouse.beerClub.model;
 
+import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
@@ -76,12 +77,13 @@ public class User implements UserDetails {
         active = true;
     }
 
-    public User(String firstName, String lastName, String email, String password, boolean active) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.active = active;
+    public User(UserAdminDTO userAdmin) {
+        this.firstName = userAdmin.getName();
+        this.lastName = userAdmin.getLastName();
+        this.email = userAdmin.getEmail();
+        this.password = userAdmin.getPassword();
+        role = RoleType.ADMIN;
+        active = true;
     }
 
     public void assignRole(RoleType roleType) {

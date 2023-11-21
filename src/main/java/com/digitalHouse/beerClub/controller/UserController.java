@@ -2,13 +2,13 @@ package com.digitalHouse.beerClub.controller;
 
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.model.Payment;
+import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.service.implement.PaymentServiceImplement;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -74,6 +74,14 @@ public class UserController {
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
+    @Operation(summary="Add admin user ", description="Add a new admin user", responses = {
+            @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "Administrator user created successfully")))})
+    @PostMapping("/create/admin")
+    public ResponseEntity<?> saveAdmin(@Valid @RequestBody UserAdminDTO user){
+        IUserService.saveAdmin(user);
+        return new ResponseEntity<>("Admin user created successfully.", HttpStatus.CREATED);
+    }
+
     @Operation(summary ="Find user by Email", description ="Find user by Email",  responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @GetMapping("/email/{email}")
@@ -103,9 +111,9 @@ public class UserController {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "User subscription activated successfully"))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @PutMapping("/activate/{userId}")
-    public ResponseEntity<String> activateUserSubscription(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException, UserActiveException {
-        IUserService.activateUserSubscription(userId);
-        return new ResponseEntity<>("User subscription activated successfully", HttpStatus.OK);
+    public ResponseEntity<String> activateUser(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException, UserActiveException {
+        IUserService.activateUser(userId);
+        return new ResponseEntity<>("User activated successfully", HttpStatus.OK);
     }
 
     @Operation(summary = "Delete user", description = "Delete a user by ID",responses = {

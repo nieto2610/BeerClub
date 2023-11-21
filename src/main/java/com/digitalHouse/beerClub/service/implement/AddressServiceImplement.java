@@ -9,6 +9,7 @@ import com.digitalHouse.beerClub.repository.IAddressRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
 import com.digitalHouse.beerClub.service.interfaces.IAddressService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -45,8 +46,8 @@ public class AddressServiceImplement implements IAddressService {
     }
 
     @Override
-    public AddressDTO updateAddressByUserEmail(String userEmail, AddressDTO updatedAddress) throws NotFoundException{
-        User user = IUserRepository.findByEmail(userEmail);
+    public AddressDTO updateAddressByUserEmail(Authentication authentication, AddressDTO updatedAddress) throws NotFoundException{
+        User user = IUserRepository.findByEmail(authentication.getName());
         if (!user.isActive()) {
             throw new NotFoundException ("The user is not active, and their address cannot be modified.");
         }

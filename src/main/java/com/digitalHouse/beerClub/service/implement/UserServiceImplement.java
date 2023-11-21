@@ -3,6 +3,7 @@ package com.digitalHouse.beerClub.service.implement;
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.*;
+import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
@@ -95,6 +96,13 @@ public class UserServiceImplement implements IUserService {
         return paymentServiceImplement.savePayment(cardPayment, createdUser);
     }
 
+    @Override
+    public void saveAdmin(UserAdminDTO adminDTO) {
+        User adminUser = new User(adminDTO);
+        adminUser.setPassword(passwordEncoder.encode(adminDTO.getPassword()));
+        userRepository.save(adminUser);
+    }
+
 
     @Override
     public UserDTO updateUser(UserApplicationDTO user, Long id) throws NotFoundException {
@@ -144,7 +152,7 @@ public class UserServiceImplement implements IUserService {
     }
 
     @Override
-    public void activateUserSubscription(Long id) throws NotFoundException, UserActiveException {
+    public void activateUser(Long id) throws NotFoundException, UserActiveException {
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
         if (user.isActive()) {
             throw new UserActiveException("The user is active.");
