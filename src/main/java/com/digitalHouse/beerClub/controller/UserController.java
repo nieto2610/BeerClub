@@ -18,6 +18,7 @@ import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -74,11 +75,11 @@ public class UserController {
         return new ResponseEntity<>(payment, HttpStatus.CREATED);
     }
 
-    @Operation(summary ="Find user by Email", description ="Find user by Email",  responses = {
+    @Operation(summary ="Find current user", description ="Find current user",  responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
-    @GetMapping("/email/{email}")
-    public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email) {
-        UserDTO userDTO = IUserService.getUserAuth(email);
+    @GetMapping("/current")
+    public ResponseEntity<UserDTO> getUserAuth(Authentication authentication) {
+        UserDTO userDTO = IUserService.getUserAuth(authentication.getName());
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
@@ -86,16 +87,16 @@ public class UserController {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @PutMapping("/update/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable @Positive(message = "Id must be greater than 0") Long id, @Valid @RequestBody UserApplicationDTO user) throws NotFoundException {
-        UserDTO userDTO = IUserService.updateUser(user, id);
+    public ResponseEntity<UserDTO> updateUser(@PathVariable @Positive(message = "Id must be greater than 0") Long id, @Valid @RequestBody UserApplicationDTO user, Authentication authentication) throws NotFoundException, ForbiddenException {
+        UserDTO userDTO = IUserService.updateUser(user, id, authentication);
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
     @Operation(summary = "Update user password", description = "Update the password of an existing user",responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "Password successfully updated.")))})
     @PatchMapping("/update/password")
-    public ResponseEntity<String> updatePasswordUser( @Valid @RequestBody UserAuthRequest user) throws NotFoundException {
-        IUserService.updatePasswordUser(user);
+    public ResponseEntity<String> updatePasswordUser( @Valid @RequestBody UserAuthRequest user, Authentication authentication) throws NotFoundException, ForbiddenException {
+        IUserService.updatePasswordUser(user, authentication);
         return new ResponseEntity<>("Password successfully updated.", HttpStatus.OK);
     }
 

@@ -12,13 +12,12 @@ import com.digitalHouse.beerClub.repository.IUserRepository;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
 import com.digitalHouse.beerClub.utils.TransformationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImplement implements IUserService {
@@ -89,6 +88,7 @@ public class UserServiceImplement implements IUserService {
         newUser.setSubscriptionDate(getSubscriptionDate());
         newUser.setAddress(address);
         newUser.setSubscription(subscription);
+        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         User createdUser = userRepository.save(newUser);
 
         return paymentServiceImplement.savePayment(cardPayment, createdUser);
@@ -96,8 +96,11 @@ public class UserServiceImplement implements IUserService {
 
 
     @Override
-    public UserDTO updateUser(UserApplicationDTO user, Long id) throws NotFoundException {
+    public UserDTO updateUser(UserApplicationDTO user, Long id, Authentication authentication) throws NotFoundException, ForbiddenException {
         User searchedUser = this.findById(id);
+        if (!authentication.getName().equals(searchedUser.getEmail())) {
+            throw new ForbiddenException("No tienes permisos para actualizar este usuario");
+        }
         if (!searchedUser.isActive()) {
             throw new NotFoundException("El usuario no está activo y no se puede modificar");
         }
@@ -133,13 +136,18 @@ public class UserServiceImplement implements IUserService {
     }
 
     @Override
-    public void updatePasswordUser(UserAuthRequest user) throws NotFoundException {
-        User searchedUser = userRepository.findByEmail(user.getEmail());
-        if (!searchedUser.isActive()) {
+    public void updatePasswordUser(UserAuthRequest user, Authentication authentication) throws NotFoundException, ForbiddenException {
+        User currentUser = userRepository.findByEmail(authentication.getName());
+
+        if (!user.getEmail().equals(currentUser.getEmail())) {
+            throw new ForbiddenException("El email proporcionado no coincide con el del usuario autenticado");
+        }
+
+        if (!currentUser.isActive()) {
             throw new NotFoundException("El usuario no está activo");
         }
-        searchedUser.setPassword(user.getPassword());
-        userRepository.save(searchedUser);
+        currentUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(currentUser);
     }
 
     @Override

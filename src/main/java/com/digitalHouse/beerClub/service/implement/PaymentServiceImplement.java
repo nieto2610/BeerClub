@@ -2,21 +2,20 @@
 package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.config.MyAppConfig;
-import com.digitalHouse.beerClub.exceptions.BadRequestException;
-import com.digitalHouse.beerClub.exceptions.EntityInactiveException;
-import com.digitalHouse.beerClub.exceptions.InsufficientBalanceException;
-import com.digitalHouse.beerClub.exceptions.NotFoundException;
+import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.*;
 import com.digitalHouse.beerClub.model.dto.*;
 import com.digitalHouse.beerClub.repository.IPaymentRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
+import com.digitalHouse.beerClub.repository.IUserRepository;
 import com.digitalHouse.beerClub.service.interfaces.IPaymentService;
 import com.digitalHouse.beerClub.utils.AccountUtils;
 import com.digitalHouse.beerClub.utils.CardUtils;
 import com.digitalHouse.beerClub.utils.TransformationUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -32,30 +31,85 @@ public class PaymentServiceImplement implements IPaymentService {
     private final AccountService accountService;
     private final Mapper paymentMapper;
     private final MyAppConfig myAppConfig;
+    private final IUserRepository userRepository;
 
     @Autowired
-    public PaymentServiceImplement(IPaymentRepository paymentRepository, ISubscriptionRepository subscriptionRepository, CardService cardService, AccountService accountService, Mapper mapper, MyAppConfig myAppConfig) {
+    public PaymentServiceImplement(IPaymentRepository paymentRepository, ISubscriptionRepository subscriptionRepository, CardService cardService, AccountService accountService, Mapper mapper, MyAppConfig myAppConfig, IUserRepository userRepository) {
         this.paymentRepository = paymentRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.cardService = cardService;
         this.accountService = accountService;
         this.paymentMapper = mapper;
         this.myAppConfig = myAppConfig;
+        this.userRepository = userRepository;
     }
+
+    // Método para que el administrador pueda acceder a todos los pagos.
     @Override
     public List<PaymentDTO> searchAll() {
         return paymentRepository.findAll().stream().map(payment -> paymentMapper.converter(payment, PaymentDTO.class)).toList();
     }
 
+    // Método para que el administrador pueda acceder a los pagos de un usuario por su id.
     @Override
     public List<PaymentDTO> findPaymentsByUserId(Long userId) {
         return paymentRepository.findByUserId(userId).stream().map(payment -> paymentMapper.converter(payment, PaymentDTO.class)).toList();
     }
 
+    // Método para que el administrador pueda acceder a un pago por su id.
     @Override
-    public PaymentDTO searchById(Long id) throws NotFoundException {
+    public PaymentDTO searchById(Long id, Authentication authentication) throws NotFoundException, ForbiddenException {
+        User user = userRepository.findByEmail(authentication.getName());
+
+        if (!user.isActive()) {
+            throw new ForbiddenException("El usuario no está activo");
+        }
         Payment payment = paymentRepository.findById(id).orElseThrow(() -> new NotFoundException("No se encontró el pago con ID: " + id));
-        return paymentMapper.converter(payment, PaymentDTO.class);
+        //return paymentMapper.converter(payment, PaymentDTO.class);
+        if (payment.getUserId().equals(user.getId())) {
+            return paymentMapper.converter(payment, PaymentDTO.class);
+        } else {
+            throw new ForbiddenException("El pago no pertenece al usuario autenticado");
+        }
+    }
+
+    // Método para que el usuario autenticado pueda acceder a su pago por id.
+    @Override
+    public PaymentDTO getPayment(Long id, Authentication authentication) throws NotFoundException, ForbiddenException {
+        User user = userRepository.findByEmail(authentication.getName());
+
+        if (!user.isActive()) {
+            throw new ForbiddenException("El usuario no está activo");
+        }
+
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("No se encontró el pago con ID: " + id));
+
+        if (payment.getUserId().equals(user.getId())) {
+            return paymentMapper.converter(payment, PaymentDTO.class);
+        } else {
+            throw new ForbiddenException("El pago no pertenece al usuario autenticado");
+        }
+    }
+
+    // Método para que el usuario autenticado pueda acceder a todos sus pagos.
+    @Override
+    public List<PaymentDTO> getPaymentsUserAuth(Authentication authentication) throws NotFoundException, ForbiddenException {
+        User user =  userRepository.findByEmail(authentication.getName());
+
+        if (!user.isActive()) {
+            throw new ForbiddenException("El usuario no está activo");
+        }
+
+        List<Payment> userPayments = paymentRepository.findByUserId(user.getId());
+
+        if (userPayments.isEmpty()) {
+            throw new NotFoundException("No se encontraron pagos para el usuario con ID: " + user.getId());
+        }
+
+        return userPayments.stream()
+                .map(payment -> paymentMapper.converter(payment, PaymentDTO.class))
+                .toList();
     }
 
     @Transactional

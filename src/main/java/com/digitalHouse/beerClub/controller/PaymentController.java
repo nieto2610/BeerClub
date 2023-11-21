@@ -1,6 +1,7 @@
 package com.digitalHouse.beerClub.controller;
 
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
+import com.digitalHouse.beerClub.exceptions.ForbiddenException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.model.PaymentStatus;
 import com.digitalHouse.beerClub.model.dto.PaymentDTO;
@@ -18,6 +19,7 @@ import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +42,14 @@ public class PaymentController {
         return new ResponseEntity<>(paymentDTOS, HttpStatus.OK);
     }
 
+    @Operation(summary="List all payments for a current user", description="List all payments for a current user", responses = {
+            @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",array = @ArraySchema(schema = @Schema(implementation = PaymentDTO.class))))})
+    @GetMapping("/user/current")
+    public ResponseEntity<List<PaymentDTO>> getPaymentsUserAuth(Authentication authentication) throws ForbiddenException, NotFoundException {
+        List<PaymentDTO> paymentDTOS = paymentService.getPaymentsUserAuth(authentication);
+        return new ResponseEntity<>(paymentDTOS, HttpStatus.OK);
+    }
+
     @Operation(summary="List all payments for a user", description="List all payments for a user", responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",array = @ArraySchema(schema = @Schema(implementation = PaymentDTO.class))))})
     @GetMapping("/paymentUser/{userId}")
@@ -52,8 +62,8 @@ public class PaymentController {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = PaymentDTO.class))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "Payment not found with ID: 1")))})
     @GetMapping("/id/{id}")
-    public ResponseEntity<PaymentDTO> getPaymentById(@PathVariable @Positive(message = "Id must be greater than 0") Long id) throws NotFoundException {
-        PaymentDTO paymentDTO = paymentService.searchById(id);
+    public ResponseEntity<PaymentDTO> getPaymentById(@PathVariable @Positive(message = "Id must be greater than 0") Long id, Authentication authentication) throws NotFoundException, ForbiddenException {
+        PaymentDTO paymentDTO = paymentService.searchById(id, authentication);
         return new ResponseEntity<>(paymentDTO, HttpStatus.OK);
     }
 
