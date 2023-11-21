@@ -45,24 +45,25 @@ public class ReviewService implements IReviewService{
 
     @Override
     public ReviewDTO create(ReviewDTO reviewDTO) throws BadRequestException {
-        Review review = mapper.converter(reviewDTO, Review.class);
-        Optional<Product> product= productRepository.findById(review.getProduct().getId());
 
-        if (product.isEmpty()) {
-            throw new BadRequestException("Product information is missing");
+        Review review = new Review();
+        User user= userRepository.findById(reviewDTO.getUserId()).orElseThrow(()->new BadRequestException("The user doesn't exist"));
+        review.setUser(user);
+
+        Product product= productRepository.findById(reviewDTO.getProductId()).orElseThrow(()-> new BadRequestException("Product information is missing"));
+        review.setProduct(product);
+        if(reviewDTO.getRating()==null){
+            throw new BadRequestException("The rating can't be null");
         }
-
-        else if(!userRepository.existsById(review.getUser().getId())) {
-            throw new BadRequestException("The user doesn't exist");
+        if(reviewDTO.getRating()<1 || reviewDTO.getRating()>5){
+            throw new BadRequestException("The rating must be a number between 1 and 5");
         }
+        review.setRating(reviewDTO.getRating());
+        review.setComments(reviewDTO.getComments());
 
-        else if(review.getRating()<1 || review.getRating()>5){
-                throw new BadRequestException("The rating must be a number between 1 and 5");
+        reviewRepository.save(review);
+        return mapper.converter(review, ReviewDTO.class);
 
-        } else {
-            reviewRepository.save(review);
-            return mapper.converter(review, ReviewDTO.class);
-        }
     }
     @Override
     public ReviewDTO update(ReviewDTO reviewDTO, Long id) throws NotFoundException {

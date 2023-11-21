@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 public class ReviewDTO {
 
     private Long id;
-    private @Valid ProductDTO product;
-    private @Valid UserDTO user;
+    private @Valid Long productId;
+    private @Valid Long userId;
     private Integer rating;
     private String comments;
 
