@@ -20,6 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -55,7 +56,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.DELETE,"/users/**", "/faqs/**", "/subscriptions/**").hasRole("ADMIN")
                                 //Los endpoint que se pueden Modificar datos siendo USER
                                 .requestMatchers(HttpMethod.PATCH,"/users/update/passwword").hasAnyRole("USER", "ADMIN")
-                                //.anyRequest().authenticated()
+                                .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->
                         sessionManager
