@@ -55,7 +55,7 @@ public class SubscriptionController {
     }
 
     @PatchMapping("/isRecommended/{id}")
-    public ResponseEntity<SubscriptionDTO> recommendSubscription(@PathVariable @Positive(message = "Id must be greater than 0") Long id) throws NotFoundException {
+    public ResponseEntity<SubscriptionDTO> recommendSubscription(@PathVariable @Positive(message = "Id debe ser mayor a 0") Long id) throws NotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(subscriptionService.markAsRecommended(id));
     }
 

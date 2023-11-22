@@ -76,7 +76,7 @@ public class SubscriptionService implements ISubscriptionService {
 
     @Override
     public SubscriptionDTO markAsRecommended(Long id) throws NotFoundException {
-        Subscription findedSubscription = subscriptionRepository.findById(id).filter(s -> s.getIsActive()).orElseThrow(() -> new NotFoundException("Subscription not found"));
+        Subscription findedSubscription = subscriptionRepository.findById(id).filter(s -> s.getIsActive()).orElseThrow(() -> new NotFoundException("Subscripción no encontrada"));
         findedSubscription.setIsRecommended(true);
         subscriptionRepository.save(findedSubscription);
         subscriptionRepository.findAll().stream().filter(subscription -> !subscription.getId().equals(id))
