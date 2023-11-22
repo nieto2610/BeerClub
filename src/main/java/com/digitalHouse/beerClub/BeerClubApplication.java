@@ -13,4 +13,5 @@ public class BeerClubApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(BeerClubApplication.class, args);
 	}
+
 }
