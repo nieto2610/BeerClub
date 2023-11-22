@@ -10,7 +10,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,5 +82,22 @@ public class GlobalExceptionHandler {
         map.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Object> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+        Map<String, Object> map = new HashMap<>();
+        String fieldName = e.getName();
+        String expectedType = e.getRequiredType().getSimpleName();
+        map.put("message", "Tipo de dato incorrecto para el campo '" + fieldName + "'. Se esperaba un valor de tipo " + expectedType + ".");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
+    }
+
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<Object> handleDateTimeParse(DateTimeParseException e) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("message", "Formato de fecha inválido. Por favor, use el formato correcto (por ejemplo, 'aaaa-mm-dd').");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
+    }
+
 
 }
