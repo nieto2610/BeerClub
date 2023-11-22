@@ -72,7 +72,20 @@ public class UserServiceImplement implements IUserService {
     public UserDTO create(UserDTO entity) throws BadRequestException { return null; }
 
     @Override
-    public UserDTO update(UserDTO entity, Long id) throws NotFoundException { return null; }
+    public UserDTO update(UserDTO user, Long id) throws NotFoundException {
+        User searchedUser = this.findById(id);
+        if (!searchedUser.isActive()) {
+            throw new NotFoundException("The user is not active and cannot be modified.");
+        }
+        searchedUser.setFirstName(user.getFirstName());
+        searchedUser.setLastName(user.getLastName());
+        searchedUser.setEmail(user.getEmail());
+        searchedUser.setTelephone(user.getTelephone());
+        userRepository.save(searchedUser);
+        addressRepository.save(user.getAddress());
+        UserDTO userDTO = userMapper.converter(searchedUser, UserDTO.class);
+        return userDTO;
+    }
 
     @Override
     public Payment saveUser(UserApplicationDTO user) throws NotFoundException, InsufficientBalanceException {

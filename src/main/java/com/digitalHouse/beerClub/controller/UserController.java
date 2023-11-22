@@ -88,8 +88,8 @@ public class UserController {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateUser(@Parameter(description = "ID del usuario a actualizar", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long id, @Valid @RequestBody UserApplicationDTO user) throws NotFoundException {
-        UserDTO userDTO = IUserService.updateUser(user, id);
+    public ResponseEntity<Object> updateUser(@Parameter(description = "ID del usuario a actualizar", example = "1", required = true, schema = @Schema(type = "Long")) @PathVariable @Positive(message = "Id must be greater than 0") Long id, @Valid @RequestBody UserDTO user) throws NotFoundException {
+        UserDTO userDTO = IUserService.update(user, id);
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
