@@ -1,5 +1,6 @@
 package com.digitalHouse.beerClub.model;
 
+import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
@@ -25,33 +26,18 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Nombre no puede ser nulo")
-    @Size(min=3)
     private String firstName;
 
-    @NotBlank(message = "Apellido no puede ser nulo")
-    @Size(min=2)
     private String lastName;
 
-    @Column(unique = true)
-    @NotBlank(message = "Correo no puede ser nulo")
     private String email;
 
-    @Column(nullable = false)
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate birthdate;
 
-    @NotBlank(message = "Telefono no puede ser nulo")
     private String telephone;
 
-    @Column(nullable = false, updatable = false)
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate subscriptionDate;
 
-    @Pattern(
-        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$",
-        message = "La contraseña debe contener al menos 8 caracteres y cumplir las siguientes condiciones: al menos una mayúscula, una minúscula, un número, y un carácter especial (@#$%^&+=!)."
-    )
     private String password;
 
     private boolean active;
@@ -92,6 +78,15 @@ public class User implements UserDetails {
         this.birthdate = user.getBirthdate();
         this.telephone = user.getTelephone();
         role = RoleType.USER;
+        active = true;
+    }
+
+    public User(UserAdminDTO userAdmin) {
+        this.firstName = userAdmin.getName();
+        this.lastName = userAdmin.getLastName();
+        this.email = userAdmin.getEmail();
+        this.password = userAdmin.getPassword();
+        role = RoleType.ADMIN;
         active = true;
     }
 

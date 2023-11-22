@@ -14,11 +14,11 @@ public class UserDTO {
     private String firstName, lastName, email;
     private LocalDate birthdate;
     private String telephone;
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate subscriptionDate;
     private Address address;
     private RoleType role;
     private boolean active;
+    private Long subscriptionId;
     private Subscription subscription;
     private Long nextSubscriptionId;
 }

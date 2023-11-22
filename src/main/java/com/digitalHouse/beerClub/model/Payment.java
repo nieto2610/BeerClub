@@ -19,9 +19,6 @@ public class Payment {
     @Positive(message = "Transaction amount must be greater than 0")
     private Double amount;
 
-   /* @Enumerated(EnumType.STRING)
-    private PaymentType type;*/
-
     private String description;
 
     @Column(nullable = false, updatable = false)
@@ -36,6 +33,5 @@ public class Payment {
     @ManyToOne
     @JoinColumn(name = "subscription_id")
     private Subscription subscription;
-
 
 }
