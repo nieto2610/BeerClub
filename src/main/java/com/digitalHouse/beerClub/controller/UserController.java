@@ -5,6 +5,7 @@ import com.digitalHouse.beerClub.model.Payment;
 import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
 import com.digitalHouse.beerClub.model.dto.ProductDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
+import com.digitalHouse.beerClub.model.dto.*;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.service.interfaces.IPaymentService;
@@ -144,6 +145,14 @@ public class UserController {
     public ResponseEntity<List<ProductDTO>> getTopFiveProductsByUser(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException {
         List<ProductDTO> productDTOS = IUserService.getTopFiveProducts(userId);
         return new ResponseEntity<>(productDTOS, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Update user subscription", description = "Update the subscription of an existing user",responses = {
+            @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
+    @PatchMapping("/update/subscription")
+    public ResponseEntity<Object> updateUserSubscription(@RequestBody UserSubscriptionDTO userSubscriptionDTO ) throws NotFoundException {
+        UserDTO userDTO = IUserService.updateUserSubscription(userSubscriptionDTO);
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
