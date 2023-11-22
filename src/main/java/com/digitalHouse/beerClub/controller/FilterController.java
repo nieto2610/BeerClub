@@ -2,7 +2,6 @@ package com.digitalHouse.beerClub.controller;
 
 
 import com.digitalHouse.beerClub.exceptions.NoDataFoundException;
-import com.digitalHouse.beerClub.model.dto.PaymentDTO;
 import com.digitalHouse.beerClub.model.dto.PaymentFilterDTO;
 import com.digitalHouse.beerClub.model.dto.SubscriptionDTO;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @Tag(name = "Filters")
@@ -34,14 +32,17 @@ public class FilterController {
     public ResponseEntity<?> getUserFilterGlobalData(
             @RequestParam(required = false) Integer typeSubscription,
             @RequestParam(required = false) Integer isActive,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOne,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTwo
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
-        List<UserDTO> users = service.UserGlobalData(typeSubscription, isActive, dateOne, dateTwo);
+        if ((startDate == null && endDate != null) || (startDate != null && endDate == null)) {
+            throw new NoDataFoundException("Ambas fechas (inicio y fin) deben estar presentes o ninguna.");
+        }
+        List<UserDTO> users = service.UserGlobalData(typeSubscription, isActive, startDate, endDate);
         if (users.isEmpty()) {
             throw new NoDataFoundException("Se realizo la búsqueda, pero no se encontraron datos que coincidan con el criterio del filtro");
-        } else if ((dateOne != null && dateTwo != null)) {
-            NoDataFoundException.forDateRange(dateOne, dateTwo);
+        } else if ((startDate != null && endDate != null)) {
+            NoDataFoundException.forDateRange(startDate, endDate);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(users);
@@ -50,17 +51,22 @@ public class FilterController {
 
     @GetMapping(value = "/payments/filterGlobalData")
     public ResponseEntity<?> getFilterPaymentsGlobalData (
-            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String typeNameSubscription,
             @RequestParam(required = false) Double amountMin,
             @RequestParam(required = false) Double amountMax,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOne,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTwo
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
-        List<PaymentFilterDTO> payments = service.getFilteredPayments(description, amountMin, amountMax, dateOne, dateTwo);
+        if ((startDate == null && endDate != null) || (startDate != null && endDate == null)) {
+            throw new NoDataFoundException("Ambas fechas (inicio y fin) deben estar presentes o ninguna.");
+        }else if ((amountMin == null && amountMax != null) || (amountMin != null && amountMax == null)) {
+            throw new NoDataFoundException("Ambos montos (mínimo y máximo) deben estar presentes o ninguno.");
+        }
+        List<PaymentFilterDTO> payments = service.getFilteredPayments(typeNameSubscription, amountMin, amountMax, startDate, endDate);
         if (payments.isEmpty()) {
-            throw new NoDataFoundException("Se realizo la búsqueda, pero no se encontraron datos que coincidan con el criterio del filtro");
-        } else if ((dateOne != null && dateTwo!= null)) {
-            NoDataFoundException.forDateRange(dateOne, dateTwo);
+            throw new NoDataFoundException("Se realizo la búsqueda, pero no se encontraron datos que coincidan con el criterio del filtro.");
+        } else if ((startDate != null && endDate!= null)) {
+            NoDataFoundException.forDateRange(startDate, endDate);
         } else if ((amountMax != null && amountMin != null)) {
             NoDataFoundException.validateRangeValues(amountMax, amountMin);
         }
@@ -69,13 +75,16 @@ public class FilterController {
 
     @GetMapping(value = "/subscriptions/filterGlobalData")
     public ResponseEntity<?> getFilterSubscription(
-            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String typeNameSubscription,
             @RequestParam(required = false) Integer isRecommended,
             @RequestParam(required = false) Integer isActive,
             @RequestParam(required = false) Double amountMin,
             @RequestParam(required = false) Double amountMax
     ) {
-        List<SubscriptionDTO> SubscriptionDTO = service.getFilterSubscription(description, isRecommended,isActive, amountMin, amountMax);
+        if ((amountMin == null && amountMax != null) || (amountMin != null && amountMax == null)) {
+            throw new NoDataFoundException("Ambos montos (mínimo y máximo) deben estar presentes o ninguno.");
+        }
+        List<SubscriptionDTO> SubscriptionDTO = service.getFilterSubscription(typeNameSubscription, isRecommended,isActive, amountMin, amountMax);
         if (SubscriptionDTO.isEmpty()) {
             throw new NoDataFoundException("Se realizo la búsqueda, pero no se encontraron datos que coincidan con el criterio del filtro");
         }else if ((amountMax != null && amountMin != null)) {
