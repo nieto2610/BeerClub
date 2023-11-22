@@ -20,6 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -39,23 +40,25 @@ public class SecurityConfig {
                         authRequest
                                 //Los endpoint Post que se pueden user sin autenticación
                                 .requestMatchers(HttpMethod.POST,"/auth/**", "/ageVerification/**").permitAll()
-                                //Los endpoint Post que se pueden ADMIN con autenticación
-                                .requestMatchers(HttpMethod.POST,"/users/**", "/faqs/**", "/users/create", "/subscriptions").permitAll()
                                 //Los endpoint que se pueden ver sin autenticación
-                                .requestMatchers(HttpMethod.GET,"/swagger-ui/**", "/v3/api-docs/**", "/subscriptions", "/faqs").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/swagger-ui/**", "/v3/api-docs/**", "/subscriptions", "/faqs", "/users/create").permitAll()
                                 //Los endpoint que se pueden ver siendo USER
-                                .requestMatchers(HttpMethod.GET,"/users/email/**", "/address/**").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/users/email/**", "/address/**", "/recommendations/**").hasAnyRole("USER", "ADMIN")
                                 //Los endpoint que se pueden ver siendo ADMIN
                                 .requestMatchers(HttpMethod.GET,"/users/all", "/users/active", "/users/id/**", "/subscriptions/**", "/faqs/**").hasRole("ADMIN")
+                                //Los endpoint Post que se pueden user siendo usuario Admin
+                                .requestMatchers(HttpMethod.POST,"/recommendations/**").hasRole("ADMIN")
+                                //Los endpoint Post que se pueden usar con autenticación
+                                .requestMatchers(HttpMethod.POST,"/reviews/**").hasAnyRole("ADMIN", "USER")
                                 //Los endpoint Put que se pueden user con autenticación
                                 .requestMatchers(HttpMethod.PUT,"/address/update/**", "/users/update/**").hasRole("USER")
                                 //Los endpoint Put que se pueden admin con autenticación
-                                .requestMatchers(HttpMethod.PUT,"/faqs/**", "/users/activate/**", "/subscriptions/**").permitAll()
-                                //Los endpoint que se pueden ver siendo ADMIN
+                                .requestMatchers(HttpMethod.PUT,"/faqs/**", "/users/activate/**", "/subscriptions/**").hasAnyRole("ADMIN")
+                                //Los endpoint que se pueden eliminar siendo ADMIN
                                 .requestMatchers(HttpMethod.DELETE,"/users/**", "/faqs/**", "/subscriptions/**").hasRole("ADMIN")
                                 //Los endpoint que se pueden Modificar datos siendo USER
                                 .requestMatchers(HttpMethod.PATCH,"/users/update/passwword").hasAnyRole("USER", "ADMIN")
-                                //.anyRequest().authenticated()
+                                .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->
                         sessionManager

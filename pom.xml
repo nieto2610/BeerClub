@@ -40,11 +40,6 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.15.0</version>
-		</dependency>
 		<!--Validation-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -60,11 +55,6 @@
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
 			<version>3.1.0</version>
-		</dependency>
-		<!-- Validation   -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<!-- Documentation  -->
 		<!--Swagger-->
@@ -133,6 +123,7 @@
                     <target>16</target>
                 </configuration>
             </plugin>
+
 		</plugins>
 	</build>
 

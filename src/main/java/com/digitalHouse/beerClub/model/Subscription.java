@@ -32,9 +32,6 @@ public class Subscription {
     private Boolean isRecommended;
     private Boolean isActive;
 
-    @ManyToMany(mappedBy = "subscriptions")
-    Set<Recommendation> recommendations;
-
     @JsonIgnore
     @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY)
     private Set<User> users = new HashSet<>();

@@ -3,6 +3,8 @@ package com.digitalHouse.beerClub.service.implement;
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.*;
+import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
+import com.digitalHouse.beerClub.model.dto.ProductDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
@@ -16,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -64,7 +68,8 @@ public class UserServiceImplement implements IUserService {
 
     @Override
     public UserDTO searchById(Long id) throws NotFoundException{
-        UserDTO userDTO = userMapper.converter(this.findById(id), UserDTO.class);
+        User user = this.findById(id);
+        UserDTO userDTO = userMapper.converter(user, UserDTO.class);
         return userDTO;
     }
 
@@ -72,10 +77,25 @@ public class UserServiceImplement implements IUserService {
     public UserDTO create(UserDTO entity) throws BadRequestException { return null; }
 
     @Override
-    public UserDTO update(UserDTO entity, Long id) throws NotFoundException { return null; }
+    public UserDTO update(UserDTO user, Long id) throws NotFoundException {
+        User searchedUser = this.findById(id);
+        if (!searchedUser.isActive()) {
+            throw new NotFoundException("The user is not active and cannot be modified.");
+        }
+        searchedUser.setFirstName(user.getFirstName());
+        searchedUser.setLastName(user.getLastName());
+        searchedUser.setEmail(user.getEmail());
+        searchedUser.setTelephone(user.getTelephone());
+        userRepository.save(searchedUser);
+        addressRepository.save(user.getAddress());
+        UserDTO userDTO = userMapper.converter(searchedUser, UserDTO.class);
+        return userDTO;
+    }
 
     @Override
-    public Payment saveUser(UserApplicationDTO user) throws NotFoundException, InsufficientBalanceException {
+    public Payment saveUser(UserApplicationDTO user) throws NotFoundException, InsufficientBalanceException, CustomUserAlreadyExistsException {
+
+        emailValidation(user.getEmail());
 
         Optional<User> existingUser = userRepository.findByUserEmail(user.getEmail());
 
@@ -97,6 +117,13 @@ public class UserServiceImplement implements IUserService {
         User createdUser = userRepository.save(newUser);
 
         return paymentServiceImplement.savePayment(cardPayment, createdUser);
+    }
+
+    @Override
+    public void saveAdmin(UserAdminDTO adminDTO) {
+        User adminUser = new User(adminDTO);
+        adminUser.setPassword(passwordEncoder.encode(adminDTO.getPassword()));
+        userRepository.save(adminUser);
     }
 
 
@@ -148,7 +175,7 @@ public class UserServiceImplement implements IUserService {
     }
 
     @Override
-    public void activateUserSubscription(Long id) throws NotFoundException, UserActiveException {
+    public void activateUser(Long id) throws NotFoundException, UserActiveException {
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
         if (user.isActive()) {
             throw new UserActiveException("The user is active.");
@@ -156,8 +183,41 @@ public class UserServiceImplement implements IUserService {
         user.setActive(true);
         userRepository.save(user);
     }
+
+    @Override
+    public List<ProductDTO> getTopFiveProducts(Long userId) throws NotFoundException {
+        User searchedUser = this.findById(userId);
+        if (!searchedUser.isActive()) {
+            throw new NotFoundException("The user is not active.");
+        }
+
+        List<Review> reviewList = searchedUser.getReviewList();
+        if (reviewList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        int limit = Math.min(reviewList.size(), 5);
+
+        List<ProductDTO> productDTOS = reviewList.stream()
+                .sorted(Comparator.comparing(Review::getRating).reversed())
+                .limit(limit)
+                .map(review -> userMapper.converter(review.getProduct(), ProductDTO.class))
+                .collect(Collectors.toList());
+
+        return productDTOS;
+
+    }
+
     private LocalDate getSubscriptionDate() {
         LocalDate currentDate = LocalDate.now();
         return currentDate.getDayOfMonth() >= 20 ? currentDate.plusMonths(1).withDayOfMonth(1) : currentDate;
+    }
+
+    private void emailValidation(String email) {
+        User existingUser = userRepository.findByEmail(email);
+
+        if (existingUser != null) {
+            throw new CustomUserAlreadyExistsException("El correo electrónico '"+ email +"' ya está registrado. Por favor, ingresa otro.");
+        }
     }
 }

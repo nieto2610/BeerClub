@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PaymentServiceImplement implements IPaymentService {
@@ -33,7 +34,7 @@ public class PaymentServiceImplement implements IPaymentService {
     private final ISubscriptionRepository subscriptionRepository;
     private final CardService cardService;
     private final AccountService accountService;
-    private final Mapper transactionMapper;
+    private final Mapper paymentMapper;
     private final MyAppConfig myAppConfig;
 
     @Autowired
@@ -42,17 +43,18 @@ public class PaymentServiceImplement implements IPaymentService {
         this.subscriptionRepository = subscriptionRepository;
         this.cardService = cardService;
         this.accountService = accountService;
-        this.transactionMapper = mapper;
+        this.paymentMapper = mapper;
         this.myAppConfig = myAppConfig;
     }
     @Override
     public List<PaymentDTO> searchAll() {
-        return null;
+        return paymentRepository.findAll().stream().map(payment -> paymentMapper.converter(payment, PaymentDTO.class)).toList();
     }
 
     @Override
     public PaymentDTO searchById(Long id) throws NotFoundException {
-        return null;
+        Payment payment = paymentRepository.findById(id).orElseThrow(() -> new NotFoundException("Payment not found with ID: " + id));
+        return paymentMapper.converter(payment, PaymentDTO.class);
     }
 
     @Transactional
