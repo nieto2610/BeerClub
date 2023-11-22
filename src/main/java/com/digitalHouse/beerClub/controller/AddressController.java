@@ -4,15 +4,14 @@ import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.model.dto.AddressDTO;
 import com.digitalHouse.beerClub.service.interfaces.IAddressService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,9 +36,9 @@ public class AddressController {
     @Operation(summary ="Update address by user Email", description ="Update address by user Email", responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = AddressDTO.class))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "Address not found with userEmail: example@beerClub")))})
-    @PutMapping("/update/{userEmail}")
-    public ResponseEntity<AddressDTO> updateAddressByUserEmail(@PathVariable String userEmail, @Valid @RequestBody AddressDTO updatedAddress) throws NotFoundException {
-        AddressDTO updated = addressService.updateAddressByUserEmail(userEmail, updatedAddress);
+    @PutMapping("/update")
+    public ResponseEntity<AddressDTO> updateAddressByUserEmail(Authentication authentication, @Valid @RequestBody AddressDTO updatedAddress) throws NotFoundException {
+        AddressDTO updated = addressService.updateAddressByUserEmail(authentication, updatedAddress);
         return ResponseEntity.ok(updated);
     }
 

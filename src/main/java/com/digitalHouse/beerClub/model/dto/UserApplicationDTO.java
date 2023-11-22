@@ -53,9 +53,8 @@ public class UserApplicationDTO {
     private String zipCode;
 
     @Pattern(
-        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!*?.])(?=\\S+$).{8,16}$",
-        message = "La contraseña debe contener entre 8 y 16 caracteres y cumplir con los siguientes criterios: al menos una letra mayúscula, una letra minúscula, un número y un caracter especial @#$%^&+=!)."
-    )
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!*?.])(?=\\S+$).{8,16}$",
+            message = "La contraseña debe contener entre 8 y 16 caracteres y cumplir con los siguientes criterios: al menos una letra mayúscula, una letra minúscula, un número y un caracter especial @#$%^&+=!).")
     private String password;
 
     private Long subscriptionId;

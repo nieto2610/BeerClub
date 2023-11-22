@@ -1,5 +1,6 @@
 package com.digitalHouse.beerClub.model;
 
+import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
@@ -15,7 +16,8 @@ import java.util.Collection;
 import java.util.List;
 
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity
 @Table(name="users")
@@ -51,6 +53,9 @@ public class User implements UserDetails {
     @JoinColumn(name = "subscription_id")
     private Subscription subscription;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Review> reviewList;
+
     public User(String firstName, String lastName, String email, LocalDate birthdate, String telephone, LocalDate subscriptionDate, String password, Address address) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -71,6 +76,15 @@ public class User implements UserDetails {
         this.birthdate = user.getBirthdate();
         this.telephone = user.getTelephone();
         role = RoleType.USER;
+        active = true;
+    }
+
+    public User(UserAdminDTO userAdmin) {
+        this.firstName = userAdmin.getName();
+        this.lastName = userAdmin.getLastName();
+        this.email = userAdmin.getEmail();
+        this.password = userAdmin.getPassword();
+        role = RoleType.ADMIN;
         active = true;
     }
 
