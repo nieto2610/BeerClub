@@ -25,7 +25,6 @@ import java.util.List;
 @Validated
 @RestController
 @RequestMapping("/recommendations")
-@CrossOrigin("*")
 @Tag(name = "Recommendations")
 public class RecommendationController {
 

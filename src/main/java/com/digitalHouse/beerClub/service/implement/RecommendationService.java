@@ -6,6 +6,7 @@ import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Product;
 import com.digitalHouse.beerClub.model.Recommendation;
+import com.digitalHouse.beerClub.model.Review;
 import com.digitalHouse.beerClub.model.Subscription;
 import com.digitalHouse.beerClub.model.dto.ProductDTO;
 import com.digitalHouse.beerClub.model.dto.RecommendationDTO;
@@ -132,13 +133,33 @@ public class RecommendationService implements IRecommendationService {
     public RecommendationDTO searchBySubscriptionAndDate(Long subscriptionId, LocalDate date) throws NotFoundException {
 
         Recommendation recommendation = recommendationRepository.findBySubscriptionIdAndCreateDate(subscriptionId,date.getMonthValue(), date.getYear());
-
         if(recommendation == null) {
             throw new NotFoundException("Recommendation not found");
+        }
+        Product product= recommendation.getProduct();
+        List<Review> reviewListProduct= recommendation.getProduct().getReviewList();
+        if (reviewListProduct.size() > 0) {
+            product.setProductScore(getProductAverage(reviewListProduct));
+            recommendation.setProduct(product);
+            productRepository.save(product);
         }
 
         RecommendationDTO recommendationDTO = mapper.converter(recommendation,RecommendationDTO.class);
         recommendationDTO.setSubscriptionId(subscriptionId);
         return recommendationDTO;
+    }
+
+    public Float getProductAverage(List<Review> reviewList){
+        Float productScore= 0.0F;
+        for(Review r :reviewList) {
+            if(r.getRating()==null){
+                productScore+=0.0F;
+            }
+            else{
+                productScore+=r.getRating();
+            }
+        }
+        productScore = productScore/reviewList.size();
+        return productScore;
     }
 }
