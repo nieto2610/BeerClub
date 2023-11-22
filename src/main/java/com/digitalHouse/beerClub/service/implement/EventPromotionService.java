@@ -40,7 +40,7 @@ public class EventPromotionService implements IEventPromotionService {
 
     @Override
     public EventPromotionDTO searchById(Long id) throws NotFoundException {
-        EventPromotion eventPromotion = eventPromotionRepository.findById(id).orElseThrow(() -> new NotFoundException("Event or Promotion not found"));
+        EventPromotion eventPromotion = eventPromotionRepository.findById(id).orElseThrow(() -> new NotFoundException("Evento o Descuento no existente"));
         return mapper.converter(eventPromotion, EventPromotionDTO.class);
     }
 
@@ -64,9 +64,9 @@ public class EventPromotionService implements IEventPromotionService {
 
     @Override
     public EventPromotionDTO update(EventPromotionDTO eventPromotionDTO, Long id) throws NotFoundException {
-        EventPromotion eventPromotion = eventPromotionRepository.findById(id).orElseThrow(() -> new NotFoundException("Event or Promotion not found"));
+        EventPromotion eventPromotion = eventPromotionRepository.findById(id).orElseThrow(() -> new NotFoundException("Evento o Descuento no existente"));
         if(!eventPromotion.getIsActive()){
-            throw new NotFoundException("The event or promotion is inactive");
+            throw new NotFoundException("El evento o descuento está inactivo");
         }
         eventPromotion.setType(eventPromotionDTO.getType());
         eventPromotion.setTitle(eventPromotionDTO.getTitle());
@@ -85,9 +85,9 @@ public class EventPromotionService implements IEventPromotionService {
 
     @Override
     public void delete(Long id) throws ServiceException, NotFoundException {
-        EventPromotion eventPromotion = eventPromotionRepository.findById(id).orElseThrow(() -> new NotFoundException("Event or Promotion not found"));
+        EventPromotion eventPromotion = eventPromotionRepository.findById(id).orElseThrow(() -> new NotFoundException("Evento o Descuento no existente"));
         if(!eventPromotion.getIsActive()){
-            throw new NotFoundException("The event or promotion is inactive");
+            throw new NotFoundException("El evento o descuento está inactivo");
         }
         eventPromotion.setIsActive(false);
         eventPromotionRepository.save(eventPromotion);
