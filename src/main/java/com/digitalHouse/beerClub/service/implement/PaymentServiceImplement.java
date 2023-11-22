@@ -56,7 +56,7 @@ public class PaymentServiceImplement implements IPaymentService {
         return paymentRepository.findByUserId(userId).stream().map(payment -> paymentMapper.converter(payment, PaymentDTO.class)).toList();
     }
 
-    // Método para que el administrador pueda acceder a un pago por su id.
+    // Método para que el usuario autenticado pueda acceder a su pago por id.
     @Override
     public PaymentDTO searchById(Long id, Authentication authentication) throws NotFoundException, ForbiddenException {
         User user = userRepository.findByEmail(authentication.getName());
@@ -66,25 +66,6 @@ public class PaymentServiceImplement implements IPaymentService {
         }
         Payment payment = paymentRepository.findById(id).orElseThrow(() -> new NotFoundException("No se encontró el pago con ID: " + id));
         //return paymentMapper.converter(payment, PaymentDTO.class);
-        if (payment.getUserId().equals(user.getId())) {
-            return paymentMapper.converter(payment, PaymentDTO.class);
-        } else {
-            throw new ForbiddenException("El pago no pertenece al usuario autenticado");
-        }
-    }
-
-    // Método para que el usuario autenticado pueda acceder a su pago por id.
-    @Override
-    public PaymentDTO getPayment(Long id, Authentication authentication) throws NotFoundException, ForbiddenException {
-        User user = userRepository.findByEmail(authentication.getName());
-
-        if (!user.isActive()) {
-            throw new ForbiddenException("El usuario no está activo");
-        }
-
-        Payment payment = paymentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("No se encontró el pago con ID: " + id));
-
         if (payment.getUserId().equals(user.getId())) {
             return paymentMapper.converter(payment, PaymentDTO.class);
         } else {
@@ -112,6 +93,7 @@ public class PaymentServiceImplement implements IPaymentService {
                 .toList();
     }
 
+    // Método para crear un pago cuando el usuario se registra por 1º vez.
     @Transactional
     @Override
     public Payment savePayment(CardPayment card, User user) throws NotFoundException, InsufficientBalanceException {
@@ -143,7 +125,10 @@ public class PaymentServiceImplement implements IPaymentService {
 
         accountService.addCredit(accountBeerClubNumber, amount);
 
-        return paymentRepository.save(payment);
+        payment.setStatus(PaymentStatus.APROBADO);
+        paymentRepository.save(payment);
+
+        return payment;
     }
 
     @Override
@@ -174,6 +159,68 @@ public class PaymentServiceImplement implements IPaymentService {
 
     }
 
+    // Método para crear una factura de pago para usuarios ya registrados.
+    @Override
+    public PaymentDTO createPaymentInvoice(Long userId) throws NotFoundException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("No se encontró el usuario con ID: " + userId));
+
+        if (!user.isActive()) {
+            throw new NotFoundException("El usuario con ID " + userId + " no está activo");
+        }
+
+        Subscription subscription = subscriptionRepository.findById(user.getSubscription().getId()).orElseThrow(() -> new NotFoundException("No se encontró la suscripción"));
+
+        Double amount = subscription.getPrice();
+        String description = subscription.getName();
+        String invoiceNumber = AccountUtils.getInvoiceNumber();
+
+        Payment payment = new Payment();
+        payment.setAmount(amount);
+        payment.setDescription(description);
+        payment.setUserId(userId);
+        payment.setInvoiceNumber(invoiceNumber);
+        payment.setSubscription(subscription);
+
+        paymentRepository.save(payment);
+        return paymentMapper.converter(payment, PaymentDTO.class);
+    }
+
+    // Método para terminar de procesar el pago luego de que el usuario recibiera el link de la factura.
+    @Override
+    public PaymentDTO processPayment(PaymentApplicationDTO paymentDTO) throws NotFoundException, InsufficientBalanceException, EntityInactiveException, BadRequestException {
+        String accountBeerClubNumber = myAppConfig.getAccountNumber();
+        Payment payment = paymentRepository.findById(paymentDTO.getPaymentId()).orElseThrow(() -> new NotFoundException("No se encontró el pago"));
+
+        try {
+            this.paymentValidation(payment.getSubscription().getId(), paymentDTO.getCardHolder(), paymentDTO.getCardNumber(), paymentDTO.getCvv(), paymentDTO.getExpDate());
+
+            payment.setDate(LocalDateTime.now());
+            payment.setCardNumber(CardUtils.getLastFourDigits(paymentDTO.getCardNumber()));
+
+            Double amount = payment.getSubscription().getPrice();
+            CardDTO cardDTO = cardService.searchByCardNumber(paymentDTO.getCardNumber());
+
+            if (cardDTO.getCardType().equals(CardType.DEBIT)) {
+                Long accountId = cardDTO.getAccountId();
+                accountService.debit(accountId, amount);
+            } else {
+                cardService.cardDebit(cardDTO.getId(), amount);
+            }
+
+            accountService.addCredit(accountBeerClubNumber, amount);
+
+            payment.setStatus(PaymentStatus.APROBADO);
+            paymentRepository.save(payment);
+
+            return paymentMapper.converter(payment, PaymentDTO.class);
+        } catch (NotFoundException | InsufficientBalanceException | EntityInactiveException | BadRequestException e) {
+            payment.setStatus(PaymentStatus.RECHAZADO);
+            paymentRepository.save(payment);
+            throw e;
+        }
+    }
+
+    // Método para que el administrador pueda cambiar el estado de un pago.
     @Override
     public PaymentDTO updatePaymentStatus(Long paymentId, PaymentStatus newStatus) throws NotFoundException {
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new NotFoundException("Payment not found with ID: " + paymentId));
@@ -209,6 +256,7 @@ public class PaymentServiceImplement implements IPaymentService {
         if(accountDTO.getBalance() < amount) {
             throw new InsufficientBalanceException("La cuenta no tiene saldo suficiente");
         }
+
     }
 }
 

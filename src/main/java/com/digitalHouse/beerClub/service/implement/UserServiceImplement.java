@@ -3,6 +3,7 @@ package com.digitalHouse.beerClub.service.implement;
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.*;
+import com.digitalHouse.beerClub.model.dto.PaymentDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
@@ -91,9 +92,8 @@ public class UserServiceImplement implements IUserService {
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         User createdUser = userRepository.save(newUser);
 
-        return paymentServiceImplement.savePayment(cardPayment, createdUser);
+        return  paymentServiceImplement.savePayment(cardPayment, createdUser);
     }
-
 
     @Override
     public UserDTO updateUser(UserApplicationDTO user, Long id, Authentication authentication) throws NotFoundException, ForbiddenException {

@@ -1,14 +1,14 @@
 package com.digitalHouse.beerClub.controller;
 
-import com.digitalHouse.beerClub.auth.UserAuthRequest;
-import com.digitalHouse.beerClub.exceptions.ForbiddenException;
-import com.digitalHouse.beerClub.exceptions.NotFoundException;
+import com.digitalHouse.beerClub.exceptions.*;
+import com.digitalHouse.beerClub.model.Payment;
 import com.digitalHouse.beerClub.model.PaymentStatus;
+import com.digitalHouse.beerClub.model.dto.PaymentApplicationDTO;
 import com.digitalHouse.beerClub.model.dto.PaymentDTO;
+import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.service.interfaces.IPaymentService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -67,9 +67,26 @@ public class PaymentController {
         return new ResponseEntity<>(paymentDTO, HttpStatus.OK);
     }
 
+    @Operation(summary="Add payment", description="Add a new payment", responses = {
+        @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = PaymentDTO.class)))})
+    @PostMapping("/create/{userId}")
+    public ResponseEntity<PaymentDTO> savePaymentInvoice(@PathVariable  @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException, CustomUserAlreadyExistsException {
+        PaymentDTO paymentDTO = paymentService.createPaymentInvoice(userId);
+        return new ResponseEntity<>(paymentDTO, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Process payment", description = "Process an existing payment", responses = {
+        @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = PaymentDTO.class))),
+        @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "Payment not found with ID: 1")))})
+    @PutMapping("/process")
+    public ResponseEntity<PaymentDTO> processPayment(@Valid @RequestBody PaymentApplicationDTO paymentApplicationDTO) throws NotFoundException, ForbiddenException, EntityInactiveException, InsufficientBalanceException, BadRequestException {
+        PaymentDTO paymentDTO = paymentService.processPayment(paymentApplicationDTO);
+        return new ResponseEntity<>(paymentDTO, HttpStatus.OK);
+    }
+
     @Operation(summary = "Update the payment status", description = "Update the status of an existing payment",responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "text/plain",schema = @Schema(implementation = PaymentDTO.class))),
-    @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "Payment not found")))})
+        @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "Payment not found")))})
     @PatchMapping("/status/{paymentId}")
     public ResponseEntity<PaymentDTO> updatePaymentStatus(@PathVariable Long paymentId, @RequestParam PaymentStatus newStatus) throws NotFoundException {
         PaymentDTO paymentDTO = paymentService.updatePaymentStatus(paymentId, newStatus);
