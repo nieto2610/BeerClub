@@ -70,6 +70,20 @@ public class SubscriptionService implements ISubscriptionService {
     public void delete(Long id) throws ServiceException, NotFoundException {
         Subscription subscription = subscriptionRepository.findById(id).orElseThrow(() -> new NotFoundException("Subscription not found"));
         subscription.setIsActive(false);
+        subscription.setIsRecommended(false);
         subscriptionRepository.save(subscription);
+    }
+
+    @Override
+    public SubscriptionDTO markAsRecommended(Long id) throws NotFoundException {
+        Subscription findedSubscription = subscriptionRepository.findById(id).filter(s -> s.getIsActive()).orElseThrow(() -> new NotFoundException("Subscription not found"));
+        findedSubscription.setIsRecommended(true);
+        subscriptionRepository.save(findedSubscription);
+        subscriptionRepository.findAll().stream().filter(subscription -> !subscription.getId().equals(id))
+                .forEach(subscription -> {
+                    subscription.setIsRecommended(false);
+                    subscriptionRepository.save(subscription);
+                });
+        return mapper.converter(findedSubscription, SubscriptionDTO.class);
     }
 }
