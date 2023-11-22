@@ -138,6 +138,8 @@ public class UserController {
         return new ResponseEntity<>(productDTOS, HttpStatus.OK);
     }
 
+    @Operation(summary = "Update user subscription", description = "Update the subscription of an existing user",responses = {
+            @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @PatchMapping("/update/subscription")
     public ResponseEntity<Object> updateUserSubscription(@RequestBody UserSubscriptionDTO userSubscriptionDTO ) throws NotFoundException {
         UserDTO userDTO = IUserService.updateUserSubscription(userSubscriptionDTO);
