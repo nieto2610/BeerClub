@@ -35,6 +35,10 @@ public class SubscriptionService implements ISubscriptionService {
         return subscriptionRepository.findAll().stream().filter(s -> s.getIsActive()).map(s -> mapper.converter(s, SubscriptionDTO.class)).toList();
     }
 
+    //Add method to bring all the subscriptions without filter
+    public List<SubscriptionDTO> searchAllStatus(){
+        return subscriptionRepository.findAll().stream().map(s -> mapper.converter(s, SubscriptionDTO.class)).toList();
+    }
     @Override
     public SubscriptionDTO searchById(Long id) throws NotFoundException {
         Subscription subscription = subscriptionRepository.findById(id).orElseThrow(() -> new NotFoundException("Subscription not found"));
@@ -55,7 +59,7 @@ public class SubscriptionService implements ISubscriptionService {
         subscription.setDescription(subscriptionDTO.getDescription());
         subscription.setPrice(subscriptionDTO.getPrice());
         subscription.setIsRecommended(subscriptionDTO.getIsRecommended());
-
+        subscription.setIsActive(subscriptionDTO.getIsActive()); // add to modify when the admin update the status
         // set new benefits
         List<BenefitDTO> newBenefits = new ArrayList<>(subscriptionDTO.getBenefits());
 
