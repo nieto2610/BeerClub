@@ -3,11 +3,8 @@ package com.digitalHouse.beerClub.controller;
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.model.Payment;
 import com.digitalHouse.beerClub.model.Product;
-import com.digitalHouse.beerClub.model.dto.ProductDTO;
-import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
+import com.digitalHouse.beerClub.model.dto.*;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
-import com.digitalHouse.beerClub.model.dto.UserDTO;
-import com.digitalHouse.beerClub.model.dto.UserResponseDTO;
 import com.digitalHouse.beerClub.service.implement.PaymentServiceImplement;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -130,6 +127,12 @@ public class UserController {
     public ResponseEntity<List<ProductDTO>> getTopFiveProductsByUser(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException {
         List<ProductDTO> productDTOS = IUserService.getTopFiveProducts(userId);
         return new ResponseEntity<>(productDTOS, HttpStatus.OK);
+    }
+
+    @PatchMapping("/update/subscription")
+    public ResponseEntity<Object> updateUserSubscription(@RequestBody UserSubscriptionDTO userSubscriptionDTO ) throws NotFoundException {
+        UserDTO userDTO = IUserService.updateUserSubscription(userSubscriptionDTO);
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

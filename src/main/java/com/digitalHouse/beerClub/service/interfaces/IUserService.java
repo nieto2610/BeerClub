@@ -8,6 +8,7 @@ import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.exceptions.UserActiveException;
+import com.digitalHouse.beerClub.model.dto.UserSubscriptionDTO;
 
 import java.util.List;
 
@@ -30,5 +31,7 @@ public interface IUserService extends IService<UserDTO>{
     void activateUserSubscription(Long userId) throws NotFoundException, UserActiveException;
 
     List<ProductDTO> getTopFiveProducts(Long userId) throws NotFoundException;
+
+    UserDTO updateUserSubscription(UserSubscriptionDTO userSubscriptionDTO) throws NotFoundException;
 }
 

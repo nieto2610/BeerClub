@@ -7,6 +7,7 @@ import com.digitalHouse.beerClub.model.dto.ProductDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
+import com.digitalHouse.beerClub.model.dto.UserSubscriptionDTO;
 import com.digitalHouse.beerClub.repository.IAddressRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
@@ -188,5 +189,37 @@ public class UserServiceImplement implements IUserService {
     private LocalDate getSubscriptionDate() {
         LocalDate currentDate = LocalDate.now();
         return currentDate.getDayOfMonth() >= 20 ? currentDate.plusMonths(1).withDayOfMonth(1) : currentDate;
+    }
+
+    @Override
+    public UserDTO updateUserSubscription(UserSubscriptionDTO userSubscriptionDTO) throws NotFoundException {
+        User user = userRepository.findById(userSubscriptionDTO.getUserId()).orElseThrow(() -> new NotFoundException("User not found with ID: " + userSubscriptionDTO.getUserId()));
+        if (!user.isActive()) {
+            throw new NotFoundException("User not found with ID: " + userSubscriptionDTO.getUserId());
+        }
+
+        Subscription newSubscription = subscriptionRepository.findById(userSubscriptionDTO.getNewSubscriptionId()).orElseThrow(()-> new NotFoundException("Subscription not found"));
+        if (!newSubscription.getIsActive()) {
+            throw new NotFoundException("Subscription not found");
+        }
+
+        user.setNextSubscriptionId(userSubscriptionDTO.getNewSubscriptionId());
+        userRepository.save(user);
+
+        return userMapper.converter(user,UserDTO.class);
+    }
+
+    public void updateUserSubscriptionWorker() throws NotFoundException {
+        List<User> userList = userRepository.findByUserNextSubscription();
+
+        if(!userList.isEmpty()){
+
+            for(User user : userList){
+                Subscription subscription = subscriptionRepository.findById(user.getNextSubscriptionId()).orElseThrow(()-> new NotFoundException("Subscription not found"));
+                user.setSubscription(subscription);
+                user.setNextSubscriptionId(null);
+                userRepository.save(user);
+            }
+        }
     }
 }
