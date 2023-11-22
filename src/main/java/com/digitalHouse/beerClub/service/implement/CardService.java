@@ -85,7 +85,6 @@ public class CardService implements ICardService {
         }
     }
 
-    @Transactional
     @Override
     public CardResponseDTO cardDebit(Long cardId, Double amount) throws NotFoundException, InsufficientBalanceException {
         Card card = cardRepository.findById(cardId).orElseThrow(() -> new NotFoundException("Card not found"));
@@ -109,6 +108,28 @@ public class CardService implements ICardService {
         }
 
     }
+
+    @Override
+    public CardResponseDTO cardCredit(Long cardId, Double amount) throws NotFoundException {
+        Card card = cardRepository.findById(cardId).orElseThrow(() -> new NotFoundException("Card not found"));
+
+        if(card.getCardType().equals(CardType.CREDIT)){
+
+            Double balance = card.getCreditLimit() + amount;
+            card.setCreditLimit(balance);
+            cardRepository.save(card);
+
+            CardResponseDTO cardResponseDTO = new CardResponseDTO();
+            cardResponseDTO.setAmount(amount);
+            cardResponseDTO.setDescription("Successful");
+
+            return cardResponseDTO;
+        }else {
+            throw new NotFoundException("El tipo de tarjeta no es válido");
+        }
+
+    }
+
 
     @Override
     public CardDTO update(CardDTO cardDTO, Long id) throws NotFoundException {

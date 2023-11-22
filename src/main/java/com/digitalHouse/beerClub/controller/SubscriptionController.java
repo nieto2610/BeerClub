@@ -5,6 +5,7 @@ import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.model.dto.SubscriptionDTO;
 import com.digitalHouse.beerClub.service.implement.SubscriptionService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Validated
 @RestController
+@Tag(name = "Suscriptions")
 @RequestMapping("/subscriptions")
 @CrossOrigin("*")
 public class SubscriptionController {
@@ -51,5 +53,15 @@ public class SubscriptionController {
         subscriptionService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @PatchMapping("/isRecommended/{id}")
+    public ResponseEntity<SubscriptionDTO> recommendSubscription(@PathVariable @Positive(message = "Id must be greater than 0") Long id) throws NotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(subscriptionService.markAsRecommended(id));
+    }
+
+
+
+
+
 
 }

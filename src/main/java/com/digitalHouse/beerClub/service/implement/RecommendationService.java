@@ -138,9 +138,12 @@ public class RecommendationService implements IRecommendationService {
         }
         Product product= recommendation.getProduct();
         List<Review> reviewListProduct= recommendation.getProduct().getReviewList();
-        product.setProductScore(getProductAverage(reviewListProduct));
-        recommendation.setProduct(product);
-        productRepository.save(product);
+        if (reviewListProduct.size() > 0) {
+            product.setProductScore(getProductAverage(reviewListProduct));
+            recommendation.setProduct(product);
+            productRepository.save(product);
+        }
+
         RecommendationDTO recommendationDTO = mapper.converter(recommendation,RecommendationDTO.class);
         recommendationDTO.setSubscriptionId(subscriptionId);
         return recommendationDTO;
