@@ -19,4 +19,6 @@ public class UserDTO {
     private RoleType role;
     private boolean active;
     private Long subscriptionId;
+    private Subscription subscription;
+    private Long nextSubscriptionId;
 }
