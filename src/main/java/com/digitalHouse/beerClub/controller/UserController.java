@@ -8,6 +8,8 @@ import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.service.implement.PaymentServiceImplement;
+import com.digitalHouse.beerClub.service.implement.ReviewService;
+import com.digitalHouse.beerClub.service.interfaces.IReviewService;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +40,9 @@ public class UserController {
 
     @Autowired
     private IUserService IUserService;
+
+    @Autowired
+    private ReviewService IReviewService;
 
     @Autowired
     private PaymentServiceImplement paymentServiceImplement;
@@ -133,7 +138,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @GetMapping("/{userId}/top5")
     public ResponseEntity<List<ProductDTO>> getTopFiveProductsByUser(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException {
-        List<ProductDTO> productDTOS = IUserService.getTopFiveProducts(userId);
+        List<ProductDTO> productDTOS = IReviewService.getTopFiveProducts(userId);
         return new ResponseEntity<>(productDTOS, HttpStatus.OK);
     }
 

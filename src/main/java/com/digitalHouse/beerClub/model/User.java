@@ -54,8 +54,6 @@ public class User implements UserDetails {
     @JoinColumn(name = "subscription_id")
     private Subscription subscription;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Review> reviewList;
 
     public User(String firstName, String lastName, String email, LocalDate birthdate, String telephone, LocalDate subscriptionDate, String password, Address address) {
         this.firstName = firstName;

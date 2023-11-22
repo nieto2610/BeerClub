@@ -38,6 +38,5 @@ public interface IUserService extends IService<UserDTO>{
 
     void activateUser(Long userId) throws NotFoundException, UserActiveException;
 
-    List<ProductDTO> getTopFiveProducts(Long userId) throws NotFoundException;
 }
 
