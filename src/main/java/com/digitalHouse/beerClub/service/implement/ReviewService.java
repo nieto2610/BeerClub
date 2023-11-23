@@ -55,8 +55,8 @@ public class ReviewService implements IReviewService{
         if(reviewDTO.getRating()==null){
             throw new BadRequestException("The rating can't be null");
         }
-        if(reviewDTO.getRating()<1 || reviewDTO.getRating()>5){
-            throw new BadRequestException("The rating must be a number between 1 and 5");
+        if(reviewDTO.getRating()<1 || reviewDTO.getRating()>10){
+            throw new BadRequestException("The rating must be a number between 1 and 10");
         }
         review.setRating(reviewDTO.getRating());
         review.setComments(reviewDTO.getComments());
@@ -80,8 +80,8 @@ public class ReviewService implements IReviewService{
             throw new NotFoundException("The user doesn't exist");
         }
 
-        else if(reviewA.getRating()<1 || reviewA.getRating()>5){
-            throw new NotFoundException("The rating must be a number between 1 and 5");
+        else if(reviewA.getRating()<1 || reviewA.getRating()>10){
+            throw new NotFoundException("The rating must be a number between 1 and 10");
 
         } else {
             reviewRepository.save(reviewA);

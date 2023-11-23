@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/products")
-@CrossOrigin("*")
 public class ProductController {
 
     final static Logger logger = Logger.getLogger(String.valueOf(ProductController.class));
@@ -26,7 +25,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping("/top10")
+    @GetMapping("/top")
     public ResponseEntity<List<ProductDTO>> getTopTen() throws NotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(productService.getGlobalTopTen());
     }
