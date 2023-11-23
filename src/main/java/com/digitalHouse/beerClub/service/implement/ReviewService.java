@@ -61,10 +61,11 @@ public class ReviewService implements IReviewService{
         review.setRating(reviewDTO.getRating());
         review.setComments(reviewDTO.getComments());
 
-        reviewRepository.save(review);
-        return mapper.converter(review, ReviewDTO.class);
+        Review reviewCreated= reviewRepository.save(review);
+        return mapper.converter(reviewCreated, ReviewDTO.class);
 
     }
+
     @Override
     public ReviewDTO update(ReviewDTO reviewDTO, Long id) throws NotFoundException {
         Review review = reviewRepository.findById(id).orElseThrow(() -> new NotFoundException("Review not found"));
