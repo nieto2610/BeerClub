@@ -73,8 +73,9 @@ public class ProductService implements IProductService {
         List<ProductDTO> topTen = new ArrayList<>();
 
         for (int index  = 0 ; index < productList.size() && index < 10 ; index++){
-
-            topTen.add(mapper.converter(productList.get(index), ProductDTO.class));
+            if (productList.get(index).getProductScore() > 0) {
+                topTen.add(mapper.converter(productList.get(index), ProductDTO.class));
+            }
         }
         return topTen;
     }

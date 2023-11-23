@@ -141,7 +141,7 @@ public class UserController {
     @Operation(summary ="Get top 5 by user ID", description ="Get top 5 by user ID", responses = {
             @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(type = "Array", implementation = ProductDTO.class))),
             @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
-    @GetMapping("/{userId}/top5")
+    @GetMapping("/top/{userId}")
     public ResponseEntity<List<ProductDTO>> getTopFiveProductsByUser(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException {
         List<ProductDTO> productDTOS = IUserService.getTopFiveProducts(userId);
         return new ResponseEntity<>(productDTOS, HttpStatus.OK);
