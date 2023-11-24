@@ -40,10 +40,14 @@ public class SecurityConfig {
                         authRequest
                                 //Los endpoint Post que se pueden user sin autenticación
                                 .requestMatchers(HttpMethod.POST,"/auth/**", "/ageVerification/**").permitAll()
+                                //Los endpoint Post que se pueden ADMIN con autenticación
+                                .requestMatchers(HttpMethod.POST,"/users/**", "/faqs/**", "/users/create", "/subscriptions", "/accounts/**", "/cards/**").permitAll()
+                                //Los endpoint que se pueden ver sin autenticación
+                                .requestMatchers(HttpMethod.GET,"/swagger-ui/**", "/v3/api-docs/**", "/subscriptions", "/faqs", "/accounts/**").permitAll()
                                 //Los endpoint que se pueden ver sin autenticación
                                 .requestMatchers(HttpMethod.GET,"/swagger-ui/**", "/v3/api-docs/**", "/subscriptions", "/faqs", "/users/create").permitAll()
                                 //Los endpoint que se pueden ver siendo USER
-                                .requestMatchers(HttpMethod.GET,"/users/email/**", "/address/**", "/recommendations/**").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/users/email/**", "/address/**", "/recommendations/**", "/products/**", "/payments/**", "/users/top/**").hasAnyRole("USER", "ADMIN")
                                 //Los endpoint que se pueden ver siendo ADMIN
                                 .requestMatchers(HttpMethod.GET,"/users/all", "/users/active", "/users/id/**", "/subscriptions/**", "/faqs/**").hasRole("ADMIN")
                                 //Los endpoint Post que se pueden user siendo usuario Admin
@@ -57,7 +61,7 @@ public class SecurityConfig {
                                 //Los endpoint que se pueden eliminar siendo ADMIN
                                 .requestMatchers(HttpMethod.DELETE,"/users/**", "/faqs/**", "/subscriptions/**").hasRole("ADMIN")
                                 //Los endpoint que se pueden Modificar datos siendo USER
-                                .requestMatchers(HttpMethod.PATCH,"/users/update/passwword").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.PATCH,"/users/update/passwword", "/users/update/subscription").hasAnyRole("USER", "ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->
@@ -75,7 +79,7 @@ public class SecurityConfig {
 
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Accept", "Authorization"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

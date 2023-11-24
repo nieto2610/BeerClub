@@ -29,8 +29,10 @@ public class SubscriptionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SubscriptionDTO>> getAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(subscriptionService.searchAll());
+    public ResponseEntity<List<SubscriptionDTO>> getAllSubscriptions(@RequestParam(required = false, defaultValue = "true") String filterByStatus) {
+        boolean filter = Boolean.parseBoolean(filterByStatus);
+        List<SubscriptionDTO> subscriptions = filter ? subscriptionService.searchAll() : subscriptionService.searchAllStatus();
+        return ResponseEntity.ok(subscriptions);
     }
 
     @PostMapping
@@ -58,10 +60,6 @@ public class SubscriptionController {
     public ResponseEntity<SubscriptionDTO> recommendSubscription(@PathVariable @Positive(message = "Id must be greater than 0") Long id) throws NotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(subscriptionService.markAsRecommended(id));
     }
-
-
-
-
 
 
 }
