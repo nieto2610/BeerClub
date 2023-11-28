@@ -18,6 +18,4 @@ public interface IUserRepository extends JpaRepository<User, Long> {
     List<User> findByActiveTrue();
     @Query("SELECT u FROM User u WHERE u.nextSubscriptionId IS NOT NULL")
     List<User> findByUserNextSubscription();
-    @Procedure(name = "filterByGlobalDataUser")
-    List<User> filterByGlobalDataUser (Integer tipoSubscription, Integer esActivo, LocalDate fechaInicio, LocalDate fechaFin);
 }

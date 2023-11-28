@@ -8,13 +8,8 @@ import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.model.dto.*;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
-<<<<<<< HEAD
-import com.digitalHouse.beerClub.service.interfaces.IPaymentService;
-=======
 import com.digitalHouse.beerClub.service.implement.PaymentServiceImplement;
 import com.digitalHouse.beerClub.service.implement.ReviewService;
-import com.digitalHouse.beerClub.service.interfaces.IReviewService;
->>>>>>> feature/BCA-112
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;

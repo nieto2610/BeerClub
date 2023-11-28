@@ -5,6 +5,7 @@ import com.digitalHouse.beerClub.exceptions.NoDataFoundException;
 import com.digitalHouse.beerClub.model.dto.PaymentFilterDTO;
 import com.digitalHouse.beerClub.model.dto.SubscriptionDTO;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
+import com.digitalHouse.beerClub.model.dto.UserXPaymentAndSubcriptionFilterDTO;
 import com.digitalHouse.beerClub.service.implement.FilterService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -30,7 +31,8 @@ public class FilterController {
 
     @GetMapping(value = "/users/filterGlobalData")
     public ResponseEntity<?> getUserFilterGlobalData(
-            @RequestParam(required = false) Integer typeSubscription,
+            @RequestParam(required = false) String typeSubscription,
+            @RequestParam(required = false) String paymentStatus,
             @RequestParam(required = false) Integer isActive,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
@@ -38,7 +40,7 @@ public class FilterController {
         if ((startDate == null && endDate != null) || (startDate != null && endDate == null)) {
             throw new NoDataFoundException("Ambas fechas (inicio y fin) deben estar presentes o ninguna.");
         }
-        List<UserDTO> users = service.UserGlobalData(typeSubscription, isActive, startDate, endDate);
+        List<UserXPaymentAndSubcriptionFilterDTO> users = service.getUserGlobalData(typeSubscription, paymentStatus,isActive, startDate, endDate);
         if (users.isEmpty()) {
             throw new NoDataFoundException("Se realizo la búsqueda, pero no se encontraron datos que coincidan con el criterio del filtro");
         } else if ((startDate != null && endDate != null)) {

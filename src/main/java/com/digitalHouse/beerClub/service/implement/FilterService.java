@@ -2,9 +2,11 @@ package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.mapper.PaymentFilterDTORowMapper;
+import com.digitalHouse.beerClub.mapper.UserXPaymentAndSubcriptionFilterDTORowMapper;
 import com.digitalHouse.beerClub.model.dto.PaymentFilterDTO;
 import com.digitalHouse.beerClub.model.dto.SubscriptionDTO;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
+import com.digitalHouse.beerClub.model.dto.UserXPaymentAndSubcriptionFilterDTO;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,8 +32,14 @@ public class FilterService {
     }
 
     @Transactional
-    public List<UserDTO> UserGlobalData(Integer typeSubscription, Integer isActive, LocalDate dateOne, LocalDate dateTwo) {
-        return userRepository.filterByGlobalDataUser(typeSubscription, isActive, dateOne, dateTwo).stream().map(user -> mapper.converter(user, UserDTO.class)).collect(Collectors.toList());
+    public List<UserXPaymentAndSubcriptionFilterDTO> getUserGlobalData(String typeSubscription, String paymentStatus,Integer isActive, LocalDate startDate, LocalDate endDate) {
+        String sql = "{call filterByGlobalDataPayments(?,?,?,?,?)}"; // La llamada al procedimiento almacenado
+
+        return jdbcTemplate.query(
+                sql,
+                new Object[]{typeSubscription, paymentStatus, isActive, startDate, endDate}, // Parámetros
+                new UserXPaymentAndSubcriptionFilterDTORowMapper() // El RowMapper para mapear los resultados
+        );
     }
 
     @Transactional
