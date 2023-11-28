@@ -26,9 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class AuthController {
 
-    private  final AuthService authService;
-
-    //TODO: REALIZAR MODIFICACIONES A LAS EXCEPCIONES
+    private final AuthService authService;
     @Operation(summary = "User login", description = "Login a user and return an authentication token.")
     @ApiResponse(responseCode = "200", description = "Authenticated successfully and token returned.")
     @ApiResponse(responseCode = "401", description = "Invalid credentials.")
