@@ -8,7 +8,8 @@ import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import com.digitalHouse.beerClub.model.dto.*;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
-import com.digitalHouse.beerClub.service.interfaces.IPaymentService;
+import com.digitalHouse.beerClub.service.implement.PaymentServiceImplement;
+import com.digitalHouse.beerClub.service.implement.ReviewService;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,7 +43,10 @@ public class UserController {
     private IUserService IUserService;
 
     @Autowired
-    private IPaymentService paymentService;
+    private ReviewService IReviewService;
+
+    @Autowired
+    private PaymentServiceImplement paymentServiceImplement;
 
 
     @Operation(summary="List all users", description="List all users", responses = {
@@ -74,7 +78,7 @@ public class UserController {
         @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @PostMapping("/create")
     public ResponseEntity<Payment> saveUser(@Valid @RequestBody UserApplicationDTO user) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException, CustomUserAlreadyExistsException {
-        paymentService.paymentValidation(user.getSubscriptionId(), user.getCardHolder(), user.getCardNumber(), user.getCvv(), user.getExpDate() );
+        paymentServiceImplement.paymentValidation(user.getSubscriptionId(), user.getCardHolder(), user.getCardNumber(), user.getCvv(), user.getExpDate() );
         Payment payment = IUserService.saveUser(user);
         return new ResponseEntity<>(payment, HttpStatus.CREATED);
     }
@@ -143,7 +147,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @GetMapping("/top/{userId}")
     public ResponseEntity<List<ProductDTO>> getTopFiveProductsByUser(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException {
-        List<ProductDTO> productDTOS = IUserService.getTopFiveProducts(userId);
+        List<ProductDTO> productDTOS = IReviewService.getTopFiveProducts(userId);
         return new ResponseEntity<>(productDTOS, HttpStatus.OK);
     }
 

@@ -27,7 +27,7 @@ public class Subscription {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "subscription_id")
-    private List<Benefit> benefits = new ArrayList<>();
+    private Set<Benefit> benefits = new HashSet<>();
 
     private Boolean isRecommended;
     private Boolean isActive;
@@ -39,7 +39,7 @@ public class Subscription {
     @OneToMany(mappedBy = "subscription", fetch = FetchType.EAGER)
     private Set<Payment> payments = new HashSet<>();
 
-    public Subscription(Long id, String name, String description, Double price, List<Benefit> benefits, Boolean isRecommended, Boolean isActive) {
+    public Subscription(Long id, String name, String description, Double price, Set<Benefit> benefits, Boolean isRecommended, Boolean isActive) {
         this.id = id;
         this.name = name;
         this.description = description;
