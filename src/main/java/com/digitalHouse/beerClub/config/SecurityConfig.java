@@ -53,7 +53,7 @@ public class SecurityConfig {
                                 //Los endpoint Post que se pueden usar con autenticación
                                 .requestMatchers(HttpMethod.POST,"/reviews/**").hasAnyRole("ADMIN", "USER")
                                 //Los endpoint Put que se pueden user con autenticación
-                                .requestMatchers(HttpMethod.PUT,"/address/update/**", "/users/update/**").hasRole("USER")
+                                .requestMatchers(HttpMethod.PUT,"/address/update/**", "/users/update/**").hasAnyRole("USER", "ADMIN")
                                 //Los endpoint Put que se pueden admin con autenticación
                                 .requestMatchers(HttpMethod.PUT,"/faqs/**", "/users/activate/**", "/subscriptions/**").hasAnyRole("ADMIN")
                                 //Los endpoint que se pueden eliminar siendo ADMIN
