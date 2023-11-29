@@ -5,6 +5,7 @@ import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.*;
+import com.digitalHouse.beerClub.model.dto.ProductDTO;
 import com.digitalHouse.beerClub.model.dto.ReviewDTO;
 import com.digitalHouse.beerClub.repository.IProductRepository;
 import com.digitalHouse.beerClub.repository.IReviewRepository;
@@ -12,6 +13,8 @@ import com.digitalHouse.beerClub.repository.IUserRepository;
 import com.digitalHouse.beerClub.service.interfaces.IReviewService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -92,5 +95,29 @@ public class ReviewService implements IReviewService{
     public void delete(Long id) throws ServiceException, NotFoundException {
         Review review= reviewRepository.findById(id).orElseThrow(() -> new NotFoundException("Review not found"));
         reviewRepository.delete(review);
+    }
+
+    @Override
+    public List<ProductDTO> getTopFiveProducts(Long userId) throws NotFoundException {
+        User searchedUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        if (searchedUser.isActive()) {
+            throw new NotFoundException("The user is not active.");
+        }
+
+        List<Review> reviewList = reviewRepository.findByUserId(userId);
+        if (reviewList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        int limit = Math.min(reviewList.size(), 5);
+
+        List<ProductDTO> productDTOS = reviewList.stream()
+                .sorted(Comparator.comparing(Review::getRating).reversed())
+                .limit(limit)
+                .map(review -> mapper.converter(review.getProduct(), ProductDTO.class))
+                .collect(Collectors.toList());
+
+        return productDTOS;
+
     }
 }
