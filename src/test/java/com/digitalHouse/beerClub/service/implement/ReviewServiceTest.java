@@ -150,6 +150,7 @@ public class ReviewServiceTest {
         expected.setRating(5);
         expected.setProductId(id);
         expected.setUserId(id);
+        expected.setExistReview(false);
 
         Review review = new Review();
         review.setId(1L);
@@ -157,6 +158,7 @@ public class ReviewServiceTest {
         review.setRating(5);
         review.setUser(user);
         review.setProduct(product);
+        review.setExistReview(false);
         when(reviewRepository.save(any())).thenReturn(review);
 
         //ACT
@@ -168,6 +170,7 @@ public class ReviewServiceTest {
         assertEquals(expected.getComments(), result.getComments());
         assertEquals(expected.getUserId(), result.getUserId());
         assertEquals(expected.getRating(), result.getRating());
+        assertEquals(expected.getExistReview(), result.getExistReview());
 
     }
 

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 @Service
-public class ReviewService implements IReviewService{
+ public class ReviewService implements IReviewService{
     private final IReviewRepository reviewRepository;
     private final IProductRepository productRepository;
     private final IUserRepository userRepository;
@@ -48,7 +48,9 @@ public class ReviewService implements IReviewService{
 
     @Override
     public ReviewDTO create(ReviewDTO reviewDTO) throws BadRequestException {
-
+        if(reviewDTO.getExistReview()){
+            throw new BadRequestException("The review has already been created.");
+        }
         Review review = new Review();
         User user= userRepository.findById(reviewDTO.getUserId()).orElseThrow(()->new BadRequestException("The user doesn't exist"));
         review.setUser(user);
@@ -63,8 +65,9 @@ public class ReviewService implements IReviewService{
         }
         review.setRating(reviewDTO.getRating());
         review.setComments(reviewDTO.getComments());
-
+        review.setExistReview(true);
         Review reviewCreated= reviewRepository.save(review);
+
         return mapper.converter(reviewCreated, ReviewDTO.class);
 
     }
