@@ -103,11 +103,12 @@ import java.util.stream.Collectors;
     @Override
     public List<ProductDTO> getTopFiveProducts(Long userId) throws NotFoundException {
         User searchedUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
-        if (searchedUser.isActive()) {
+        System.out.println(searchedUser.isActive());
+        if (!searchedUser.isActive()) {
             throw new NotFoundException("The user is not active.");
         }
 
-        List<Review> reviewList = reviewRepository.findByUserId(userId);
+        List<Review> reviewList = reviewRepository.findByUser(userId);
         if (reviewList.isEmpty()) {
             return new ArrayList<>();
         }
@@ -119,7 +120,6 @@ import java.util.stream.Collectors;
                 .limit(limit)
                 .map(review -> mapper.converter(review.getProduct(), ProductDTO.class))
                 .collect(Collectors.toList());
-
         return productDTOS;
 
     }
