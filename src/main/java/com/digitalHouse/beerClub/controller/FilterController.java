@@ -39,7 +39,7 @@ public class FilterController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
         if ((startDate == null && endDate != null) || (startDate != null && endDate == null)) {
-            throw new NoDataFoundException("Ambas fechas (inicio y fin) deben estar presentes o ninguna.");
+            throw new NoDataFoundException("Ambas fechas (inicio y fin) deben estar presentes o ninguna. ");
         }
         List<UserXPaymentAndSubcriptionFilterDTO> users = service.getUserGlobalData(typeSubscription, paymentStatus, country,isActive, startDate, endDate);
         if (users.isEmpty()) {
