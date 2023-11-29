@@ -33,6 +33,7 @@ public class FilterController {
     public ResponseEntity<?> getUserFilterGlobalData(
             @RequestParam(required = false) String typeSubscription,
             @RequestParam(required = false) String paymentStatus,
+            @RequestParam(required = false) String country,
             @RequestParam(required = false) Integer isActive,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
@@ -40,7 +41,7 @@ public class FilterController {
         if ((startDate == null && endDate != null) || (startDate != null && endDate == null)) {
             throw new NoDataFoundException("Ambas fechas (inicio y fin) deben estar presentes o ninguna.");
         }
-        List<UserXPaymentAndSubcriptionFilterDTO> users = service.getUserGlobalData(typeSubscription, paymentStatus,isActive, startDate, endDate);
+        List<UserXPaymentAndSubcriptionFilterDTO> users = service.getUserGlobalData(typeSubscription, paymentStatus, country,isActive, startDate, endDate);
         if (users.isEmpty()) {
             throw new NoDataFoundException("Se realizo la búsqueda, pero no se encontraron datos que coincidan con el criterio del filtro");
         } else if ((startDate != null && endDate != null)) {
