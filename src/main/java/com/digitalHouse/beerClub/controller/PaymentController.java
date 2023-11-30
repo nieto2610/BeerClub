@@ -67,11 +67,11 @@ public class PaymentController {
         return new ResponseEntity<>(paymentDTO, HttpStatus.OK);
     }
 
-    @Operation(summary="Add payment", description="Add a new payment", responses = {
-        @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = PaymentDTO.class)))})
-    @PostMapping("/create/{userId}")
-    public ResponseEntity<PaymentDTO> savePaymentInvoice(@PathVariable  @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException, CustomUserAlreadyExistsException {
-        PaymentDTO paymentDTO = paymentService.createPaymentInvoice(userId);
+    @Operation(summary="Add payments", description="Add new payments", responses = {
+        @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",array = @ArraySchema(schema = @Schema(implementation = PaymentDTO.class))))})
+    @PostMapping("/create")
+    public ResponseEntity<List<PaymentDTO>> savePaymentsInvoices() throws CustomUserAlreadyExistsException {
+        List<PaymentDTO> paymentDTO = paymentService.createPaymentsAndSendInvoices();
         return new ResponseEntity<>(paymentDTO, HttpStatus.CREATED);
     }
 

@@ -13,14 +13,18 @@ import com.digitalHouse.beerClub.service.interfaces.IPaymentService;
 import com.digitalHouse.beerClub.utils.AccountUtils;
 import com.digitalHouse.beerClub.utils.CardUtils;
 import com.digitalHouse.beerClub.utils.TransformationUtils;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PaymentServiceImplement implements IPaymentService {
@@ -32,6 +36,9 @@ public class PaymentServiceImplement implements IPaymentService {
     private final Mapper paymentMapper;
     private final MyAppConfig myAppConfig;
     private final IUserRepository userRepository;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     @Autowired
     public PaymentServiceImplement(IPaymentRepository paymentRepository, ISubscriptionRepository subscriptionRepository, CardService cardService, AccountService accountService, Mapper mapper, MyAppConfig myAppConfig, IUserRepository userRepository) {
@@ -159,17 +166,38 @@ public class PaymentServiceImplement implements IPaymentService {
 
     }
 
-    // Método para crear una factura de pago para usuarios ya registrados.
     @Override
-    public PaymentDTO createPaymentInvoice(Long userId) throws NotFoundException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("No se encontró el usuario con ID: " + userId));
+    public List<PaymentDTO> createPaymentsAndSendInvoices() {
+        List<User> activeUsers = userRepository.findByActiveTrue();
+        System.out.println("Usuarios Activos: "+activeUsers);
+        System.out.println("Cantidad de Usuarios Activos: " + activeUsers.size());
 
-        if (!user.isActive()) {
-            throw new NotFoundException("El usuario con ID " + userId + " no está activo");
-        }
+        List<User> activeUsersWithUserRole = activeUsers.stream()
+                .filter(user -> user.getRole() == RoleType.USER)
+                .toList();
+        System.out.println("Usuarios Activos con Rol USER: " + activeUsersWithUserRole);
+        System.out.println("Cantidad de Usuarios Activos con Rol USER: " + activeUsersWithUserRole.size());
 
-        Subscription subscription = subscriptionRepository.findById(user.getSubscription().getId()).orElseThrow(() -> new NotFoundException("No se encontró la suscripción"));
+        return activeUsersWithUserRole.stream()
+                .map(user -> {
+                    System.out.println("User: "+user.getId()+" "+user.getFirstName());
+                    try {
+                        PaymentDTO paymentDTO = createPaymentInvoice(user);
+                        sendInvoiceToUser(user, paymentDTO);
+                        return paymentDTO;
+                    } catch (NotFoundException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull) // Filtra los resultados nulos (caso de excepción)
+                .toList();
+    }
 
+    // Método para crear una factura de pago para usuarios ya registrados.
+    private PaymentDTO createPaymentInvoice(User user) throws NotFoundException {
+        Subscription subscription = user.getSubscription();
+        System.out.println("Suscripción: "+subscription.getId());
         Double amount = subscription.getPrice();
         String description = subscription.getName();
         String invoiceNumber = AccountUtils.getInvoiceNumber();
@@ -177,12 +205,51 @@ public class PaymentServiceImplement implements IPaymentService {
         Payment payment = new Payment();
         payment.setAmount(amount);
         payment.setDescription(description);
-        payment.setUserId(userId);
+        payment.setUserId(user.getId());
         payment.setInvoiceNumber(invoiceNumber);
         payment.setSubscription(subscription);
 
         paymentRepository.save(payment);
         return paymentMapper.converter(payment, PaymentDTO.class);
+    }
+
+    private void sendInvoiceToUser(User user, PaymentDTO paymentDTO) {
+        String to = user.getEmail();
+        String fullName = user.getFirstName()+" "+user.getLastName();
+        String subject = "Factura de Pago";
+        String loginUrl = "http://ec2-54-82-22-67.compute-1.amazonaws.com/login";
+
+        String body = "<style>" +
+                "   body { color: #CAB0A1; font-family: 'Arial', sans-serif; }" +
+                "</style>" +
+                "Estimado/a " + fullName + ",<br><br>" +
+                "Adjuntamos la factura correspondiente a su suscripción:<br><br>" +
+                "Número de factura: " + paymentDTO.getInvoiceNumber() + "<br>" +
+                "Monto: " + paymentDTO.getAmount() + "<br>" +
+                "Descripción: " + paymentDTO.getDescription() + "<br>" +
+                "Estado: " + paymentDTO.getPaymentStatus() + "<br><br>" +
+                "<button style=\"padding: 10px; background-color: #CEB5A7; color: white; border: none; border-radius: 5px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; cursor: pointer;\">" +
+                "<a href=\"" + loginUrl + "\" style=\"color: white; text-decoration: none;\">Iniciar sesión en Beer Club</a>" +
+                "</button><br><br>";
+
+        sendEmail(to, subject, body);
+    }
+
+    private void sendEmail(String to, String subject, String body) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        try {
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(body, true);
+
+            javaMailSender.send(message);
+            System.out.println("Correo electrónico enviado exitosamente");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error al enviar el correo electrónico");
+        }
     }
 
     // Método para terminar de procesar el pago luego de que el usuario recibiera el link de la factura.

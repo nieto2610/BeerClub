@@ -4,9 +4,7 @@ import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +13,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
-
+@Data
 @Getter
 @Setter
 @NoArgsConstructor
