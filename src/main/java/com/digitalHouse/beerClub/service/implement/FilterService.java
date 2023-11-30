@@ -32,12 +32,12 @@ public class FilterService {
     }
 
     @Transactional
-    public List<UserXPaymentAndSubcriptionFilterDTO> getUserGlobalData(String typeSubscription, String paymentStatus,Integer isActive, LocalDate startDate, LocalDate endDate) {
-        String sql = "{call filterByGlobalDataPayments(?,?,?,?,?)}"; // La llamada al procedimiento almacenado
+    public List<UserXPaymentAndSubcriptionFilterDTO> getUserGlobalData(String typeSubscription, String paymentStatus,String country ,Integer isActive, LocalDate startDate, LocalDate endDate) {
+        String sql = "{call filterByGlobalDataPayments(?,?,?,?,?,?)}"; // La llamada al procedimiento almacenado
 
         return jdbcTemplate.query(
                 sql,
-                new Object[]{typeSubscription, paymentStatus, isActive, startDate, endDate}, // Parámetros
+                new Object[]{typeSubscription, paymentStatus, country,isActive, startDate, endDate}, // Parámetros
                 new UserXPaymentAndSubcriptionFilterDTORowMapper() // El RowMapper para mapear los resultados
         );
     }

@@ -41,9 +41,7 @@ public class SecurityConfig {
                                 //Los endpoint Post que se pueden ADMIN con autenticación
                                 .requestMatchers(HttpMethod.POST,"/users/**", "/faqs/**", "/users/create", "/subscriptions", "/accounts/**", "/cards/**").permitAll()
                                 //Los endpoint que se pueden ver sin autenticación
-                                .requestMatchers(HttpMethod.GET,"/swagger-ui/**", "/v3/api-docs/**", "/subscriptions", "/faqs", "/accounts/**").permitAll()
-                                //Los endpoint que se pueden ver sin autenticación
-                                .requestMatchers(HttpMethod.GET,"/swagger-ui/**", "/v3/api-docs/**", "/subscriptions", "/faqs", "/users/create").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/swagger-ui/**", "/v3/api-docs/**", "/subscriptions", "/faqs", "/accounts/**", "/users/create").permitAll()
                                 //Los endpoint que se pueden ver siendo USER
                                 .requestMatchers(HttpMethod.GET,"/users/email/**", "/address/**", "/recommendations/**", "/products/**", "/payments/**", "/users/top/**").hasAnyRole("USER", "ADMIN")
                                 //Los endpoint que se pueden ver siendo ADMIN
