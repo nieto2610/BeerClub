@@ -1,4 +1,5 @@
 package com.digitalHouse.beerClub.service.implement;
+
 import com.digitalHouse.beerClub.exceptions.BadRequestException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.exceptions.ServiceException;
@@ -8,11 +9,9 @@ import com.digitalHouse.beerClub.model.Review;
 import com.digitalHouse.beerClub.model.Subscription;
 import com.digitalHouse.beerClub.model.User;
 import com.digitalHouse.beerClub.model.dto.ReviewDTO;
-import com.digitalHouse.beerClub.model.dto.SubscriptionDTO;
 import com.digitalHouse.beerClub.repository.IProductRepository;
 import com.digitalHouse.beerClub.repository.IReviewRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
-import com.digitalHouse.beerClub.service.implement.ReviewService;
 import com.digitalHouse.beerClub.service.implement.utils.DataGenerator;
 import com.digitalHouse.beerClub.service.interfaces.IReviewService;
 import org.junit.jupiter.api.Assertions;
@@ -20,21 +19,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.Optional.of;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class ReviewServiceTest {
     DataGenerator dataGenerator;
@@ -150,7 +146,7 @@ public class ReviewServiceTest {
         expected.setRating(5);
         expected.setProductId(id);
         expected.setUserId(id);
-        expected.setExistReview(false);
+        expected.setExistReview(true);
 
         Review review = new Review();
         review.setId(1L);
@@ -158,7 +154,7 @@ public class ReviewServiceTest {
         review.setRating(5);
         review.setUser(user);
         review.setProduct(product);
-        review.setExistReview(false);
+        review.setExistReview(true);
         when(reviewRepository.save(any())).thenReturn(review);
 
         //ACT

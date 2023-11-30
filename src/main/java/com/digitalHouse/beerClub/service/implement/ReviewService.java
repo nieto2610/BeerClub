@@ -48,15 +48,19 @@ import java.util.stream.Collectors;
 
     @Override
     public ReviewDTO create(ReviewDTO reviewDTO) throws BadRequestException {
-        if(reviewDTO.getExistReview()){
+
+        List<Review> previousReviews= reviewRepository.findByUserProduct(reviewDTO.getUserId(),reviewDTO.getProductId());
+        if(!previousReviews.isEmpty()) {
             throw new BadRequestException("The review has already been created.");
         }
+
         Review review = new Review();
         User user= userRepository.findById(reviewDTO.getUserId()).orElseThrow(()->new BadRequestException("The user doesn't exist"));
         review.setUser(user);
 
         Product product= productRepository.findById(reviewDTO.getProductId()).orElseThrow(()-> new BadRequestException("Product information is missing"));
         review.setProduct(product);
+
         if(reviewDTO.getRating()==null){
             throw new BadRequestException("The rating can't be null");
         }
