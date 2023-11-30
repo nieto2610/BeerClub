@@ -209,30 +209,6 @@ public class UserServiceImplement implements IUserService {
         userRepository.save(user);
     }
 
-    @Override
-    public List<ProductDTO> getTopFiveProducts(Long userId) throws NotFoundException {
-        User searchedUser = this.findById(userId);
-        if (!searchedUser.isActive()) {
-            throw new NotFoundException("The user is not active.");
-        }
-
-        List<Review> reviewList = searchedUser.getReviewList();
-        if (reviewList.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        int limit = Math.min(reviewList.size(), 5);
-
-        List<ProductDTO> productDTOS = reviewList.stream()
-                .sorted(Comparator.comparing(Review::getRating).reversed())
-                .limit(limit)
-                .map(review -> userMapper.converter(review.getProduct(), ProductDTO.class))
-                .collect(Collectors.toList());
-
-        return productDTOS;
-
-    }
-
     private LocalDate getSubscriptionDate() {
         LocalDate currentDate = LocalDate.now();
         return currentDate.getDayOfMonth() >= 20 ? currentDate.plusMonths(1).withDayOfMonth(1) : currentDate;

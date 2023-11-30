@@ -26,5 +26,6 @@ public class Review {
 
     private Integer rating;
     private String comments;
+    private Boolean existReview;
 
 }

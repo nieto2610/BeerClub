@@ -40,19 +40,20 @@ public class DataGenerator {
 
         List<Review> reviewList = new ArrayList<>();
         for (int i = 1; i <= 5; i++){
-            reviewList.add(generateReview(index));
+            reviewList.add(generateReview(index, generateUser(index)));
         }
         product.setReviewList(reviewList);
 
         return product;
     }
 
-    public Review generateReview(Long index){
+    public Review generateReview(Long index, User user){
         Review review = new Review();
         review.setId(index);
         review.setComments("Comentarios sobre la cerveza " + index);
         review.setRating(rating[Math.toIntExact(index)]);
         review.setProduct(new Product());
+        review.setUser(user);
         return  review;
     }
 
@@ -64,9 +65,8 @@ public class DataGenerator {
 
         List<Review> reviewList = new ArrayList<>();
         for (int i = 1; i <= 5; i++){
-            reviewList.add(generateReview(index));
+            reviewList.add(generateReview(index, user));
         }
-        user.setReviewList(reviewList);
 
         return user;
     }
@@ -76,9 +76,6 @@ public class DataGenerator {
         user.setId(index);
         user.setActive(true);
         user.setFirstName("usuario " + index);
-
-        List<Review> reviewList = new ArrayList<>();
-        user.setReviewList(reviewList);
 
         return user;
     }
