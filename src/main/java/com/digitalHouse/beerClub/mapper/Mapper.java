@@ -13,6 +13,9 @@ public class Mapper {
     }
 
     public <E> E converter(Object obj, Class<E> resultClass) {
+        if (obj == null) {
+            return null;
+        }
         return modelMapper.map(obj, resultClass);
     }
 }

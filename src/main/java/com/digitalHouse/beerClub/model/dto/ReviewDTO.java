@@ -17,5 +17,5 @@ public class ReviewDTO {
     private @Valid Long userId;
     private Integer rating;
     private String comments;
-
+    private Boolean existReview;
 }
