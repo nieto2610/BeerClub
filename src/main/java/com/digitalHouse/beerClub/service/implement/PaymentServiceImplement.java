@@ -166,6 +166,7 @@ public class PaymentServiceImplement implements IPaymentService {
 
     }
 
+    // Método para el administrador pueda enviar a todos los usuarios activos  y con rol USER la factura de pago del mes correspondiente.
     @Override
     public List<PaymentDTO> createPaymentsAndSendInvoices() {
         List<User> activeUsers = userRepository.findByActiveTrue();
