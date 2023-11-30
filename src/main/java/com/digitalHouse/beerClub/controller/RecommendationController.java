@@ -1,6 +1,7 @@
 package com.digitalHouse.beerClub.controller;
 
 import com.digitalHouse.beerClub.exceptions.BadRequestException;
+import com.digitalHouse.beerClub.exceptions.ForbiddenException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.model.dto.RecommendationDTO;
@@ -17,6 +18,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -78,7 +80,7 @@ public class RecommendationController {
             @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = RecommendationDTO.class))),
             @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "Recommendation not found")))})
     @GetMapping("/{subscriptionId}/{date}")
-    public ResponseEntity<RecommendationDTO> getBySubscriptionAndDate (@PathVariable @Positive(message = "Id must be greater than 0") Long subscriptionId, @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) throws NotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(recommendationService.searchBySubscriptionAndDate(subscriptionId,date));
+    public ResponseEntity<RecommendationDTO> getBySubscriptionAndDate (@PathVariable @Positive(message = "Id must be greater than 0") Long subscriptionId, @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date, Authentication authentication) throws NotFoundException, ForbiddenException {
+        return ResponseEntity.status(HttpStatus.OK).body(recommendationService.searchBySubscriptionAndDate(subscriptionId,date, authentication));
     }
 }
