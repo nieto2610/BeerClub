@@ -111,11 +111,10 @@ public class UserServiceImplement implements IUserService {
         CardPayment cardPayment = new CardPayment(user.getCardHolder(),user.getCardNumber(), TransformationUtils.getNumber(user.getCvv()),user.getExpDate());
 
         User newUser = new User(user);
-        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         newUser.setSubscriptionDate(getSubscriptionDate());
+        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         newUser.setAddress(address);
         newUser.setSubscription(subscription);
-        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         User createdUser = userRepository.save(newUser);
 
         return  paymentServiceImplement.savePayment(cardPayment, createdUser);
