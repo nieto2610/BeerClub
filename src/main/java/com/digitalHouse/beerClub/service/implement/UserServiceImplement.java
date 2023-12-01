@@ -36,7 +36,8 @@ public class UserServiceImplement implements IUserService {
     private final ISubscriptionRepository subscriptionRepository;
 
     private final PaymentServiceImplement paymentServiceImplement;
-
+    @Autowired
+    private EmailService emailService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -62,6 +63,7 @@ public class UserServiceImplement implements IUserService {
         List<UserDTO> users = userRepository.findByActiveTrue().stream().map(user -> userMapper.converter(user, UserDTO.class)).toList();
         return users;
     }
+
 
     @Override
     public User findById(Long id) throws NotFoundException {
@@ -118,7 +120,20 @@ public class UserServiceImplement implements IUserService {
         newUser.setSubscription(subscription);
         User createdUser = userRepository.save(newUser);
 
-        return  paymentServiceImplement.savePayment(cardPayment, createdUser);
+        Payment payment = paymentServiceImplement.savePayment(cardPayment, createdUser);
+
+        //Envio Email
+        String to = user.getEmail();
+        String subject = "¡Bienvenido a Beer Club";
+        String username = user.getName() + " " + user.getLastName();
+        String invoice = payment.getInvoiceNumber();
+        String amount = payment.getAmount().toString();
+        String description = payment.getDescription();
+        String state = String.valueOf(PaymentStatus.APROBADO);
+
+        String content = emailService.buildContentWellcomeEmail(username, invoice, amount, description, state);
+        emailService.sendHtmlMessage(to, subject, content);
+        return payment;
     }
 
     @Override
