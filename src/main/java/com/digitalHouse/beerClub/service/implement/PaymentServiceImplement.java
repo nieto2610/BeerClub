@@ -1,4 +1,3 @@
-
 package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.config.MyAppConfig;
@@ -13,11 +12,9 @@ import com.digitalHouse.beerClub.service.interfaces.IPaymentService;
 import com.digitalHouse.beerClub.utils.AccountUtils;
 import com.digitalHouse.beerClub.utils.CardUtils;
 import com.digitalHouse.beerClub.utils.TransformationUtils;
-import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +33,9 @@ public class PaymentServiceImplement implements IPaymentService {
     private final Mapper paymentMapper;
     private final MyAppConfig myAppConfig;
     private final IUserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private JavaMailSender javaMailSender;
@@ -72,7 +72,7 @@ public class PaymentServiceImplement implements IPaymentService {
             throw new ForbiddenException("El usuario no está activo");
         }
         Payment payment = paymentRepository.findById(id).orElseThrow(() -> new NotFoundException("No se encontró el pago con ID: " + id));
-        //return paymentMapper.converter(payment, PaymentDTO.class);
+
         if (payment.getUserId().equals(user.getId())) {
             return paymentMapper.converter(payment, PaymentDTO.class);
         } else {
@@ -104,7 +104,6 @@ public class PaymentServiceImplement implements IPaymentService {
     @Transactional
     @Override
     public Payment savePayment(CardPayment card, User user) throws NotFoundException, InsufficientBalanceException {
-        //Long accountBeerClubId = 1L;
         String accountBeerClubNumber = myAppConfig.getAccountNumber();
         Subscription subscription = subscriptionRepository.findById(user.getSubscription().getId()).orElseThrow(() -> new NotFoundException("No se encontró la suscripción"));
 
@@ -170,18 +169,13 @@ public class PaymentServiceImplement implements IPaymentService {
     @Override
     public List<PaymentDTO> createPaymentsAndSendInvoices() {
         List<User> activeUsers = userRepository.findByActiveTrue();
-        System.out.println("Usuarios Activos: "+activeUsers);
-        System.out.println("Cantidad de Usuarios Activos: " + activeUsers.size());
 
         List<User> activeUsersWithUserRole = activeUsers.stream()
                 .filter(user -> user.getRole() == RoleType.USER)
                 .toList();
-        System.out.println("Usuarios Activos con Rol USER: " + activeUsersWithUserRole);
-        System.out.println("Cantidad de Usuarios Activos con Rol USER: " + activeUsersWithUserRole.size());
 
         return activeUsersWithUserRole.stream()
                 .map(user -> {
-                    System.out.println("User: "+user.getId()+" "+user.getFirstName());
                     try {
                         PaymentDTO paymentDTO = createPaymentInvoice(user);
                         sendInvoiceToUser(user, paymentDTO);
@@ -215,42 +209,17 @@ public class PaymentServiceImplement implements IPaymentService {
     }
 
     private void sendInvoiceToUser(User user, PaymentDTO paymentDTO) {
+        //Envio Email
         String to = user.getEmail();
-        String fullName = user.getFirstName()+" "+user.getLastName();
         String subject = "Factura de Pago";
-        String loginUrl = "http://ec2-54-82-22-67.compute-1.amazonaws.com/login";
+        String username = user.getFirstName() + " " + user.getLastName();
+        String invoice = paymentDTO.getInvoiceNumber();
+        String amount = paymentDTO.getAmount().toString();
+        String description = paymentDTO.getDescription();
+        String state = paymentDTO.getPaymentStatus().toString();
 
-        String body = "<style>" +
-                "   body { color: #CAB0A1; font-family: 'Arial', sans-serif; }" +
-                "</style>" +
-                "Estimado/a " + fullName + ",<br><br>" +
-                "Adjuntamos la factura correspondiente a su suscripción:<br><br>" +
-                "Número de factura: " + paymentDTO.getInvoiceNumber() + "<br>" +
-                "Monto: " + paymentDTO.getAmount() + "<br>" +
-                "Descripción: " + paymentDTO.getDescription() + "<br>" +
-                "Estado: " + paymentDTO.getPaymentStatus() + "<br><br>" +
-                "<button style=\"padding: 10px; background-color: #CEB5A7; color: white; border: none; border-radius: 5px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; cursor: pointer;\">" +
-                "<a href=\"" + loginUrl + "\" style=\"color: white; text-decoration: none;\">Iniciar sesión en Beer Club</a>" +
-                "</button><br><br>";
-
-        sendEmail(to, subject, body);
-    }
-
-    private void sendEmail(String to, String subject, String body) {
-        MimeMessage message = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message);
-
-        try {
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(body, true);
-
-            javaMailSender.send(message);
-            System.out.println("Correo electrónico enviado exitosamente");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error al enviar el correo electrónico");
-        }
+        String content = emailService.buildContentPaymentEmail(username, invoice, amount, description, state);
+        emailService.sendHtmlMessage(to, subject, content);
     }
 
     // Método para terminar de procesar el pago luego de que el usuario recibiera el link de la factura.
