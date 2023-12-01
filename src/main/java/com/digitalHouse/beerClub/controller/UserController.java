@@ -5,9 +5,11 @@ import com.digitalHouse.beerClub.model.Payment;
 import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
 import com.digitalHouse.beerClub.model.dto.ProductDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
+import com.digitalHouse.beerClub.model.dto.*;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
 import com.digitalHouse.beerClub.model.dto.UserDTO;
-import com.digitalHouse.beerClub.service.interfaces.IPaymentService;
+import com.digitalHouse.beerClub.service.implement.PaymentServiceImplement;
+import com.digitalHouse.beerClub.service.implement.ReviewService;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,7 +43,10 @@ public class UserController {
     private IUserService IUserService;
 
     @Autowired
-    private IPaymentService paymentService;
+    private ReviewService IReviewService;
+
+    @Autowired
+    private PaymentServiceImplement paymentServiceImplement;
 
 
     @Operation(summary="List all users", description="List all users", responses = {
@@ -73,7 +78,7 @@ public class UserController {
         @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
     @PostMapping("/create")
     public ResponseEntity<Payment> saveUser(@Valid @RequestBody UserApplicationDTO user) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException, CustomUserAlreadyExistsException {
-        paymentService.paymentValidation(user.getSubscriptionId(), user.getCardHolder(), user.getCardNumber(), user.getCvv(), user.getExpDate() );
+        paymentServiceImplement.paymentValidation(user.getSubscriptionId(), user.getCardHolder(), user.getCardNumber(), user.getCvv(), user.getExpDate() );
         Payment payment = IUserService.saveUser(user);
         return new ResponseEntity<>(payment, HttpStatus.CREATED);
     }
@@ -106,8 +111,8 @@ public class UserController {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @PutMapping("/update/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable @Positive(message = "Id must be greater than 0") Long id, @Valid @RequestBody UserApplicationDTO user, Authentication authentication) throws NotFoundException, ForbiddenException {
-        UserDTO userDTO = IUserService.updateUser(user, id, authentication);
+    public ResponseEntity<UserDTO> updateUser(@PathVariable @Positive(message = "Id must be greater than 0") Long id, @Valid @RequestBody UserDTO user, Authentication authentication) throws NotFoundException, ForbiddenException {
+        UserDTO userDTO = IUserService.update(user, id);
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
@@ -140,10 +145,18 @@ public class UserController {
     @Operation(summary ="Get top 5 by user ID", description ="Get top 5 by user ID", responses = {
             @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(type = "Array", implementation = ProductDTO.class))),
             @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
-    @GetMapping("/{userId}/top5")
+    @GetMapping("/top/{userId}")
     public ResponseEntity<List<ProductDTO>> getTopFiveProductsByUser(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException {
-        List<ProductDTO> productDTOS = IUserService.getTopFiveProducts(userId);
+        List<ProductDTO> productDTOS = IReviewService.getTopFiveProducts(userId);
         return new ResponseEntity<>(productDTOS, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Update user subscription", description = "Update the subscription of an existing user",responses = {
+            @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "application/json",schema = @Schema(implementation = UserDTO.class)))})
+    @PatchMapping("/update/subscription")
+    public ResponseEntity<Object> updateUserSubscription(@RequestBody UserSubscriptionDTO userSubscriptionDTO ) throws NotFoundException {
+        UserDTO userDTO = IUserService.updateUserSubscription(userSubscriptionDTO);
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

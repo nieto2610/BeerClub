@@ -4,9 +4,7 @@ import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.Product;
 import com.digitalHouse.beerClub.model.dto.ProductDTO;
-import com.digitalHouse.beerClub.repository.IProductRepository;
-import com.digitalHouse.beerClub.repository.IRecommendationRepository;
-import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
+import com.digitalHouse.beerClub.repository.*;
 import com.digitalHouse.beerClub.service.implement.utils.DataGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +34,12 @@ public class ProductServiceTest {
 
     @Mock
     IRecommendationRepository recommendationRepository;
+
+    @Mock
+    IReviewRepository reviewRepository;
+
+    @Mock
+    IUserRepository userRepository;
     @Mock
     Mapper mapper;
 
@@ -43,7 +47,7 @@ public class ProductServiceTest {
 
     @BeforeEach
     void setUp() {
-        recommendationService = new RecommendationService(recommendationRepository,subscriptionRepository,productRepository,mapper);
+        recommendationService = new RecommendationService(recommendationRepository,subscriptionRepository,productRepository, reviewRepository, userRepository, mapper);
         dataGenerator = new DataGenerator();
         mapper = new Mapper(new ModelMapper());
         productService = new ProductService(productRepository,recommendationService,mapper);

@@ -5,6 +5,7 @@ import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.*;
+import com.digitalHouse.beerClub.model.dto.ProductDTO;
 import com.digitalHouse.beerClub.model.dto.ReviewDTO;
 import com.digitalHouse.beerClub.repository.IProductRepository;
 import com.digitalHouse.beerClub.repository.IReviewRepository;
@@ -12,11 +13,13 @@ import com.digitalHouse.beerClub.repository.IUserRepository;
 import com.digitalHouse.beerClub.service.interfaces.IReviewService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 @Service
-public class ReviewService implements IReviewService{
+ public class ReviewService implements IReviewService{
     private final IReviewRepository reviewRepository;
     private final IProductRepository productRepository;
     private final IUserRepository userRepository;
@@ -46,25 +49,33 @@ public class ReviewService implements IReviewService{
     @Override
     public ReviewDTO create(ReviewDTO reviewDTO) throws BadRequestException {
 
+        List<Review> previousReviews= reviewRepository.findByUserProduct(reviewDTO.getUserId(),reviewDTO.getProductId());
+        if(!previousReviews.isEmpty()) {
+            throw new BadRequestException("The review has already been created.");
+        }
+
         Review review = new Review();
         User user= userRepository.findById(reviewDTO.getUserId()).orElseThrow(()->new BadRequestException("The user doesn't exist"));
         review.setUser(user);
 
         Product product= productRepository.findById(reviewDTO.getProductId()).orElseThrow(()-> new BadRequestException("Product information is missing"));
         review.setProduct(product);
+
         if(reviewDTO.getRating()==null){
             throw new BadRequestException("The rating can't be null");
         }
-        if(reviewDTO.getRating()<1 || reviewDTO.getRating()>5){
-            throw new BadRequestException("The rating must be a number between 1 and 5");
+        if(reviewDTO.getRating()<1 || reviewDTO.getRating()>10){
+            throw new BadRequestException("The rating must be a number between 1 and 10");
         }
         review.setRating(reviewDTO.getRating());
         review.setComments(reviewDTO.getComments());
+        review.setExistReview(true);
+        Review reviewCreated= reviewRepository.save(review);
 
-        reviewRepository.save(review);
-        return mapper.converter(review, ReviewDTO.class);
+        return mapper.converter(reviewCreated, ReviewDTO.class);
 
     }
+
     @Override
     public ReviewDTO update(ReviewDTO reviewDTO, Long id) throws NotFoundException {
         Review review = reviewRepository.findById(id).orElseThrow(() -> new NotFoundException("Review not found"));
@@ -79,8 +90,8 @@ public class ReviewService implements IReviewService{
             throw new NotFoundException("The user doesn't exist");
         }
 
-        else if(reviewA.getRating()<1 || reviewA.getRating()>5){
-            throw new NotFoundException("The rating must be a number between 1 and 5");
+        else if(reviewA.getRating()<1 || reviewA.getRating()>10){
+            throw new NotFoundException("The rating must be a number between 1 and 10");
 
         } else {
             reviewRepository.save(reviewA);
@@ -91,5 +102,29 @@ public class ReviewService implements IReviewService{
     public void delete(Long id) throws ServiceException, NotFoundException {
         Review review= reviewRepository.findById(id).orElseThrow(() -> new NotFoundException("Review not found"));
         reviewRepository.delete(review);
+    }
+
+    @Override
+    public List<ProductDTO> getTopFiveProducts(Long userId) throws NotFoundException {
+        User searchedUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        System.out.println(searchedUser.isActive());
+        if (!searchedUser.isActive()) {
+            throw new NotFoundException("The user is not active.");
+        }
+
+        List<Review> reviewList = reviewRepository.findByUser(userId);
+        if (reviewList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        int limit = Math.min(reviewList.size(), 5);
+
+        List<ProductDTO> productDTOS = reviewList.stream()
+                .sorted(Comparator.comparing(Review::getRating).reversed())
+                .limit(limit)
+                .map(review -> mapper.converter(review.getProduct(), ProductDTO.class))
+                .collect(Collectors.toList());
+        return productDTOS;
+
     }
 }

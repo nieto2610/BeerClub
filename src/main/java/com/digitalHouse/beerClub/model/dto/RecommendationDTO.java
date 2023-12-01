@@ -28,4 +28,6 @@ public class RecommendationDTO {
     @JsonProperty("image_url")
     private String imageUrl;
     private @Valid ProductDTO product;
+
+    private boolean isReviewed;
 }

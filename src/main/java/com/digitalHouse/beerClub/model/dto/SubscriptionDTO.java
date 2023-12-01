@@ -30,7 +30,7 @@ public class SubscriptionDTO {
     @NotNull(message = "Subscription isRecommended must be true or false")
     private Boolean isRecommended;
 
-    @AssertTrue(message = "Subscription isActive must be true or false")
+    @NotNull(message = "Subscription isActive must be true or false")
     private Boolean isActive;
 
 }

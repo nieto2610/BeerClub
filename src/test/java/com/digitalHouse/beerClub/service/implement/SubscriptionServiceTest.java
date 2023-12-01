@@ -156,7 +156,7 @@ class SubscriptionServiceTest {
         subscription.setName("Novato");
         subscription.setDescription("Disfrutas de la cerveza y quieres conocer más acerca de ella");
         subscription.setIsRecommended(false);
-        subscription.setBenefits(benefits);
+        subscription.setBenefits((Set<Benefit>) benefits);
         subscription.setIsActive(true);
 
         when(subscriptionRepository.findById(any())).thenReturn(Optional.of(subscription));
