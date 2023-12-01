@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 @Service
-public class ReviewService implements IReviewService{
+ public class ReviewService implements IReviewService{
     private final IReviewRepository reviewRepository;
     private final IProductRepository productRepository;
     private final IUserRepository userRepository;
@@ -49,12 +49,18 @@ public class ReviewService implements IReviewService{
     @Override
     public ReviewDTO create(ReviewDTO reviewDTO) throws BadRequestException {
 
+        List<Review> previousReviews= reviewRepository.findByUserProduct(reviewDTO.getUserId(),reviewDTO.getProductId());
+        if(!previousReviews.isEmpty()) {
+            throw new BadRequestException("The review has already been created.");
+        }
+
         Review review = new Review();
         User user= userRepository.findById(reviewDTO.getUserId()).orElseThrow(()->new BadRequestException("The user doesn't exist"));
         review.setUser(user);
 
         Product product= productRepository.findById(reviewDTO.getProductId()).orElseThrow(()-> new BadRequestException("Product information is missing"));
         review.setProduct(product);
+
         if(reviewDTO.getRating()==null){
             throw new BadRequestException("The rating can't be null");
         }
@@ -63,11 +69,13 @@ public class ReviewService implements IReviewService{
         }
         review.setRating(reviewDTO.getRating());
         review.setComments(reviewDTO.getComments());
+        review.setExistReview(true);
+        Review reviewCreated= reviewRepository.save(review);
 
-        reviewRepository.save(review);
-        return mapper.converter(review, ReviewDTO.class);
+        return mapper.converter(reviewCreated, ReviewDTO.class);
 
     }
+
     @Override
     public ReviewDTO update(ReviewDTO reviewDTO, Long id) throws NotFoundException {
         Review review = reviewRepository.findById(id).orElseThrow(() -> new NotFoundException("Review not found"));
@@ -99,11 +107,12 @@ public class ReviewService implements IReviewService{
     @Override
     public List<ProductDTO> getTopFiveProducts(Long userId) throws NotFoundException {
         User searchedUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
-        if (searchedUser.isActive()) {
+        System.out.println(searchedUser.isActive());
+        if (!searchedUser.isActive()) {
             throw new NotFoundException("The user is not active.");
         }
 
-        List<Review> reviewList = reviewRepository.findByUserId(userId);
+        List<Review> reviewList = reviewRepository.findByUser(userId);
         if (reviewList.isEmpty()) {
             return new ArrayList<>();
         }
@@ -115,7 +124,6 @@ public class ReviewService implements IReviewService{
                 .limit(limit)
                 .map(review -> mapper.converter(review.getProduct(), ProductDTO.class))
                 .collect(Collectors.toList());
-
         return productDTOS;
 
     }

@@ -250,9 +250,17 @@ class UserServiceImplementTest {
 */
 
 
+import com.digitalHouse.beerClub.exceptions.CustomUserAlreadyExistsException;
+import com.digitalHouse.beerClub.exceptions.InsufficientBalanceException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.mapper.Mapper;
+import com.digitalHouse.beerClub.model.CardPayment;
+import com.digitalHouse.beerClub.model.Payment;
+import com.digitalHouse.beerClub.model.Subscription;
+import com.digitalHouse.beerClub.model.User;
 import com.digitalHouse.beerClub.model.dto.ProductDTO;
+import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
+import com.digitalHouse.beerClub.model.dto.UserDTO;
 import com.digitalHouse.beerClub.repository.IAddressRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
@@ -264,13 +272,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -296,13 +308,50 @@ class UserServiceImplementTest {
     @Mock
     private ISubscriptionRepository subscriptionRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
+        MockitoAnnotations.openMocks(this);
         dataGenerator = new DataGenerator();
         mapper = new Mapper(new ModelMapper());
         userServiceImplement = new UserServiceImplement(userRepository, addressRepository, subscriptionRepository, paymentService, mapper);
     }
+
+/*
+    @Test
+    @DisplayName("Save User")
+    void saveUser() throws NotFoundException, InsufficientBalanceException, CustomUserAlreadyExistsException {
+        // ARRANGE
+        Subscription subscription = new Subscription(1L, "Novato", "Disfrutas de la cerveza y quieres conocer más acerca de ella", 200.0, List.of(), false, true);
+        subscriptionRepository.save(subscription);
+
+        when(passwordEncoder.encode(any(CharSequence.class))).thenReturn("encodedPassword");
+        when(subscriptionRepository.findById(1L)).thenReturn(Optional.of(subscription));
+        when(userRepository.findByUserEmail(any(String.class))).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User savedUser = invocation.getArgument(0);
+            savedUser.setId(1L);
+            return savedUser;
+        });
+        when(paymentService.savePayment(any(CardPayment.class), any(User.class))).thenReturn(new Payment());
+
+        LocalDate birthdate = LocalDate.now().minusYears(23);
+        UserApplicationDTO userDto = new UserApplicationDTO("Juan", "Perez", "juan@beerClub.com",
+                birthdate, "123456789", "Argentina", "Santa Fe", "Rosario", "Roca", "1200", "", "", "3400","Juan123#", 1L, "Juan Perez", "1234567890123456", "123","128");
+
+        userDto.setPassword(passwordEncoder.encode("Juan123#"));
+        // ACT
+        Payment result = userServiceImplement.saveUser(userDto);
+
+        // ASSERT
+        Assertions.assertNotNull(result);
+        Assertions.assertNotNull(result.getId());
+        verify(passwordEncoder).encode("Juan123#");
+    }*/
+
+
     /*
     @Test
     @DisplayName("✅ - Search Top 5 of products")

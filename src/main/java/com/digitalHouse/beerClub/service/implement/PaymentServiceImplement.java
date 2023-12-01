@@ -1,4 +1,3 @@
-
 package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.config.MyAppConfig;
@@ -15,12 +14,14 @@ import com.digitalHouse.beerClub.utils.CardUtils;
 import com.digitalHouse.beerClub.utils.TransformationUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PaymentServiceImplement implements IPaymentService {
@@ -32,6 +33,12 @@ public class PaymentServiceImplement implements IPaymentService {
     private final Mapper paymentMapper;
     private final MyAppConfig myAppConfig;
     private final IUserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     @Autowired
     public PaymentServiceImplement(IPaymentRepository paymentRepository, ISubscriptionRepository subscriptionRepository, CardService cardService, AccountService accountService, Mapper mapper, MyAppConfig myAppConfig, IUserRepository userRepository) {
@@ -65,7 +72,7 @@ public class PaymentServiceImplement implements IPaymentService {
             throw new ForbiddenException("El usuario no está activo");
         }
         Payment payment = paymentRepository.findById(id).orElseThrow(() -> new NotFoundException("No se encontró el pago con ID: " + id));
-        //return paymentMapper.converter(payment, PaymentDTO.class);
+
         if (payment.getUserId().equals(user.getId())) {
             return paymentMapper.converter(payment, PaymentDTO.class);
         } else {
@@ -97,7 +104,6 @@ public class PaymentServiceImplement implements IPaymentService {
     @Transactional
     @Override
     public Payment savePayment(CardPayment card, User user) throws NotFoundException, InsufficientBalanceException {
-        //Long accountBeerClubId = 1L;
         String accountBeerClubNumber = myAppConfig.getAccountNumber();
         Subscription subscription = subscriptionRepository.findById(user.getSubscription().getId()).orElseThrow(() -> new NotFoundException("No se encontró la suscripción"));
 
@@ -159,17 +165,34 @@ public class PaymentServiceImplement implements IPaymentService {
 
     }
 
-    // Método para crear una factura de pago para usuarios ya registrados.
+    // Método para el administrador pueda enviar a todos los usuarios activos  y con rol USER la factura de pago del mes correspondiente.
     @Override
-    public PaymentDTO createPaymentInvoice(Long userId) throws NotFoundException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("No se encontró el usuario con ID: " + userId));
+    public List<PaymentDTO> createPaymentsAndSendInvoices() {
+        List<User> activeUsers = userRepository.findByActiveTrue();
 
-        if (!user.isActive()) {
-            throw new NotFoundException("El usuario con ID " + userId + " no está activo");
-        }
+        List<User> activeUsersWithUserRole = activeUsers.stream()
+                .filter(user -> user.getRole() == RoleType.USER)
+                .toList();
 
-        Subscription subscription = subscriptionRepository.findById(user.getSubscription().getId()).orElseThrow(() -> new NotFoundException("No se encontró la suscripción"));
+        return activeUsersWithUserRole.stream()
+                .map(user -> {
+                    try {
+                        PaymentDTO paymentDTO = createPaymentInvoice(user);
+                        sendInvoiceToUser(user, paymentDTO);
+                        return paymentDTO;
+                    } catch (NotFoundException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull) // Filtra los resultados nulos (caso de excepción)
+                .toList();
+    }
 
+    // Método para crear una factura de pago para usuarios ya registrados.
+    private PaymentDTO createPaymentInvoice(User user) throws NotFoundException {
+        Subscription subscription = user.getSubscription();
+        System.out.println("Suscripción: "+subscription.getId());
         Double amount = subscription.getPrice();
         String description = subscription.getName();
         String invoiceNumber = AccountUtils.getInvoiceNumber();
@@ -177,12 +200,26 @@ public class PaymentServiceImplement implements IPaymentService {
         Payment payment = new Payment();
         payment.setAmount(amount);
         payment.setDescription(description);
-        payment.setUserId(userId);
+        payment.setUserId(user.getId());
         payment.setInvoiceNumber(invoiceNumber);
         payment.setSubscription(subscription);
 
         paymentRepository.save(payment);
         return paymentMapper.converter(payment, PaymentDTO.class);
+    }
+
+    private void sendInvoiceToUser(User user, PaymentDTO paymentDTO) {
+        //Envio Email
+        String to = user.getEmail();
+        String subject = "Factura de Pago";
+        String username = user.getFirstName() + " " + user.getLastName();
+        String invoice = paymentDTO.getInvoiceNumber();
+        String amount = paymentDTO.getAmount().toString();
+        String description = paymentDTO.getDescription();
+        String state = paymentDTO.getPaymentStatus().toString();
+
+        String content = emailService.buildContentPaymentEmail(username, invoice, amount, description, state);
+        emailService.sendHtmlMessage(to, subject, content);
     }
 
     // Método para terminar de procesar el pago luego de que el usuario recibiera el link de la factura.

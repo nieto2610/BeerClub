@@ -42,18 +42,19 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST,"/users/**", "/faqs/**", "/users/create", "/subscriptions", "/accounts/**", "/cards/**").permitAll()
                                 //Los endpoint que se pueden ver sin autenticación
                                 .requestMatchers(HttpMethod.GET,"/swagger-ui/**", "/v3/api-docs/**", "/subscriptions", "/faqs", "/accounts/**").permitAll()
-                                //Los endpoint que se pueden ver sin autenticación
-                                .requestMatchers(HttpMethod.GET,"/swagger-ui/**", "/v3/api-docs/**", "/subscriptions", "/faqs", "/users/create").permitAll()
+                                //Los endpoint que se pueden ver siendo USER
+                                .requestMatchers(HttpMethod.GET,"/users/email/**", "/address/**", "/recommendations/**", "user/current").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/swagger-ui/**", "/v3/api-docs/**", "/subscriptions", "/faqs", "/accounts/**", "/users/create").permitAll()
                                 //Los endpoint que se pueden ver siendo USER
                                 .requestMatchers(HttpMethod.GET,"/users/email/**", "/address/**", "/recommendations/**", "/products/**", "/payments/**", "/users/top/**").hasAnyRole("USER", "ADMIN")
                                 //Los endpoint que se pueden ver siendo ADMIN
                                 .requestMatchers(HttpMethod.GET,"/users/all", "/users/active", "/users/id/**", "/subscriptions/**", "/faqs/**", "/filters/**").hasRole("ADMIN")
                                 //Los endpoint Post que se pueden user siendo usuario Admin
-                                .requestMatchers(HttpMethod.POST,"/recommendations/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST,"/recommendations/**", "/payments/create").hasRole("ADMIN")
                                 //Los endpoint Post que se pueden usar con autenticación
                                 .requestMatchers(HttpMethod.POST,"/reviews/**").hasAnyRole("ADMIN", "USER")
                                 //Los endpoint Put que se pueden user con autenticación
-                                .requestMatchers(HttpMethod.PUT,"/address/update/**", "/users/update/**").hasRole("USER")
+                                .requestMatchers(HttpMethod.PUT,"/address/update/**", "/users/update/**", "payments/process").hasRole("USER")
                                 //Los endpoint Put que se pueden admin con autenticación
                                 .requestMatchers(HttpMethod.PUT,"/faqs/**", "/users/activate/**", "/subscriptions/**").hasAnyRole("ADMIN")
                                 //Los endpoint que se pueden eliminar siendo ADMIN
