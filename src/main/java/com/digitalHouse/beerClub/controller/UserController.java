@@ -124,7 +124,7 @@ public class UserController {
         return new ResponseEntity<>("Password successfully updated.", HttpStatus.OK);
     }
 
-    @Operation(summary = "Activate user subscription", description = "Activate the subscription of a user by ID",responses = {
+    @Operation(summary = "Activate user", description = "Activate user by ID",responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "User subscription activated successfully"))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @PutMapping("/activate/{userId}")
@@ -134,10 +134,10 @@ public class UserController {
     }
 
     @Operation(summary = "Delete user", description = "Delete a user by ID",responses = {
-        @ApiResponse(responseCode = "204",description = "NO_CONTENT",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "1"))),
+        @ApiResponse(responseCode = "204",description = "NO_CONTENT",content = @Content(mediaType = "application/json",schema = @Schema(defaultValue = "1"))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @DeleteMapping("/{userId}")
-    public ResponseEntity<String> softDeleteUser(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws ServiceException, NotFoundException {
+    public ResponseEntity<String> softDeleteUser(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException {
         IUserService.delete(userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

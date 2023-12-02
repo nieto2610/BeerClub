@@ -38,6 +38,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
     }
 
+    /*@ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<?> notFoundExceptionUser(Exception e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }*/
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationErrors(MethodArgumentNotValidException e) {
         ExceptionDTO errors = new ExceptionDTO(e.getBindingResult().getFieldErrors()
