@@ -17,13 +17,13 @@ public class PaymentGeneratorWorker {
         this.paymentServiceImplement = paymentServiceImplement;
     }
 
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 0 0 1 * ?")
     public void worker() throws NotFoundException {
 
         if (LocalDate.now().getDayOfMonth() == 1) {
             System.out.println("WORKER: Generación de facturas pendientes de pago a usuarios activos - " + LocalDateTime.now());
             //TODO: agregar método que genera pagos masivos a usuarios activos.
-            //paymentServiceImplement.createPaymentInvoice(1L);
+            paymentServiceImplement.createPaymentsAndSendInvoices();
         }
     }
 }
