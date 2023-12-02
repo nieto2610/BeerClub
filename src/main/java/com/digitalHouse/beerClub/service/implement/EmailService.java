@@ -1,5 +1,6 @@
 package com.digitalHouse.beerClub.service.implement;
 
+import com.digitalHouse.beerClub.model.PaymentStatus;
 import com.digitalHouse.beerClub.service.interfaces.IEmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -64,6 +65,37 @@ public class EmailService implements IEmailService {
         String content = buildContentEmail(title, username, paragraph1, paragraph2, paragraph3, invoice, amount, description, state, link, buttonText, textFooter);
         return content;
     }
+
+    @Override
+    public String buildContentPaymentTransactionEmail(String username, String invoice, String amount, String description, String state){
+        //Header
+        String title = "Notificación Transacción Beer Club";
+
+        //Body
+        String paymentParagraph1 = null;
+        String paymentParagraph2 = null;
+        String paymentParagraph3 = null;
+        if(state.equals(PaymentStatus.APROBADO)){
+            paymentParagraph1 = "¡Felicidades! Hemos recibido y procesado con éxito tu pago.";
+            paymentParagraph2 = "Agradecemos tu prontitud en realizar la transacción, tu participación en Beer Club es fundamental para nosotros. A continuación adjuntamos detalles de tu pago.";
+            paymentParagraph3 = "Si tienes alguna pregunta adicional o necesitas más información, no dudes en contactarnos. ¡Disfruta de tu membresía en Beer Club!";
+
+        }else if(state.equals(PaymentStatus.RECHAZADO) || state.equals(PaymentStatus.CANCELADO)){
+            paymentParagraph1 = "Lamentamos informarte que tu pago ha sido rechazado.";
+            paymentParagraph2 = "Por favor, verifica los detalles de la transacción y asegúrate de tener fondos suficientes en tu cuenta. A continuación adjuntamos detalles de la transacción";
+            paymentParagraph3 = "Si necesitas asistencia o tienes alguna pregunta, no dudes en ponerte en contacto con nuestro equipo de soporte. Estamos aquí para ayudarte.";
+
+        }
+        String link = "http://ec2-54-82-22-67.compute-1.amazonaws.com/login";
+        String buttonText = "Ir a Beer Club";
+
+        //Footer
+        String textFooter = "¡Salud!";
+
+        String content = buildContentEmail(title, username, paymentParagraph1, paymentParagraph2, paymentParagraph3, invoice, amount, description, state, link, buttonText, textFooter);
+        return content;
+    }
+
     @Override
     public String buildContentEmail(String title,String userName, String parag1, String parag2, String parag3, String invoice, String amount, String description, String state, String buttonLink, String buttonText, String textFooter){
         return "<!DOCTYPE html>" +
