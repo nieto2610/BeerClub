@@ -52,7 +52,7 @@ public class EmailService implements IEmailService {
         String title = "Facturación Beer Club";
 
         //Body
-        String paragraph1 = "Gracias por preferir Beer Club. Estamos felices de tenerte en nuestra comunidad.";
+        String paragraph1 = "Gracias por elegir Beer Club. Estamos felices de tenerte en nuestra comunidad.";
         String paragraph2 = "Esperamos que estes disfrutando la experiencia de pertenecer al mejor Club de Cerveza. Adjuntamos la factura correspondiente a tu suscripción";
         String paragraph3 = "No dudes en ponerte en contacto con nosotros si tienes alguna pregunta o necesitas ayuda.";
         String link = "http://ec2-54-82-22-67.compute-1.amazonaws.com/login";
@@ -84,6 +84,7 @@ public class EmailService implements IEmailService {
 
     private String buildHeader(String title){
         String COLOR_HEADER = "#000000";
+        String logoUrl = "Logo_sin_escudo_Color_Original.svg";
         return "    <table style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: " + COLOR_HEADER + "; border-collapse: collapse;'>" +
                 "        <tr>" +
                 "            <td align='center' style='padding: 20px; color: #ffffff;'>" +
@@ -100,7 +101,7 @@ public class EmailService implements IEmailService {
 
         return "        <tr>" +
                 "            <td style='padding: 20px; background-color: " + COLOR_BODY + "; border-collapse: collapse;'>" +
-                "                <p><b>Apreciad@ " + userName + ",</b></p>" +
+                "                <p><b>Estimad@ " + userName + ",</b></p>" +
                 "                <p>" + parag1 + "</p>" +
                 "                <p>" + parag2 + "</p>" +
                 "                " + tableHtml +

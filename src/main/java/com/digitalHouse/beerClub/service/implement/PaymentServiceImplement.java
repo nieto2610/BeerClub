@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Year;
 import java.util.List;
 import java.util.Objects;
 
@@ -191,8 +193,12 @@ public class PaymentServiceImplement implements IPaymentService {
 
     // Método para crear una factura de pago para usuarios ya registrados.
     private PaymentDTO createPaymentInvoice(User user) throws NotFoundException {
+        if(isInvoiceAlreadySent(user)) {
+            System.out.println("Ya se envió una factura para este usuario en el mes actual.");
+            return null;
+        }
+
         Subscription subscription = user.getSubscription();
-        System.out.println("Suscripción: "+subscription.getId());
         Double amount = subscription.getPrice();
         String description = subscription.getName();
         String invoiceNumber = AccountUtils.getInvoiceNumber();
@@ -209,6 +215,11 @@ public class PaymentServiceImplement implements IPaymentService {
     }
 
     private void sendInvoiceToUser(User user, PaymentDTO paymentDTO) {
+        if (isInvoiceAlreadySent(user)) {
+            System.out.println("La factura ya se ha enviado para este usuario en el mes actual.");
+            return;
+        }
+
         //Envio Email
         String to = user.getEmail();
         String subject = "Factura de Pago";
@@ -220,6 +231,17 @@ public class PaymentServiceImplement implements IPaymentService {
 
         String content = emailService.buildContentPaymentEmail(username, invoice, amount, description, state);
         emailService.sendHtmlMessage(to, subject, content);
+
+        // Actualiza la fecha de envío de la factura
+        paymentDTO.setInvoiceDate(LocalDateTime.now());
+        Payment paymentEntity = paymentMapper.converter(paymentDTO, Payment.class);
+        paymentRepository.save(paymentEntity);
+    }
+
+    private boolean isInvoiceAlreadySent(User user) {
+        int currentYear = LocalDateTime.now().getYear();
+        int currentMonth = LocalDateTime.now().getMonthValue();
+        return paymentRepository.existsInvoiceByUserId(user.getId(), currentYear, currentMonth);
     }
 
     // Método para terminar de procesar el pago luego de que el usuario recibiera el link de la factura.

@@ -31,6 +31,8 @@ public class Payment {
 
     private String invoiceNumber;
 
+    private LocalDateTime invoiceDate;
+
     @Enumerated(EnumType.STRING)
     private PaymentStatus status = PaymentStatus.PENDIENTE;
 
