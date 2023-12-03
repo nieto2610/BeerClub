@@ -20,7 +20,7 @@ public class ProductDTO {
     private Long id;
     @NotBlank(message = "Product name must not be blank")
     private String name;
-    @Size(max = 255, message = "Product description must have at most 255 characters")
+    @Size(max = 1000, message = "Product description must have at most 1000 characters")
     private String description;
     private Float productScore;
     @JsonProperty("image_url")
