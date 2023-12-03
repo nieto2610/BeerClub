@@ -3,12 +3,10 @@ package com.digitalHouse.beerClub.service.implement;
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.mapper.Mapper;
 import com.digitalHouse.beerClub.model.*;
-import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
-import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
+import com.digitalHouse.beerClub.model.dto.*;
 import com.digitalHouse.beerClub.auth.UserAuthRequest;
-import com.digitalHouse.beerClub.model.dto.UserDTO;
-import com.digitalHouse.beerClub.model.dto.UserSubscriptionDTO;
 import com.digitalHouse.beerClub.repository.IAddressRepository;
+import com.digitalHouse.beerClub.repository.IPaymentRepository;
 import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
 import com.digitalHouse.beerClub.repository.IUserRepository;
 import com.digitalHouse.beerClub.service.interfaces.IUserService;
@@ -19,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,12 +30,13 @@ public class UserServiceImplement implements IUserService {
 
     private final ISubscriptionRepository subscriptionRepository;
 
+    @Autowired
+    private IPaymentRepository paymentRepository;
+
     private final PaymentServiceImplement paymentServiceImplement;
 
-    @Autowired
     private final EmailService emailService;
 
-    @Autowired
     private final PasswordEncoder passwordEncoder;
 
     private final Mapper userMapper;
@@ -127,6 +127,12 @@ public class UserServiceImplement implements IUserService {
         Payment payment = paymentServiceImplement.savePayment(cardPayment, createdUser);
 
         //Envio Email
+        sendEmail(user, payment);
+
+        return payment;
+    }
+
+    private void sendEmail(UserApplicationDTO user, Payment payment) {
         String to = user.getEmail();
         String subject = "¡Bienvenido a Beer Club";
         String username = user.getName() + " " + user.getLastName();
@@ -137,7 +143,9 @@ public class UserServiceImplement implements IUserService {
 
         String content = emailService.buildContentWellcomeEmail(username, invoice, amount, description, state);
         emailService.sendHtmlMessage(to, subject, content);
-        return payment;
+
+        payment.setInvoiceDate(LocalDateTime.now());
+        paymentRepository.save(payment);
     }
 
     @Override

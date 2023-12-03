@@ -26,4 +26,16 @@ public interface IPaymentRepository extends JpaRepository<Payment, Long> {
             @Param("year") int year,
             @Param("month") int month
     );
+
+    @Query("SELECT p FROM Payment p " +
+            "WHERE p.userId = :userId " +
+            "AND p.creationDate IS NOT NULL " +
+            "AND YEAR(p.creationDate) = :year " +
+            "AND MONTH(p.creationDate) = :month")
+    Payment findPaymentByUserIdAndMonthYear(
+            @Param("userId") Long userId,
+            @Param("year") int year,
+            @Param("month") int month
+    );
+
 }

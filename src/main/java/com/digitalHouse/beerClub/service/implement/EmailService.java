@@ -75,12 +75,12 @@ public class EmailService implements IEmailService {
         String paymentParagraph1 = null;
         String paymentParagraph2 = null;
         String paymentParagraph3 = null;
-        if(state.equals(PaymentStatus.APROBADO)){
+        if(state.equals("APROBADO")){
             paymentParagraph1 = "¡Felicidades! Hemos recibido y procesado con éxito tu pago.";
             paymentParagraph2 = "Agradecemos tu prontitud en realizar la transacción, tu participación en Beer Club es fundamental para nosotros. A continuación adjuntamos detalles de tu pago.";
             paymentParagraph3 = "Si tienes alguna pregunta adicional o necesitas más información, no dudes en contactarnos. ¡Disfruta de tu membresía en Beer Club!";
 
-        }else if(state.equals(PaymentStatus.RECHAZADO) || state.equals(PaymentStatus.CANCELADO)){
+        }else if(state.equals("RECHAZADO") || state.equals("CANCELADO")){
             paymentParagraph1 = "Lamentamos informarte que tu pago ha sido rechazado.";
             paymentParagraph2 = "Por favor, verifica los detalles de la transacción y asegúrate de tener fondos suficientes en tu cuenta. A continuación adjuntamos detalles de la transacción";
             paymentParagraph3 = "Si necesitas asistencia o tienes alguna pregunta, no dudes en ponerte en contacto con nuestro equipo de soporte. Estamos aquí para ayudarte.";
@@ -116,7 +116,6 @@ public class EmailService implements IEmailService {
 
     private String buildHeader(String title){
         String COLOR_HEADER = "#000000";
-        String logoUrl = "Logo_sin_escudo_Color_Original.svg";
         return "    <table style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: " + COLOR_HEADER + "; border-collapse: collapse;'>" +
                 "        <tr>" +
                 "            <td align='center' style='padding: 20px; color: #ffffff;'>" +
