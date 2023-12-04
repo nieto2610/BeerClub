@@ -149,10 +149,10 @@ public class UserServiceImplement implements IUserService {
     }
 
     @Override
-    public void saveAdmin(UserAdminDTO adminDTO) {
+    public UserDTO saveAdmin(UserAdminDTO adminDTO) {
         User adminUser = new User(adminDTO);
         adminUser.setPassword(passwordEncoder.encode(adminDTO.getPassword()));
-        userRepository.save(adminUser);
+        return userMapper.converter(userRepository.save(adminUser), UserDTO.class);
     }
 
     @Override

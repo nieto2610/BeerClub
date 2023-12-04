@@ -2,6 +2,7 @@ package com.digitalHouse.beerClub.controller;
 
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.model.Payment;
+import com.digitalHouse.beerClub.model.User;
 import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
 import com.digitalHouse.beerClub.model.dto.ProductDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
@@ -94,9 +95,9 @@ public class UserController {
     @Operation(summary="Add admin user ", description="Add a new admin user", responses = {
             @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "Administrator user created successfully")))})
     @PostMapping("/create/admin")
-    public ResponseEntity<?> saveAdmin(@Valid @RequestBody UserAdminDTO user){
-        IUserService.saveAdmin(user);
-        return new ResponseEntity<>("Admin user created successfully.", HttpStatus.CREATED);
+    public ResponseEntity<UserDTO> saveAdmin(@Valid @RequestBody UserAdminDTO user){
+        return new ResponseEntity<>(IUserService.saveAdmin(user), HttpStatus.OK);
+
     }
 
     @Operation(summary ="Find user by Email", description ="Find user by Email",  responses = {

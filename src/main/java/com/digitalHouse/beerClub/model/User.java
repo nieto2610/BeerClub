@@ -83,6 +83,8 @@ public class User implements UserDetails {
         this.lastName = userAdmin.getLastName();
         this.email = userAdmin.getEmail();
         this.password = userAdmin.getPassword();
+        this.birthdate = LocalDate.now();
+        this.subscriptionDate = LocalDate.now();
         role = RoleType.ADMIN;
         active = true;
     }

@@ -18,7 +18,7 @@ public interface IUserService extends IService<UserDTO>{
 
     Payment saveUser(UserApplicationDTO user) throws NotFoundException, EntityInactiveException, InsufficientBalanceException, BadRequestException;
 
-    void saveAdmin(UserAdminDTO adminDTO);
+    UserDTO saveAdmin(UserAdminDTO adminDTO);
 
     List<UserDTO> searchAll();
 
