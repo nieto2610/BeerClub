@@ -10,8 +10,9 @@ public class PaymentDTO {
     private Long id;
     private Double amount;
     private String description;
-    private LocalDateTime date;
+    private LocalDateTime paymentDate;
     private String invoiceNumber;
+    private LocalDateTime invoiceDate;
     private Long userId;
     private PaymentStatus paymentStatus;
 }

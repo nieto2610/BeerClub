@@ -23,7 +23,7 @@ public class Payment {
 
     private String description;
 
-    private LocalDateTime date;
+    private LocalDateTime creationDate;
 
     private String cardNumber;
 
@@ -31,8 +31,12 @@ public class Payment {
 
     private String invoiceNumber;
 
+    private LocalDateTime invoiceDate;
+
     @Enumerated(EnumType.STRING)
     private PaymentStatus status = PaymentStatus.PENDIENTE;
+
+    private LocalDateTime paymentDate;
 
     @ManyToOne
     @JoinColumn(name = "subscription_id")
