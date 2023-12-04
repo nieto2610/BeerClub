@@ -25,7 +25,7 @@ public interface IPaymentService {
 
         void paymentValidation(Long subscriptionId, String cardHolder, String cardNumber,String cvv, String expDate ) throws EntityInactiveException, NotFoundException, BadRequestException, InsufficientBalanceException;
 
-        PaymentDTO createPaymentInvoice(Long userId) throws NotFoundException;
+        List<PaymentDTO> createPaymentsAndSendInvoices();
 
         PaymentDTO processPayment(PaymentApplicationDTO paymentDTO) throws NotFoundException, InsufficientBalanceException, EntityInactiveException, BadRequestException;
 

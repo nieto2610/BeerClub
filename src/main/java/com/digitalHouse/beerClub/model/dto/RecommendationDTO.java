@@ -19,7 +19,7 @@ public class RecommendationDTO {
     private Long id;
     @NotBlank(message = "Recommendation name must not be blank")
     private String title;
-    @Size(max = 255, message = "Recommendation description must have at most 255 characters")
+    @Size(max = 1000, message = "Recommendation description must have at most 1000 characters")
     private String description;
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate createDate;
@@ -28,4 +28,6 @@ public class RecommendationDTO {
     @JsonProperty("image_url")
     private String imageUrl;
     private @Valid ProductDTO product;
+
+    private boolean isReviewed;
 }

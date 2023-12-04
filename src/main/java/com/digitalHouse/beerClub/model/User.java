@@ -4,9 +4,7 @@ import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
+@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -85,6 +83,8 @@ public class User implements UserDetails {
         this.lastName = userAdmin.getLastName();
         this.email = userAdmin.getEmail();
         this.password = userAdmin.getPassword();
+        this.birthdate = LocalDate.now();
+        this.subscriptionDate = LocalDate.now();
         role = RoleType.ADMIN;
         active = true;
     }

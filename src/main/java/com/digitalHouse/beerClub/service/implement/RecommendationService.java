@@ -1,19 +1,16 @@
 package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.exceptions.BadRequestException;
+import com.digitalHouse.beerClub.exceptions.ForbiddenException;
 import com.digitalHouse.beerClub.exceptions.NotFoundException;
 import com.digitalHouse.beerClub.exceptions.ServiceException;
 import com.digitalHouse.beerClub.mapper.Mapper;
-import com.digitalHouse.beerClub.model.Product;
-import com.digitalHouse.beerClub.model.Recommendation;
-import com.digitalHouse.beerClub.model.Review;
-import com.digitalHouse.beerClub.model.Subscription;
+import com.digitalHouse.beerClub.model.*;
 import com.digitalHouse.beerClub.model.dto.ProductDTO;
 import com.digitalHouse.beerClub.model.dto.RecommendationDTO;
-import com.digitalHouse.beerClub.repository.IProductRepository;
-import com.digitalHouse.beerClub.repository.IRecommendationRepository;
-import com.digitalHouse.beerClub.repository.ISubscriptionRepository;
+import com.digitalHouse.beerClub.repository.*;
 import com.digitalHouse.beerClub.service.interfaces.IRecommendationService;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,12 +22,17 @@ public class RecommendationService implements IRecommendationService {
     private  final IRecommendationRepository recommendationRepository;
     private final ISubscriptionRepository subscriptionRepository;
     private final IProductRepository productRepository;
+    private final IReviewRepository reviewRepository;
+
+    private final IUserRepository userRepository;
     private final Mapper mapper;
 
-    public RecommendationService(IRecommendationRepository recommendationRepository, ISubscriptionRepository subscriptionRepository, IProductRepository productRepository, Mapper mapper) {
+    public RecommendationService(IRecommendationRepository recommendationRepository, ISubscriptionRepository subscriptionRepository, IProductRepository productRepository, IReviewRepository reviewRepository, IUserRepository userRepository, Mapper mapper) {
         this.recommendationRepository = recommendationRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.productRepository = productRepository;
+        this.reviewRepository = reviewRepository;
+        this.userRepository = userRepository;
         this.mapper = mapper;
     }
 
@@ -130,8 +132,11 @@ public class RecommendationService implements IRecommendationService {
     }
 
     @Override
-    public RecommendationDTO searchBySubscriptionAndDate(Long subscriptionId, LocalDate date) throws NotFoundException {
-
+    public RecommendationDTO searchBySubscriptionAndDate(Long subscriptionId, LocalDate date, Authentication authentication) throws NotFoundException, ForbiddenException {
+        User user =  userRepository.findByEmail(authentication.getName());
+        if (!user.isActive()) {
+            throw new ForbiddenException("El usuario no está activo");
+        }
         Recommendation recommendation = recommendationRepository.findBySubscriptionIdAndCreateDate(subscriptionId,date.getMonthValue(), date.getYear());
         if(recommendation == null) {
             throw new NotFoundException("Recommendation not found");
@@ -146,6 +151,8 @@ public class RecommendationService implements IRecommendationService {
 
         RecommendationDTO recommendationDTO = mapper.converter(recommendation,RecommendationDTO.class);
         recommendationDTO.setSubscriptionId(subscriptionId);
+        List<Review> review = reviewRepository.findByUserProduct(user.getId(), recommendationDTO.getProduct().getId());
+        recommendationDTO.setReviewed(review.size() > 0);
         return recommendationDTO;
     }
 

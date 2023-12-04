@@ -2,6 +2,7 @@ package com.digitalHouse.beerClub.controller;
 
 import com.digitalHouse.beerClub.exceptions.*;
 import com.digitalHouse.beerClub.model.Payment;
+import com.digitalHouse.beerClub.model.User;
 import com.digitalHouse.beerClub.model.dto.UserAdminDTO;
 import com.digitalHouse.beerClub.model.dto.ProductDTO;
 import com.digitalHouse.beerClub.model.dto.UserApplicationDTO;
@@ -94,9 +95,9 @@ public class UserController {
     @Operation(summary="Add admin user ", description="Add a new admin user", responses = {
             @ApiResponse(responseCode = "201",description = "CREATED",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "Administrator user created successfully")))})
     @PostMapping("/create/admin")
-    public ResponseEntity<?> saveAdmin(@Valid @RequestBody UserAdminDTO user){
-        IUserService.saveAdmin(user);
-        return new ResponseEntity<>("Admin user created successfully.", HttpStatus.CREATED);
+    public ResponseEntity<UserDTO> saveAdmin(@Valid @RequestBody UserAdminDTO user){
+        return new ResponseEntity<>(IUserService.saveAdmin(user), HttpStatus.OK);
+
     }
 
     @Operation(summary ="Find user by Email", description ="Find user by Email",  responses = {
@@ -124,7 +125,7 @@ public class UserController {
         return new ResponseEntity<>("Password successfully updated.", HttpStatus.OK);
     }
 
-    @Operation(summary = "Activate user subscription", description = "Activate the subscription of a user by ID",responses = {
+    @Operation(summary = "Activate user", description = "Activate user by ID",responses = {
         @ApiResponse(responseCode = "200",description = "OK",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "User subscription activated successfully"))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @PutMapping("/activate/{userId}")
@@ -134,10 +135,10 @@ public class UserController {
     }
 
     @Operation(summary = "Delete user", description = "Delete a user by ID",responses = {
-        @ApiResponse(responseCode = "204",description = "NO_CONTENT",content = @Content(mediaType = "text/plain",schema = @Schema(defaultValue = "1"))),
+        @ApiResponse(responseCode = "204",description = "NO_CONTENT",content = @Content(mediaType = "application/json",schema = @Schema(defaultValue = "1"))),
         @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(mediaType = "text/plain", schema = @Schema(defaultValue= "User not found with ID: 1")))})
     @DeleteMapping("/{userId}")
-    public ResponseEntity<String> softDeleteUser(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws ServiceException, NotFoundException {
+    public ResponseEntity<String> softDeleteUser(@PathVariable @Positive(message = "Id must be greater than 0") Long userId) throws NotFoundException {
         IUserService.delete(userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

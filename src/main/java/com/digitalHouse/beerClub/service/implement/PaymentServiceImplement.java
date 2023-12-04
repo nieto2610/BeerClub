@@ -1,4 +1,3 @@
-
 package com.digitalHouse.beerClub.service.implement;
 
 import com.digitalHouse.beerClub.config.MyAppConfig;
@@ -15,12 +14,14 @@ import com.digitalHouse.beerClub.utils.CardUtils;
 import com.digitalHouse.beerClub.utils.TransformationUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PaymentServiceImplement implements IPaymentService {
@@ -32,6 +33,12 @@ public class PaymentServiceImplement implements IPaymentService {
     private final Mapper paymentMapper;
     private final MyAppConfig myAppConfig;
     private final IUserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     @Autowired
     public PaymentServiceImplement(IPaymentRepository paymentRepository, ISubscriptionRepository subscriptionRepository, CardService cardService, AccountService accountService, Mapper mapper, MyAppConfig myAppConfig, IUserRepository userRepository) {
@@ -65,7 +72,7 @@ public class PaymentServiceImplement implements IPaymentService {
             throw new ForbiddenException("El usuario no está activo");
         }
         Payment payment = paymentRepository.findById(id).orElseThrow(() -> new NotFoundException("No se encontró el pago con ID: " + id));
-        //return paymentMapper.converter(payment, PaymentDTO.class);
+
         if (payment.getUserId().equals(user.getId())) {
             return paymentMapper.converter(payment, PaymentDTO.class);
         } else {
@@ -97,7 +104,6 @@ public class PaymentServiceImplement implements IPaymentService {
     @Transactional
     @Override
     public Payment savePayment(CardPayment card, User user) throws NotFoundException, InsufficientBalanceException {
-        //Long accountBeerClubId = 1L;
         String accountBeerClubNumber = myAppConfig.getAccountNumber();
         Subscription subscription = subscriptionRepository.findById(user.getSubscription().getId()).orElseThrow(() -> new NotFoundException("No se encontró la suscripción"));
 
@@ -108,7 +114,7 @@ public class PaymentServiceImplement implements IPaymentService {
         Payment payment = new Payment();
         payment.setAmount(amount);
         payment.setDescription(description);
-        payment.setDate(LocalDateTime.now());
+        payment.setCreationDate(LocalDateTime.now());
         payment.setCardNumber(CardUtils.getLastFourDigits(card.getNumber()));
         payment.setUserId(user.getId());
         payment.setInvoiceNumber(invoiceNumber);
@@ -126,6 +132,7 @@ public class PaymentServiceImplement implements IPaymentService {
         accountService.addCredit(accountBeerClubNumber, amount);
 
         payment.setStatus(PaymentStatus.APROBADO);
+        payment.setPaymentDate(LocalDateTime.now());
         paymentRepository.save(payment);
 
         return payment;
@@ -159,30 +166,97 @@ public class PaymentServiceImplement implements IPaymentService {
 
     }
 
-    // Método para crear una factura de pago para usuarios ya registrados.
+    // Método para el administrador pueda enviar a todos los usuarios activos  y con rol USER la factura de pago del mes correspondiente.
     @Override
-    public PaymentDTO createPaymentInvoice(Long userId) throws NotFoundException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("No se encontró el usuario con ID: " + userId));
+    public List<PaymentDTO> createPaymentsAndSendInvoices() {
+        List<User> activeUsers = userRepository.findByActiveTrue();
 
-        if (!user.isActive()) {
-            throw new NotFoundException("El usuario con ID " + userId + " no está activo");
+        List<User> activeUsersWithUserRole = activeUsers.stream()
+                .filter(user -> user.getRole() == RoleType.USER)
+                .toList();
+
+        String emailType = "invoice";
+
+        return activeUsersWithUserRole.stream()
+                .map(user -> {
+                    try {
+                        PaymentDTO paymentDTO = createPaymentInvoice(user);
+                        sendEmail(user, paymentDTO, emailType);
+                        return paymentDTO;
+                    } catch (NotFoundException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull) // Filtra los resultados nulos (caso de excepción)
+                .toList();
+    }
+
+    // Método para crear una factura de pago para usuarios ya registrados.
+    private PaymentDTO createPaymentInvoice(User user) throws NotFoundException {
+        Payment payment = searchPaymentByMonthYear(user);
+
+        if(payment != null) {
+            System.out.println("Ya se registró una factura de pago para este usuario en el mes actual.");
+            return paymentMapper.converter(payment, PaymentDTO.class);
+        } else {
+            Subscription subscription = subscriptionRepository.findById(user.getSubscription().getId()).orElseThrow(() -> new NotFoundException("No se encontró la suscripción"));
+            Double amount = subscription.getPrice();
+            String description = subscription.getName();
+            String invoiceNumber = AccountUtils.getInvoiceNumber();
+
+            Payment newPayment = new Payment();
+            newPayment.setAmount(amount);
+            newPayment.setDescription(description);
+            newPayment.setUserId(user.getId());
+            newPayment.setInvoiceNumber(invoiceNumber);
+            newPayment.setCreationDate(LocalDateTime.now());
+            newPayment.setSubscription(subscription);
+
+            paymentRepository.save(newPayment);
+            return paymentMapper.converter(newPayment, PaymentDTO.class);
         }
+    }
 
-        Subscription subscription = subscriptionRepository.findById(user.getSubscription().getId()).orElseThrow(() -> new NotFoundException("No se encontró la suscripción"));
+    private Payment searchPaymentByMonthYear(User user) {
+        int currentYear = LocalDateTime.now().getYear();
+        int currentMonth = LocalDateTime.now().getMonthValue();
+        return paymentRepository.findPaymentByUserIdAndMonthYear(user.getId(), currentYear, currentMonth);
+    }
 
-        Double amount = subscription.getPrice();
-        String description = subscription.getName();
-        String invoiceNumber = AccountUtils.getInvoiceNumber();
+    private void sendEmail(User user, PaymentDTO paymentDTO, String emailType) {
+        String to = user.getEmail();
+        String username = user.getFirstName() + " " + user.getLastName();
+        String invoice = paymentDTO.getInvoiceNumber();
+        String amount = String.valueOf(paymentDTO.getAmount());
+        String description = paymentDTO.getDescription();
+        String state = String.valueOf(paymentDTO.getPaymentStatus());
 
-        Payment payment = new Payment();
-        payment.setAmount(amount);
-        payment.setDescription(description);
-        payment.setUserId(userId);
-        payment.setInvoiceNumber(invoiceNumber);
-        payment.setSubscription(subscription);
+        if ("invoice".equals(emailType)) {
+            if (isInvoiceAlreadySent(user)) {
+                System.out.println("La factura ya se ha enviado para este usuario en el mes actual.");
+                return;
+            }
+            Subscription subscription = user.getSubscription();
+            String content = emailService.buildContentPaymentEmail(username, invoice, amount, description, state);
+            emailService.sendHtmlMessage(to, "Factura de Pago", content);
 
-        paymentRepository.save(payment);
-        return paymentMapper.converter(payment, PaymentDTO.class);
+            // Actualiza la fecha de envío de la factura
+            paymentDTO.setInvoiceDate(LocalDateTime.now());
+            Payment paymentEntity = paymentMapper.converter(paymentDTO, Payment.class);
+            paymentEntity.setSubscription(subscription);
+            paymentRepository.save(paymentEntity);
+
+        } else if("payment".equals(emailType)) {
+            String  content = emailService.buildContentPaymentTransactionEmail(username, invoice, amount, description, state);
+            emailService.sendHtmlMessage(to, "Notificación de Transacción Beer Club", content);
+        }
+    }
+
+    private boolean isInvoiceAlreadySent(User user) {
+        int currentYear = LocalDateTime.now().getYear();
+        int currentMonth = LocalDateTime.now().getMonthValue();
+        return paymentRepository.existsInvoiceByUserId(user.getId(), currentYear, currentMonth);
     }
 
     // Método para terminar de procesar el pago luego de que el usuario recibiera el link de la factura.
@@ -191,10 +265,14 @@ public class PaymentServiceImplement implements IPaymentService {
         String accountBeerClubNumber = myAppConfig.getAccountNumber();
         Payment payment = paymentRepository.findById(paymentDTO.getPaymentId()).orElseThrow(() -> new NotFoundException("No se encontró el pago"));
 
+        User user = userRepository.findById(payment.getUserId()).orElseThrow(() -> new NotFoundException("No se encontró el usuario con ID: " + payment.getUserId()));
+        PaymentDTO newPaymentDTO;
+        String emailType = "payment";
+
         try {
             this.paymentValidation(payment.getSubscription().getId(), paymentDTO.getCardHolder(), paymentDTO.getCardNumber(), paymentDTO.getCvv(), paymentDTO.getExpDate());
 
-            payment.setDate(LocalDateTime.now());
+            payment.setPaymentDate(LocalDateTime.now());
             payment.setCardNumber(CardUtils.getLastFourDigits(paymentDTO.getCardNumber()));
 
             Double amount = payment.getSubscription().getPrice();
@@ -211,11 +289,16 @@ public class PaymentServiceImplement implements IPaymentService {
 
             payment.setStatus(PaymentStatus.APROBADO);
             paymentRepository.save(payment);
+            newPaymentDTO =  paymentMapper.converter(payment, PaymentDTO.class);
 
-            return paymentMapper.converter(payment, PaymentDTO.class);
+            sendEmail(user, newPaymentDTO, emailType);
+            return newPaymentDTO;
+
         } catch (NotFoundException | InsufficientBalanceException | EntityInactiveException | BadRequestException e) {
             payment.setStatus(PaymentStatus.RECHAZADO);
             paymentRepository.save(payment);
+            newPaymentDTO =  paymentMapper.converter(payment, PaymentDTO.class);
+            sendEmail(user, newPaymentDTO, emailType);
             throw e;
         }
     }
