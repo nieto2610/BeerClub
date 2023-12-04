@@ -58,7 +58,9 @@ public class SecurityConfig {
                                 //Los endpoint Put que se pueden admin con autenticación
                                 .requestMatchers(HttpMethod.PUT,"/faqs/**", "/users/activate/**", "/subscriptions/**").hasAnyRole("ADMIN")
                                 //Los endpoint que se pueden eliminar siendo ADMIN
-                                .requestMatchers(HttpMethod.DELETE,"/users/**", "/faqs/**", "/subscriptions/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/faqs/**", "/subscriptions/**").hasRole("ADMIN")
+                                //Los endpoint que se pueden eliminar siendo ADMIN Y USER
+                                .requestMatchers(HttpMethod.DELETE,"/users/**").hasAnyRole("ADMIN","USER")
                                 //Los endpoint que se pueden Modificar datos siendo USER
                                 .requestMatchers(HttpMethod.PATCH,"/users/update/passwword", "/users/update/subscription").hasAnyRole("USER", "ADMIN")
                                 .anyRequest().authenticated()
