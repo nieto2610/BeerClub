@@ -224,7 +224,7 @@ public class PaymentServiceImplement implements IPaymentService {
         return paymentRepository.findPaymentByUserIdAndMonthYear(user.getId(), currentYear, currentMonth);
     }
 
-    private void sendEmail(User user, PaymentDTO paymentDTO, String emailType) {
+    private void sendEmail(User user, PaymentDTO paymentDTO, String emailType) throws NotFoundException {
         String to = user.getEmail();
         String username = user.getFirstName() + " " + user.getLastName();
         String invoice = paymentDTO.getInvoiceNumber();
@@ -242,10 +242,9 @@ public class PaymentServiceImplement implements IPaymentService {
             emailService.sendHtmlMessage(to, "Factura de Pago", content);
 
             // Actualiza la fecha de envío de la factura
-            paymentDTO.setInvoiceDate(LocalDateTime.now());
-            Payment paymentEntity = paymentMapper.converter(paymentDTO, Payment.class);
-            paymentEntity.setSubscription(subscription);
-            paymentRepository.save(paymentEntity);
+            Payment payment = paymentRepository.findById(paymentDTO.getId()).orElseThrow(() -> new NotFoundException("No se encontró el pago con id" + paymentDTO.getId()));
+            payment.setInvoiceDate(LocalDateTime.now());
+            paymentRepository.save(payment);
 
         } else if("payment".equals(emailType)) {
             String  content = emailService.buildContentPaymentTransactionEmail(username, invoice, amount, description, state);
