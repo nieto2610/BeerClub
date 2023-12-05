@@ -23,7 +23,7 @@ public class Payment {
 
     private String description;
 
-    private LocalDateTime creationDate;
+    private LocalDateTime date;
 
     private String cardNumber;
 

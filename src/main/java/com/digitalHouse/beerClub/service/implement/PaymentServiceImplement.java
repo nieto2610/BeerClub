@@ -114,7 +114,7 @@ public class PaymentServiceImplement implements IPaymentService {
         Payment payment = new Payment();
         payment.setAmount(amount);
         payment.setDescription(description);
-        payment.setCreationDate(LocalDateTime.now());
+        payment.setDate(LocalDateTime.now());
         payment.setCardNumber(CardUtils.getLastFourDigits(card.getNumber()));
         payment.setUserId(user.getId());
         payment.setInvoiceNumber(invoiceNumber);
@@ -210,7 +210,7 @@ public class PaymentServiceImplement implements IPaymentService {
             newPayment.setDescription(description);
             newPayment.setUserId(user.getId());
             newPayment.setInvoiceNumber(invoiceNumber);
-            newPayment.setCreationDate(LocalDateTime.now());
+            newPayment.setDate(LocalDateTime.now());
             newPayment.setSubscription(subscription);
 
             paymentRepository.save(newPayment);
